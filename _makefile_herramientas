@@ -1,0 +1,17 @@
+################################################################################
+#Definiciones
+
+DIR_HERRAMIENTAS_PROYECTO=./class/herramientas_proyecto/
+
+################################################################################
+#Herramientas...
+
+$(DIR_O)generador_numeros.o :\
+$(DIR_HERRAMIENTAS_PROYECTO)generador_numeros.h \
+$(DIR_HERRAMIENTAS_PROYECTO)generador_numeros.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_HERRAMIENTAS_PROYECTO)generador_numeros.cpp -o $(DIR_O)generador_numeros.o 
+
+$(DIR_O)tabla_sprites.o :\
+$(DIR_HERRAMIENTAS_PROYECTO)tabla_sprites.h \
+$(DIR_HERRAMIENTAS_PROYECTO)tabla_sprites.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_HERRAMIENTAS_PROYECTO)tabla_sprites.cpp -o $(DIR_O)tabla_sprites.o 

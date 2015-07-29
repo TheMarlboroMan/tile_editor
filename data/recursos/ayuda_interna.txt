@@ -1,0 +1,74 @@
+MODO AYUDA:
+
+    Cursores: Desplazar texto.
+    ESCAPE: Volver.
+
+MODO REJILLA
+
+    F1: Modo ayuda.
+    F2: Modo rejilla.
+    F3: Modo objetos.
+    F4: Modo propiedades meta.
+    Cursores: mover cámara
+    Cursores + RShift : Cambiar dimensiones rejilla
+    Cursores + RControl : Desplazar rejilla
+    Cursores + Espacio : Cambiar espaciado líneas de rejilla en rejilla
+    [1-6]: cambiar rejilla
+    Control + [1-6]: cambiar visibilidad rejilla
+    Click izquierdo: crear celda (LShift para línea, LControl para rectángulo)
+    Click izquierdo + espacio : seleccionar tipo de celda
+    Click derecho: Borrar celda (LShift para línea, LControl para rectángulo)
+    TAB: mostrar y ocultar selector celdas
+    C: Intercambiar posición de rejilla y rejilla anterior
+    T: Intercambiar set de celdas
+    Z: Ciclar zoom
+    N: Crear nueva rejilla (hasta 6)
+    DEL: Eliminar rejilla actual
+    S: Guardar
+    L: Cargar
+    AV PAG / RE PAG: Ver más celdas
+
+MODO OBJETOS
+
+    Cursores: mover cámara
+    Cursores + RShift : Cambiar dimensiones capa
+    Cursores + RControl : Desplazar capa
+    Cursores + Espacio : Cambiar espaciado líneas de rejilla en capa
+    [1-6]: cambiar capa
+    Control + [1-6]: cambiar visibilidad capa
+    Click izquierdo: crear objeto del tipo actual
+    Click izquierdo sobre objeto: seleccionar objeto
+    Doble click izquierdo sobre objeto: editar propiedades de objeto
+    Click derecho: eliminar objeto seleccionado
+    TAB: mostrar y ocultar selector tipos
+    C: Intercambiar posición de capa y capa anterior
+    T: Intercambiar set de tipos
+    Z: Ciclar zoom
+    N: Crear nueva capa (hasta 6)
+    DEL: Eliminar capa actual
+    S: Guardar
+    L: Cargar
+    AV PAG / RE PAG: Ver más tipos
+
+MODO EDICION PROPIEDADES OBJETO
+
+    ESCAPE: Volver a modo objetos
+    Cursores arriba y abajo : seleccionar propiedad
+    Letras y números: escribir nuevo valor
+    ENTER: Confirmar nuevo valor en propiedad actual
+
+MODO EDICION PROPIEDADES META [LISTADO]
+
+    ESCAPE: Volver a modo rejilla / objetos
+    Cursores arriba y abajo: seleccionar propiedad
+    Control + cursores arriba y abajo: intercambiar posición de propiedades
+    DEL: Eliminar propiedad.
+    N: Crear nueva propiedad.
+    ENTER: Acceder a edición de propiedad.
+
+MODO EDICION PROPIEDADES META [EDITANDO PROPIEDAD]
+
+    ESCAPE: Volver a modo listado
+    Cursores izquierda y derecha: intercambiar entre nombre y valor
+    Letras y números: introducir nuevo valor.
+    ENTER: Confirmar valor.

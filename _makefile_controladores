@@ -1,0 +1,44 @@
+################################################################################
+#Definiciones...
+
+DIR_CONTROLADORES=./class/controladores/
+DIR_FRAMEWORK=./class/framework/
+
+################################################################################
+#Controladores...
+
+$(DIR_O)director_estados.o :\
+$(DIR_CONTROLADORES)director_estados.h \
+$(DIR_CONTROLADORES)director_estados.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)director_estados.cpp -o $(DIR_O)director_estados.o 
+
+$(DIR_O)controlador_propiedades_meta.o :\
+$(DIR_O)controlador_base.o \
+$(DIR_CONTROLADORES)controlador_propiedades_meta.h \
+$(DIR_CONTROLADORES)controlador_propiedades_meta.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_propiedades_meta.cpp -o $(DIR_O)controlador_propiedades_meta.o
+
+$(DIR_O)controlador_propiedades_objeto_logica.o :\
+$(DIR_O)controlador_base.o \
+$(DIR_CONTROLADORES)controlador_propiedades_objeto_logica.h \
+$(DIR_CONTROLADORES)controlador_propiedades_objeto_logica.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_propiedades_objeto_logica.cpp -o $(DIR_O)controlador_propiedades_objeto_logica.o
+
+$(DIR_O)controlador_ayuda.o :\
+$(DIR_O)controlador_base.o \
+$(DIR_CONTROLADORES)controlador_ayuda.h \
+$(DIR_CONTROLADORES)controlador_ayuda.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_ayuda.cpp -o $(DIR_O)controlador_ayuda.o
+
+$(DIR_O)controlador_rejilla.o :\
+$(DIR_O)controlador_base.o \
+$(DIR_CONTROLADORES)controlador_rejilla.h \
+$(DIR_CONTROLADORES)controlador_rejilla.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_rejilla.cpp -o $(DIR_O)controlador_rejilla.o
+
+$(DIR_O)controlador_base.o :\
+$(DIR_O)director_estados.o \
+$(DIR_FRAMEWORK)interface_controlador.h \
+$(DIR_CONTROLADORES)controlador_base.h \
+$(DIR_CONTROLADORES)controlador_base.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_base.cpp -o $(DIR_O)controlador_base.o  

@@ -1,0 +1,40 @@
+DEP_HERRAMIENTAS_PROYECTO=$(DIR_O)tabla_sprites.o \
+$(DIR_O)generador_numeros.o \
+
+DEP_CLASES_APP=\
+$(DIR_O)propiedad_meta.o\
+$(DIR_O)logica.o\
+$(DIR_O)capa_logica.o\
+$(DIR_O)objeto_logica.o\
+$(DIR_O)exportador.o\
+$(DIR_O)importador.o\
+$(DIR_O)tile.o\
+$(DIR_O)rejilla.o\
+$(DIR_O)contenedor_tilesets.o\
+$(DIR_O)contenedor_logica_sets.o\
+$(DIR_O)selector_base.o\
+$(DIR_O)selector_tiles.o\
+$(DIR_O)selector_tipo_logica.o\
+$(DIR_O)definiciones_importacion_exportacion.o\
+#$(DIR_O)tile_representacion.o\
+
+
+DEP_CONTROLADORES=$(DIR_O)controlador_base.o \
+$(DIR_O)controlador_rejilla.o \
+$(DIR_O)controlador_propiedades_objeto_logica.o \
+$(DIR_O)controlador_propiedades_meta.o \
+$(DIR_O)controlador_ayuda.o \
+
+DEP_FRAMEWORK_BASE=$(DIR_O)input_base.o \
+$(DIR_O)configuracion_base.o \
+$(DIR_O)audio_base.o \
+$(DIR_O)cargador_recursos_base.o \
+$(DIR_O)kernel_base.o \
+
+DEP_FRAMEWORK_DERIVADA=$(DIR_O)input.o \
+$(DIR_O)configuracion.o \
+$(DIR_O)localizador.o \
+$(DIR_O)audio.o \
+$(DIR_O)cargador_recursos.o \
+$(DIR_O)kernel.o \
+
