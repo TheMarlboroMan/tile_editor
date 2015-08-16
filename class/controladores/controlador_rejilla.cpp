@@ -679,6 +679,7 @@ void Controlador_rejilla::reconstruir_rep_info_con_objeto_logica(const Objeto_lo
 	std::string info_obj=obj.como_cadena();
 	if(tipo!=nullptr)
 	{
+		info_obj=tipo->acc_nombre()+"\n"+info_obj;
 		const auto& propiedades=tipo->acc_propiedades();
 		for(const auto&p : propiedades) info_obj+="\n - "+p.nombre+"="+obj.valor_propiedad(p.id);
 	}
