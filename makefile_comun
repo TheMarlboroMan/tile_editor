@@ -28,7 +28,6 @@ clean:
 
 include _makefile_controladores
 include _makefile_clases_app
-include _makefile_herramientas
 include _makefile_framework
 
 $(DIR_O)bootstrap_aplicacion.o :\

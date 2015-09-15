@@ -48,7 +48,6 @@ $(DIR_CLASES_APP)contenedor_tilesets.cpp
 
 $(DIR_O)rejilla.o:\
 $(DIR_O)tile.o\
-$(DIR_CLASES_APP)matriz2d.h \
 $(DIR_CLASES_APP)rejilla.h \
 $(DIR_CLASES_APP)rejilla.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)rejilla.cpp -o $(DIR_O)rejilla.o

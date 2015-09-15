@@ -4,6 +4,7 @@
 
 using namespace DLibV;
 using namespace DLibH;
+using namespace Herramientas_proyecto;
 
 extern Log_base LOG;
 
@@ -23,8 +24,8 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	capa_logica_actual(0),
 	modo_actual(modo_operacion::REJILLA),
 	objeto_logica_actual(nullptr),
-	listado_tiles(W_LISTADOS, 64/*pantalla.acc_h()*/, DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
-	listado_logica(W_LISTADOS, ALTURA_LISTADO_VERTICAL),
+	listado_tiles(W_LISTADOS, pantalla.acc_h(), DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
+	listado_logica(pantalla.acc_h(), ALTURA_LISTADO_VERTICAL),
 	rep_listado_tiles(true),
 	rep_listado_logica(true),
 	rep_seleccion_actual(
@@ -414,7 +415,7 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 
 		switch(modo_actual)
 		{
-			case modo_operacion::REJILLA: 
+			case modo_operacion::REJILLA:
 				if(input.es_input_pulsado(Input::I_CONTROL)) intercambiar_visibilidad_parte(rejillas, indice);
 				else seleccionar_rejilla_actual(indice);
 			break;
@@ -425,18 +426,18 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 		}
 	}
 	else if(input.es_input_down(Input::I_TAB)) 
-	{		
+	{	
+		DLibV::Representacion * r=nullptr;
+	
 		switch(modo_actual)
 		{
-			case modo_operacion::REJILLA: 
-				rep_listado_tiles.intercambiar_visibilidad(); 
-				rep_seleccion_actual.cambiar_visibilidad(rep_listado_tiles.es_visible());
-			break;
-			case modo_operacion::CAPA_LOGICA:
-				rep_listado_logica.intercambiar_visibilidad(); 
-				rep_seleccion_actual.cambiar_visibilidad(rep_listado_logica.es_visible());
-			break;
-		}		
+			case modo_operacion::REJILLA: 		r=&rep_listado_tiles; 	break;
+			case modo_operacion::CAPA_LOGICA: 	r=&rep_listado_logica; 	break;
+		}
+
+		r->intercambiar_visibilidad();
+		rep_seleccion_actual.cambiar_visibilidad(r->es_visible());
+		actualizar_seleccion_actual_listado();
 	}
 	else if(input.es_input_down(Input::I_SWAP_REJILLAS)) 
 	{
@@ -456,10 +457,12 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 			case modo_operacion::REJILLA: 
 				ciclar_set_listado(rejillas[rejilla_actual], tilesets); 
 				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+				actualizar_seleccion_actual_listado();
 			break;
 			case modo_operacion::CAPA_LOGICA:
 				ciclar_set_listado(capas_logica[capa_logica_actual], sets_tipo_logica); 
 				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor()); 
+				actualizar_seleccion_actual_listado();
 			break;
 		}
 	}
@@ -489,24 +492,6 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 
 	//TODO: Al mover sólo la cámara no se refresca esto.
 	auto pos_raton=input.acc_posicion_raton();
-
-	//TODO: Mover a otra función, usar cuando sea conveniente: esto es, cuando se cambie 
-	//realmente el item actual (pasar página, recibir click...).
-	switch(modo_actual)
-	{
-		case modo_operacion::REJILLA: 
-		{
-			const auto l=listado_tiles.linea_actual();
-			rep_seleccion_actual.establecer_posicion(rep_listado_tiles.acc_posicion().x + l.x, l.y);
-		}
-		break;
-		case modo_operacion::CAPA_LOGICA:
-		{
-			const auto l=listado_logica.linea_actual();
-			rep_seleccion_actual.establecer_posicion(rep_listado_logica.acc_posicion().x, l.y);
-		}
-		break;
-	}
 
 	return Info_input(x, y, pos_raton.x, pos_raton.y, 
 		input.es_input_down(Input::I_CLICK_I), input.es_input_down(Input::I_CLICK_D), 
@@ -542,13 +527,16 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 	//Comprobar si seleccionamos, creamos o borramos...
 	if(ii.click_i || ii.click_d)
 	{
-		//TODO TODO
-//		if(selector_tipo_logica.recibe_click(ii.raton_x, ii.raton_y))
-//		{
-//			int indice=selector_tipo_logica.procesar_click(ii.raton_x, ii.raton_y);
-//			if(indice) capa.mut_indice_actual(indice);
-//		}
-		if(false) {}
+		if(rep_listado_logica.es_visible() && es_click_en_selector(ii.raton_x, ii.raton_y))
+		{
+			auto f=[this, &capa](const Herramientas_proyecto::Listado_vertical<Item_logica>::Item& itemp)
+			{
+				listado_logica.mut_indice(itemp.indice);
+				capa.mut_indice_actual(itemp.item.logica.acc_tipo());
+				actualizar_seleccion_actual_listado();
+			};
+			listado_logica.selector_topologico(ii.raton_y, f);
+		}
 		else
 		{
 			camara.transformar_posicion_raton(ii.raton_x, ii.raton_y);
@@ -610,27 +598,14 @@ void Controlador_rejilla::procesar_input_rejilla(Info_input& ii, Rejilla& rejill
 	{
 		if(rep_listado_tiles.es_visible() && es_click_en_selector(ii.raton_x, ii.raton_y))
 		{
-			//Convertir a "coordenadas" de listado...
-			const size_t rx=ii.raton_x - rep_listado_tiles.acc_posicion().x,
-				ry=ii.raton_y,
-				w=listado_tiles.acc_w_item(),
-				h=listado_tiles.acc_h_item();
-
-			//El listado no tiene conciencia de si mismo en el espacio, luego...
-			const auto& pag=listado_tiles.obtener_pagina();
-			for(const auto& itemp : pag)
+			auto f=[this, &rejilla](const Herramientas_proyecto::Listado_rejilla<Item_tile>::Item& itemp)
 			{
-
-				if(	rx >= itemp.x
-					&& ry >= itemp.y
-					&& rx <= itemp.x + w
-					&& ry <= itemp.y + h)
-				{
-					listado_tiles.mut_indice(itemp.indice);
-					rejilla.mut_indice_actual(itemp.item.tile.acc_tipo());
-					break;
-				}
-			}
+				listado_tiles.mut_indice(itemp.indice);
+				rejilla.mut_indice_actual(itemp.item.tile.acc_tipo());
+				actualizar_seleccion_actual_listado();
+			};
+			//Convertir a "coordenadas" de listado...
+			listado_tiles.selector_topologico(ii.raton_x - rep_listado_tiles.acc_posicion().x, ii.raton_y, f);
 		}
 		else
 		{		
@@ -844,12 +819,6 @@ void Controlador_rejilla::ciclar_zoom()
 	if(info_zoom.zoom==4) info_zoom.zoom=1;
 
 	camara.mut_enfoque(info_zoom.w * info_zoom.zoom, info_zoom.h * info_zoom.zoom);
-
-//	auto& foco=camara.acc_caja_foco();
-//	camara.enfocar_a(0,0);
-
-	//TODO: Cambiar el zoom en un momento distinto de enfocar a 0,0 tiene consecuencias chungas...
-	//camara.enfocar_a(0,0);
 }
 
 void Controlador_rejilla::insertar_rejilla()
@@ -907,40 +876,48 @@ void Controlador_rejilla::deseleccionar_objeto_logica_actual()
 
 void Controlador_rejilla::pasar_pagina_selector(int v)
 {
-	//TODO: Actualizar el item actual!!!
-
 	switch(modo_actual)
 	{
 		case modo_operacion::REJILLA:
 			if(listado_tiles.cambiar_pagina(v))
 			{
 				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+				rejillas[rejilla_actual].mut_indice_actual(listado_tiles.linea_actual().item.tile.acc_tipo());
 			}
 		break;
 		case modo_operacion::CAPA_LOGICA:
 			if(listado_logica.cambiar_pagina(v))
 			{
 				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
+				capas_logica[capa_logica_actual].mut_indice_actual(listado_logica.linea_actual().item.logica.acc_tipo());
 			}
 		break;
 	}
+
+	actualizar_seleccion_actual_listado();
 }
 
 void Controlador_rejilla::cambiar_tile_selector(int v)
 {
-	//TODO: Actualizar el item actual!!!
-
 	switch(modo_actual)
 	{
 		case modo_operacion::REJILLA: 
 			if(listado_tiles.cambiar_item(v))
+			{
 				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+				rejillas[rejilla_actual].mut_indice_actual(listado_tiles.linea_actual().item.tile.acc_tipo());
+			}
 		break;
 		case modo_operacion::CAPA_LOGICA: 
 			if(listado_logica.cambiar_item(v))
+			{
 				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
+				capas_logica[capa_logica_actual].mut_indice_actual(listado_logica.linea_actual().item.logica.acc_tipo());
+			}
 		break;
 	}
+
+	actualizar_seleccion_actual_listado();
 }
 
 const Logica& Controlador_rejilla::obtener_tipo_objeto_logica_actual()
@@ -948,4 +925,23 @@ const Logica& Controlador_rejilla::obtener_tipo_objeto_logica_actual()
 	int t=objeto_logica_actual->acc_tipo();
 	auto cb=[t](const Logica& l) {return l.acc_tipo()==t;};
 	return *capas_logica[capa_logica_actual].acc_gestor().buscar_unico_callback(cb);
+}
+
+void Controlador_rejilla::actualizar_seleccion_actual_listado()
+{
+	switch(modo_actual)
+	{
+		case modo_operacion::REJILLA: 
+		{
+			const auto l=listado_tiles.linea_actual();
+			rep_seleccion_actual.establecer_posicion(rep_listado_tiles.acc_posicion().x + l.x, l.y);
+		}
+		break;
+		case modo_operacion::CAPA_LOGICA:
+		{
+			const auto l=listado_logica.linea_actual();
+			rep_seleccion_actual.establecer_posicion(rep_listado_logica.acc_posicion().x, l.y);
+		}
+		break;
+	}
 }

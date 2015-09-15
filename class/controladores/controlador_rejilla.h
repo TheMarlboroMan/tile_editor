@@ -1,6 +1,8 @@
 #ifndef CONTROLADOR_REJILLA
 #define CONTROLADOR_REJILLA
 
+#include <listado_rejilla.h>
+#include <listado_vertical.h>
 #include "controlador_base.h"
 #include "../app/propiedad_meta.h"
 #include "../app/tile.h"
@@ -11,8 +13,6 @@
 #include "../app/contenedor_logica_sets.h"
 #include "../app/exportador.h"
 #include "../app/importador.h"
-#include "../herramientas_proyecto/listado_rejilla.h"
-#include "../herramientas_proyecto/listado_vertical.h"
 
 class Controlador_rejilla:public Controlador_base
 {
@@ -132,6 +132,7 @@ class Controlador_rejilla:public Controlador_base
 
 	void preparar_listado_tiles(const Tile_set& s);
 	void preparar_listado_logica(const Logica_set& s);
+	void actualizar_seleccion_actual_listado();
 
 	void pasar_pagina_selector(int v);
 	void cambiar_tile_selector(int v);

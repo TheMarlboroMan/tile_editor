@@ -2,7 +2,7 @@
 #define REJILLA_H
 
 #include "tile.h"
-#include "matriz2d.h"
+#include <matriz2d.h>
 
 class Celda
 {
@@ -44,7 +44,7 @@ class Rejilla
 
 	public:
 
-	Matriz_2d<Celda> r;	//La rejilla es PUBLICA. Si, pública... No tiene sentido hacer de este un objeto proxy para eso.
+	Herramientas_proyecto::Matriz_2d<Celda> r;	//La rejilla es PUBLICA. Si, pública... No tiene sentido hacer de este un objeto proxy para eso.
 
 	int acc_w() const {return w;}
 	int acc_h() const {return h;}
