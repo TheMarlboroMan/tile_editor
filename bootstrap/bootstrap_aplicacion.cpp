@@ -4,7 +4,6 @@
 #include "../class/controladores/controlador_propiedades_objeto_logica.h"
 #include "../class/controladores/controlador_propiedades_meta.h"
 #include "../class/controladores/controlador_ayuda.h"
-#include "../class/app/selector_tiles.h"
 #include "../class/app/recursos.h"
 #include "../class/app/contenedor_tilesets.h"
 #include "../class/app/contenedor_logica_sets.h"
@@ -41,7 +40,7 @@ void App::loop_aplicacion(Kernel_app& kernel)
 			{
 				if(l[0]==delimitador_tile)
 				{
-					T.insertar_tileset(indice++, partes[1], partes[2][0]);	
+					T.insertar_tileset(indice++, partes[1], partes[2][0]);
 				}
 				else if(l[0]==delimitador_objetos)
 				{

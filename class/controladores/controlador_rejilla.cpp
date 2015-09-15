@@ -12,10 +12,9 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	
 	info_zoom(1, pantalla.acc_w(), pantalla.acc_h()),
 	nombre_fichero(nombre_fichero),
+	renderer(pantalla.acc_renderer()),
 	tilesets(t),
 	sets_tipo_logica(s),
-	selector_tiles(pantalla),
-	selector_tipo_logica(pantalla),
 	camara(0, 0, pantalla.acc_w(), pantalla.acc_h()),
 	rep_tiles(),
 	rep_info_capa(pantalla.acc_renderer(), DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
@@ -23,11 +22,26 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	rejilla_actual(0),
 	capa_logica_actual(0),
 	modo_actual(modo_operacion::REJILLA),
-	objeto_logica_actual(nullptr)
+	objeto_logica_actual(nullptr),
+	listado_tiles(W_LISTADOS, 64/*pantalla.acc_h()*/, DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
+	listado_logica(W_LISTADOS, ALTURA_LISTADO_VERTICAL),
+	rep_listado_tiles(true),
+	rep_listado_logica(true),
+	rep_seleccion_actual(
+			DLibH::Herramientas_SDL::nuevo_sdl_rect(0, 0, DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
+			64, 64, 192)
 {
+	rep_seleccion_actual.establecer_alpha(128);
 	rep_info_pos.establecer_posicion(16, 16);
 	rep_info_capa.establecer_posicion(16, 32);
+
 	rep_tiles.establecer_modo_blend(Representacion::BLEND_ALPHA);
+
+	rep_listado_tiles.establecer_posicion(pantalla.acc_w()-W_LISTADOS, 0),
+	rep_listado_tiles.establecer_modo_blend(DLibV::Representacion::BLEND_ALPHA);
+
+	rep_listado_logica.establecer_posicion(pantalla.acc_w()-W_LISTADOS, 0),
+	rep_listado_logica.establecer_modo_blend(DLibV::Representacion::BLEND_ALPHA);
 }
 
 void Controlador_rejilla::inicializar_sin_fichero()
@@ -46,15 +60,61 @@ void Controlador_rejilla::inicializar_sin_fichero()
 
 void Controlador_rejilla::inicializar()
 {
-	auto& r=*rejillas.begin();
-	auto& o=*capas_logica.begin();
-
-	selector_tiles.preparar_paginas(r.acc_gestor());
-	selector_tipo_logica.preparar_paginas(o.acc_gestor());
+	auto r=*rejillas.begin();
+	preparar_listado_tiles(r.acc_gestor());
+	preparar_listado_logica(capas_logica.begin()->acc_gestor());
 	camara.establecer_limites(0, 0, r.acc_w() * r.acc_w_celda(), r.acc_h()*r.acc_h_celda());
-
 	reconstruir_rep_info_posicion(Info_input(), r);
 	reconstruir_rep_info_con_rejilla(r);
+}
+
+/**
+* Rellenar el objeto del listado con las tiles que correspondan...
+*/
+
+void Controlador_rejilla::preparar_listado_tiles(const Tile_set& s)
+{
+	listado_tiles.clear();
+	const auto& v=s.acc_items();
+	for(const auto& tile : v) listado_tiles.insertar(Item_tile{tile});
+
+	rep_listado_tiles.vaciar_grupo();
+	const auto pagina=listado_tiles.obtener_pagina();
+	auto * rec=DLibV::Gestor_texturas::obtener(s.acc_indice_recurso());
+	using BMP=DLibV::Representacion_bitmap_estatica;
+
+	for(const auto& itemp : pagina)
+	{
+		BMP * bmp=new BMP(rec);
+		const auto& tile=itemp.item.tile;
+		bmp->establecer_recorte(tile.acc_x(), tile.acc_y(), tile.acc_w(), tile.acc_h());
+		bmp->establecer_posicion(itemp.x, itemp.y, 32, 32);
+		rep_listado_tiles.insertar_representacion(bmp);
+	}
+}
+
+void Controlador_rejilla::preparar_listado_logica(const Logica_set& s)
+{
+	listado_logica.clear();
+	const auto& v=s.acc_items();
+	for(const auto& logica : v) listado_logica.insertar(Item_logica{logica});
+
+	rep_listado_logica.vaciar_grupo();
+	const auto pagina=listado_logica.obtener_pagina();
+
+	using CAJA=DLibV::Representacion_primitiva_caja_estatica;
+	using TXT=DLibV::Representacion_texto_auto_estatica;
+
+	for(const auto& itemp : pagina)
+	{
+		const auto& l=itemp.item.logica;
+		CAJA * rep_caja=new CAJA(Herramientas_SDL::nuevo_sdl_rect(2, itemp.y, 6, 6), l.acc_r_editor(), l.acc_g_editor(), l.acc_b_editor());
+		TXT * rep_txt=new TXT(renderer, Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), l.acc_nombre());
+		rep_txt->establecer_posicion(10, itemp.y);
+
+		rep_listado_logica.insertar_representacion(rep_caja);
+		rep_listado_logica.insertar_representacion(rep_txt);
+	}
 }
 
 void Controlador_rejilla::loop(Input_base& input, float delta)
@@ -105,10 +165,11 @@ void Controlador_rejilla::dibujar(Pantalla& pantalla)
 
 	switch(modo_actual)
 	{
-		case modo_operacion::REJILLA: selector_tiles.volcar(pantalla, r.acc_indice_actual()); break;
-		case modo_operacion::CAPA_LOGICA: selector_tipo_logica.volcar(pantalla, c.acc_indice_actual()); break;
+		case modo_operacion::REJILLA: rep_listado_tiles.volcar(pantalla); break;
+		case modo_operacion::CAPA_LOGICA: rep_listado_logica.volcar(pantalla); break;
 	}
 
+	rep_seleccion_actual.volcar(pantalla);
 	rep_info_pos.volcar(pantalla);
 	rep_info_capa.volcar(pantalla);
 }
@@ -318,11 +379,21 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	}
 	else if(input.es_input_down(Input::I_MODO_REJILLA)) 
 	{
-		if(modo_actual==modo_operacion::CAPA_LOGICA) modo_actual=modo_operacion::REJILLA;
+		if(modo_actual==modo_operacion::CAPA_LOGICA) 
+		{
+			modo_actual=modo_operacion::REJILLA;
+			const auto& pos=rep_seleccion_actual.acc_posicion();
+			rep_seleccion_actual.establecer_posicion(pos.x, pos.y, DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA);
+		}
 	}
 	else if(input.es_input_down(Input::I_MODO_OBJETOS)) 
 	{
-		if(modo_actual==modo_operacion::REJILLA) modo_actual=modo_operacion::CAPA_LOGICA;
+		if(modo_actual==modo_operacion::REJILLA) 
+		{
+			modo_actual=modo_operacion::CAPA_LOGICA;
+			const auto& pos=rep_seleccion_actual.acc_posicion();
+			rep_seleccion_actual.establecer_posicion(pos.x, pos.y, W_LISTADOS, ALTURA_LISTADO_VERTICAL);
+		}
 	}
 	else if(input.es_input_down(Input::I_MODO_META)) 
 	{
@@ -354,20 +425,26 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 		}
 	}
 	else if(input.es_input_down(Input::I_TAB)) 
-	{
+	{		
 		switch(modo_actual)
 		{
-			case modo_operacion::REJILLA: selector_tiles.intercambiar_visible(); break;
-			case modo_operacion::CAPA_LOGICA: selector_tipo_logica.intercambiar_visible(); break;		
+			case modo_operacion::REJILLA: 
+				rep_listado_tiles.intercambiar_visibilidad(); 
+				rep_seleccion_actual.cambiar_visibilidad(rep_listado_tiles.es_visible());
+			break;
+			case modo_operacion::CAPA_LOGICA:
+				rep_listado_logica.intercambiar_visibilidad(); 
+				rep_seleccion_actual.cambiar_visibilidad(rep_listado_logica.es_visible());
+			break;
 		}		
 	}
 	else if(input.es_input_down(Input::I_SWAP_REJILLAS)) 
 	{
 		switch(modo_actual)
 		{
-			case modo_operacion::REJILLA: 	
+			case modo_operacion::REJILLA:
 				swap_parte(rejillas, rejilla_actual);
-				reconstruir_rep_info_con_rejilla(rejillas[rejilla_actual]);	
+				reconstruir_rep_info_con_rejilla(rejillas[rejilla_actual]);
 			break;
 			case modo_operacion::CAPA_LOGICA: swap_parte(capas_logica, capa_logica_actual); break;
 		}
@@ -376,8 +453,14 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	{
 		switch(modo_actual)
 		{
-			case modo_operacion::REJILLA: ciclar_set_parte(rejillas[rejilla_actual], tilesets, selector_tiles); break;
-			case modo_operacion::CAPA_LOGICA: ciclar_set_parte(capas_logica[capa_logica_actual], sets_tipo_logica, selector_tipo_logica); break;
+			case modo_operacion::REJILLA: 
+				ciclar_set_listado(rejillas[rejilla_actual], tilesets); 
+				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+			break;
+			case modo_operacion::CAPA_LOGICA:
+				ciclar_set_listado(capas_logica[capa_logica_actual], sets_tipo_logica); 
+				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor()); 
+			break;
 		}
 	}
 	else if(input.es_input_down(Input::I_NUEVO)) 
@@ -401,9 +484,29 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	else if(input.es_input_down(Input::I_CARGAR)) cargar();
 	else if(input.es_input_down(Input::I_AV_PAG)) pasar_pagina_selector(1);
 	else if(input.es_input_down(Input::I_RE_PAG)) pasar_pagina_selector(-1);
+	else if(input.es_input_down(Input::I_SIGUIENTE_TILE)) cambiar_tile_selector(1);
+	else if(input.es_input_down(Input::I_ANTERIOR_TILE)) cambiar_tile_selector(-1);
 
 	//TODO: Al mover sólo la cámara no se refresca esto.
 	auto pos_raton=input.acc_posicion_raton();
+
+	//TODO: Mover a otra función, usar cuando sea conveniente: esto es, cuando se cambie 
+	//realmente el item actual (pasar página, recibir click...).
+	switch(modo_actual)
+	{
+		case modo_operacion::REJILLA: 
+		{
+			const auto l=listado_tiles.linea_actual();
+			rep_seleccion_actual.establecer_posicion(rep_listado_tiles.acc_posicion().x + l.x, l.y);
+		}
+		break;
+		case modo_operacion::CAPA_LOGICA:
+		{
+			const auto l=listado_logica.linea_actual();
+			rep_seleccion_actual.establecer_posicion(rep_listado_logica.acc_posicion().x, l.y);
+		}
+		break;
+	}
 
 	return Info_input(x, y, pos_raton.x, pos_raton.y, 
 		input.es_input_down(Input::I_CLICK_I), input.es_input_down(Input::I_CLICK_D), 
@@ -439,11 +542,13 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 	//Comprobar si seleccionamos, creamos o borramos...
 	if(ii.click_i || ii.click_d)
 	{
-		if(selector_tipo_logica.recibe_click(ii.raton_x, ii.raton_y))
-		{
-			int indice=selector_tipo_logica.procesar_click(ii.raton_x, ii.raton_y);		
-			if(indice) capa.mut_indice_actual(indice);
-		}
+		//TODO TODO
+//		if(selector_tipo_logica.recibe_click(ii.raton_x, ii.raton_y))
+//		{
+//			int indice=selector_tipo_logica.procesar_click(ii.raton_x, ii.raton_y);
+//			if(indice) capa.mut_indice_actual(indice);
+//		}
+		if(false) {}
 		else
 		{
 			camara.transformar_posicion_raton(ii.raton_x, ii.raton_y);
@@ -469,7 +574,7 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 					{
 						objeto_logica_actual=obj;
 						reconstruir_rep_info_con_objeto_logica(*objeto_logica_actual);
-					}	
+					}
 				}
 			}
 			else if(ii.click_d)
@@ -503,10 +608,29 @@ void Controlador_rejilla::procesar_input_rejilla(Info_input& ii, Rejilla& rejill
 
 	if(ii.click_i || ii.click_d)
 	{
-		if(selector_tiles.recibe_click(ii.raton_x, ii.raton_y))
+		if(rep_listado_tiles.es_visible() && es_click_en_selector(ii.raton_x, ii.raton_y))
 		{
-			int indice=selector_tiles.procesar_click(ii.raton_x, ii.raton_y);		
-			if(indice) rejilla.mut_indice_actual(indice);
+			//Convertir a "coordenadas" de listado...
+			const size_t rx=ii.raton_x - rep_listado_tiles.acc_posicion().x,
+				ry=ii.raton_y,
+				w=listado_tiles.acc_w_item(),
+				h=listado_tiles.acc_h_item();
+
+			//El listado no tiene conciencia de si mismo en el espacio, luego...
+			const auto& pag=listado_tiles.obtener_pagina();
+			for(const auto& itemp : pag)
+			{
+
+				if(	rx >= itemp.x
+					&& ry >= itemp.y
+					&& rx <= itemp.x + w
+					&& ry <= itemp.y + h)
+				{
+					listado_tiles.mut_indice(itemp.indice);
+					rejilla.mut_indice_actual(itemp.item.tile.acc_tipo());
+					break;
+				}
+			}
 		}
 		else
 		{		
@@ -578,6 +702,11 @@ void Controlador_rejilla::procesar_input_rejilla(Info_input& ii, Rejilla& rejill
 	{
 		reconstruir_rep_info_posicion(ii, rejilla);
 	}
+}
+
+bool Controlador_rejilla::es_click_en_selector(int x, int y)
+{
+	return x >= rep_listado_tiles.acc_posicion().x;
 }
 
 void Controlador_rejilla::redimensionar_rejilla(int w, int h, Rejilla& r)
@@ -689,8 +818,11 @@ void Controlador_rejilla::reconstruir_rep_info_con_objeto_logica(const Objeto_lo
 
 void Controlador_rejilla::seleccionar_rejilla_actual(size_t indice)
 {
-	if(seleccionar_parte_actual(rejillas, indice, rejilla_actual, rejillas[rejilla_actual].acc_gestor(), selector_tiles))
+	if(seleccionar_parte(rejillas, indice, rejilla_actual))
 	{
+		const auto& g=rejillas[rejilla_actual].acc_gestor();
+		preparar_listado_tiles(g);
+
 		auto& r=rejillas[rejilla_actual];
 		//Ajusta los nuevos límites de la cámara.
 		camara.establecer_limites(0, 0, r.acc_w() * r.acc_w_celda(), r.acc_h()*r.acc_h_celda());
@@ -700,7 +832,10 @@ void Controlador_rejilla::seleccionar_rejilla_actual(size_t indice)
 
 void Controlador_rejilla::seleccionar_capa_logica_actual(size_t indice)
 {
-	seleccionar_parte_actual(capas_logica, indice, capa_logica_actual, capas_logica[capa_logica_actual].acc_gestor(), selector_tipo_logica);
+	if(seleccionar_parte(capas_logica, indice, capa_logica_actual))
+	{
+		preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
+	}
 }
 
 void Controlador_rejilla::ciclar_zoom()
@@ -772,15 +907,40 @@ void Controlador_rejilla::deseleccionar_objeto_logica_actual()
 
 void Controlador_rejilla::pasar_pagina_selector(int v)
 {
-	Selector_base * s=nullptr;
+	//TODO: Actualizar el item actual!!!
 
 	switch(modo_actual)
 	{
-		case modo_operacion::REJILLA: s=&selector_tiles;; break;
-		case modo_operacion::CAPA_LOGICA: s=&selector_tipo_logica; break;
+		case modo_operacion::REJILLA:
+			if(listado_tiles.cambiar_pagina(v))
+			{
+				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+			}
+		break;
+		case modo_operacion::CAPA_LOGICA:
+			if(listado_logica.cambiar_pagina(v))
+			{
+				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
+			}
+		break;
 	}
+}
 
-	if(s) s->pasar_pagina(v);
+void Controlador_rejilla::cambiar_tile_selector(int v)
+{
+	//TODO: Actualizar el item actual!!!
+
+	switch(modo_actual)
+	{
+		case modo_operacion::REJILLA: 
+			if(listado_tiles.cambiar_item(v))
+				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
+		break;
+		case modo_operacion::CAPA_LOGICA: 
+			if(listado_logica.cambiar_item(v))
+				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
+		break;
+	}
 }
 
 const Logica& Controlador_rejilla::obtener_tipo_objeto_logica_actual()

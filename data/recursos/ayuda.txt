@@ -1,5 +1,5 @@
-Uso de la aplicación: ejecutable res=WxH out=fichero_salida cfg=fichero_configuracion
-	./a.out res=800x600 out=salida.dat cfg=config.dat
+Uso de la aplicación: ejecutable out=fichero_salida cfg=fichero_configuracion [res=WxH]
+	./a.out out=salida.dat cfg=config.dat res=800x600 
 
 PARÁMETROS:
 	res: resolución de pantalla expresada en ancho x alto

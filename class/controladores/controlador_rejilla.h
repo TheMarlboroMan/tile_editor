@@ -7,12 +7,12 @@
 #include "../app/rejilla.h"
 #include "../app/objeto_logica.h"
 #include "../app/capa_logica.h"
-#include "../app/selector_tiles.h"
-#include "../app/selector_tipo_logica.h"
 #include "../app/contenedor_tilesets.h"
 #include "../app/contenedor_logica_sets.h"
 #include "../app/exportador.h"
 #include "../app/importador.h"
+#include "../herramientas_proyecto/listado_rejilla.h"
+#include "../herramientas_proyecto/listado_vertical.h"
 
 class Controlador_rejilla:public Controlador_base
 {
@@ -20,7 +20,10 @@ class Controlador_rejilla:public Controlador_base
 	//Propiedades
 	private:
 
-	const size_t MAX_REJILLAS=6; //Completamente arbitrario.
+	static const size_t MAX_REJILLAS=6; //Completamente arbitrario.
+	static const size_t ALTURA_LISTADO_VERTICAL=10;
+	static const size_t DIM_LISTADO_REJILLA=32;
+	static const size_t W_LISTADOS=200;
 	
 	enum class modo_operacion {REJILLA, CAPA_LOGICA};
 
@@ -65,11 +68,20 @@ class Controlador_rejilla:public Controlador_base
 		{}
 	}info_zoom;
 
+	struct Item_tile
+	{
+		const Tile& tile;
+	};
+
+	struct Item_logica
+	{
+		const Logica& logica;
+	};
+
 	const std::string& nombre_fichero;
+	SDL_Renderer * 						renderer;
 	const Contenedor_tilesets& tilesets;
 	const Contenedor_logica_sets& sets_tipo_logica;
-	Selector_tiles selector_tiles;
-	Selector_tipo_logica selector_tipo_logica;
 	std::vector<Rejilla> rejillas;
 	std::vector<Capa_logica> capas_logica;
 	std::vector<Propiedad_meta> propiedades_meta;
@@ -82,6 +94,14 @@ class Controlador_rejilla:public Controlador_base
 	size_t capa_logica_actual;
 	modo_operacion modo_actual;
 	Objeto_logica * objeto_logica_actual;
+
+	Herramientas_proyecto::Listado_rejilla<Item_tile>	listado_tiles;
+	Herramientas_proyecto::Listado_vertical<Item_logica>	listado_logica;
+
+	DLibV::Representacion_agrupada_estatica 		rep_listado_tiles;
+	DLibV::Representacion_agrupada_estatica 		rep_listado_logica;
+
+	DLibV::Representacion_primitiva_caja_estatica 		rep_seleccion_actual;
 
 	///////////////
 	//Métodos internos.
@@ -110,7 +130,12 @@ class Controlador_rejilla:public Controlador_base
 	void dibujar_hud_rejillas(DLibV::Pantalla& p);
 	void dibujar_elemento_desconocido(DLibV::Pantalla& p, int x, int y);
 
+	void preparar_listado_tiles(const Tile_set& s);
+	void preparar_listado_logica(const Logica_set& s);
+
 	void pasar_pagina_selector(int v);
+	void cambiar_tile_selector(int v);
+	bool es_click_en_selector(int x, int y);
 
 	template<typename T> 
 	void swap_parte(std::vector<T>& v, size_t &indice)
@@ -122,14 +147,12 @@ class Controlador_rejilla:public Controlador_base
 		}
 	}
 
-	template <typename T, typename B, typename C>
-	bool seleccionar_parte_actual(std::vector<T>& v, size_t indice, size_t& actual, const B& gestor, C& selector)
+	template <typename T>
+	bool seleccionar_parte(std::vector<T>& v, size_t indice, size_t& actual)
 	{
 		if(indice < v.size())
 		{	
 			actual=indice;
-			//Esto carga las nuevas tiles/objetos y reinicia la página y el indice actual seleccionado.			
-			selector.preparar_paginas(v[actual].acc_gestor());
 			return true;
 		}
 		return false;
@@ -156,17 +179,19 @@ class Controlador_rejilla:public Controlador_base
 			else (this->*metodo)(indice_actual-1);
 		}
 	}
-
-	template <typename T, typename C, typename S>
-	void ciclar_set_parte(T& parte, const C& set, S& selector)
+	
+	template <typename T, typename C>
+	void ciclar_set_listado(T& parte, const C& set)
 	{
 		auto& gestor=set.obtener_siguiente(parte.acc_gestor());
 		parte.cambiar_gestor(gestor);
-		selector.preparar_paginas(gestor);
 	}
 
 	template <typename T>
-	void intercambiar_visibilidad_parte(std::vector<T>& v, size_t indice) {if(indice < v.size()) v[indice].intercambiar_visible_siempre();}
+	void intercambiar_visibilidad_parte(std::vector<T>& v, size_t indice) 
+	{
+		if(indice < v.size()) v[indice].intercambiar_visible_siempre();
+	}
 
 	void procesar_input_rejilla(Info_input& ii, Rejilla& rejilla);
 	void procesar_input_capa_logica(Info_input& ii, Capa_logica& capa);

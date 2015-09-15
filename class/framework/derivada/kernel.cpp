@@ -25,18 +25,27 @@ void Kernel_app::inicializar()
 	}
 	try
 	{
-		auto arg_res=carg.valor_argumento("res");
-		auto ex=Herramientas::explotar(arg_res, 'x');
+		try
+		{
+			auto arg_res=carg.valor_argumento("res");
+			auto ex=Herramientas::explotar(arg_res, 'x');
 
-		if(ex.size()!=2)
-		{
-			throw Kernel_exception("El argumento res debe especficarse como wxh");
+			if(ex.size()!=2)
+			{
+				throw Kernel_exception("El argumento res debe especficarse como wxh");
+			}
+			else
+			{
+				w_pantalla=std::atoi(ex[0].c_str());
+				h_pantalla=std::atoi(ex[1].c_str());
+			}
 		}
-		else
+		catch(Controlador_argumentos_exception& e)
 		{
-			w_pantalla=std::atoi(ex[0].c_str());
-			h_pantalla=std::atoi(ex[1].c_str());
+			w_pantalla=800;
+			h_pantalla=600;
 		}
+		
 
 		//Localizamos el fichero out, por si no se ha especificado poder lanzar la excepción.
 		nombre_fichero_salida=carg.valor_argumento("out");

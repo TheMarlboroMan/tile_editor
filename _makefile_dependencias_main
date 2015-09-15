@@ -1,5 +1,8 @@
 DEP_HERRAMIENTAS_PROYECTO=$(DIR_O)tabla_sprites.o \
 $(DIR_O)generador_numeros.o \
+$(DIR_O)estructura_paginacion.o \
+$(DIR_O)listado_rejilla.o \
+$(DIR_O)listado_vertical.o
 
 DEP_CLASES_APP=\
 $(DIR_O)propiedad_meta.o\
@@ -12,9 +15,6 @@ $(DIR_O)tile.o\
 $(DIR_O)rejilla.o\
 $(DIR_O)contenedor_tilesets.o\
 $(DIR_O)contenedor_logica_sets.o\
-$(DIR_O)selector_base.o\
-$(DIR_O)selector_tiles.o\
-$(DIR_O)selector_tipo_logica.o\
 $(DIR_O)definiciones_importacion_exportacion.o\
 #$(DIR_O)tile_representacion.o\
 

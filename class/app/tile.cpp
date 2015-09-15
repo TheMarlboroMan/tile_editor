@@ -18,7 +18,7 @@ void Tile_set::insertar_tile_desde_cadena(const std::string& s)
 
 		if(ex.size() < 5)
 		{
-			LOG<<"WARNING: La cadena no tiene suficientes parámetros para generar un tile"<<std::endl;	
+			LOG<<"WARNING: La cadena no tiene suficientes parámetros para generar un tile"<<std::endl;
 		}
 		else
 		{

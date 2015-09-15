@@ -46,25 +46,6 @@ $(DIR_CLASES_APP)contenedor_tilesets.h \
 $(DIR_CLASES_APP)contenedor_tilesets.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)contenedor_tilesets.cpp -o $(DIR_O)contenedor_tilesets.o
 
-$(DIR_O)selector_tipo_logica.o:\
-$(DIR_O)selector_base.o \
-$(DIR_O)logica.o \
-$(DIR_CLASES_APP)selector_tipo_logica.h \
-$(DIR_CLASES_APP)selector_tipo_logica.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)selector_tipo_logica.cpp -o $(DIR_O)selector_tipo_logica.o
-
-$(DIR_O)selector_tiles.o:\
-$(DIR_O)selector_base.o \
-$(DIR_O)tile.o \
-$(DIR_CLASES_APP)selector_tiles.h \
-$(DIR_CLASES_APP)selector_tiles.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)selector_tiles.cpp -o $(DIR_O)selector_tiles.o
-
-$(DIR_O)selector_base.o:\
-$(DIR_CLASES_APP)selector_base.h \
-$(DIR_CLASES_APP)selector_base.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)selector_base.cpp -o $(DIR_O)selector_base.o
-
 $(DIR_O)rejilla.o:\
 $(DIR_O)tile.o\
 $(DIR_CLASES_APP)matriz2d.h \
