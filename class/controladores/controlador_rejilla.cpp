@@ -36,6 +36,9 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	rep_info_pos.establecer_posicion(16, 16);
 	rep_info_capa.establecer_posicion(16, 32);
 
+	listado_tiles.mut_margen_w(2);
+	listado_tiles.mut_margen_h(2);
+
 	rep_tiles.establecer_modo_blend(Representacion::BLEND_ALPHA);
 
 	rep_listado_tiles.establecer_posicion(pantalla.acc_w()-W_LISTADOS, 0),
