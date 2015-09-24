@@ -32,6 +32,7 @@ void Input::configurar()
 	mapa_teclado.insert(std::make_pair(I_CICLAR_ZOOM, SDL_SCANCODE_Z));
 	mapa_teclado.insert(std::make_pair(I_NUEVO, SDL_SCANCODE_N));
 	mapa_teclado.insert(std::make_pair(I_DELETE, SDL_SCANCODE_DELETE));
+	mapa_teclado.insert(std::make_pair(I_BORRAR_PARTE, SDL_SCANCODE_D));
 	mapa_teclado.insert(std::make_pair(I_GUARDAR, SDL_SCANCODE_S));
 	mapa_teclado.insert(std::make_pair(I_CARGAR, SDL_SCANCODE_L));
 	mapa_teclado.insert(std::make_pair(I_ENTER, SDL_SCANCODE_RETURN));

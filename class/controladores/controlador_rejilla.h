@@ -79,7 +79,6 @@ class Controlador_rejilla:public Controlador_base
 	};
 
 	const std::string& nombre_fichero;
-	SDL_Renderer * 						renderer;
 	const Contenedor_tilesets& tilesets;
 	const Contenedor_logica_sets& sets_tipo_logica;
 	std::vector<Rejilla> rejillas;

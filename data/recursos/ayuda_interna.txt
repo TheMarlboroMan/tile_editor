@@ -23,7 +23,7 @@ MODO REJILLA
     T: Intercambiar set de celdas
     Z: Ciclar zoom
     N: Crear nueva rejilla (hasta 6)
-    DEL: Eliminar rejilla actual
+    D: Elimina capa.
     S: Guardar
     L: Cargar
     AV PAG / RE PAG: Ver más celdas
@@ -39,13 +39,13 @@ MODO OBJETOS
     Click izquierdo: crear objeto del tipo actual
     Click izquierdo sobre objeto: seleccionar objeto
     Doble click izquierdo sobre objeto: editar propiedades de objeto
-    Click derecho: eliminar objeto seleccionado
     TAB: mostrar y ocultar selector tipos
     C: Intercambiar posición de capa y capa anterior
     T: Intercambiar set de tipos
     Z: Ciclar zoom
     N: Crear nueva capa (hasta 6)
-    DEL: Eliminar capa actual
+    D: Eliminar capa actual
+    DEL: Eliminar objeto lógica seleccionado
     S: Guardar
     L: Cargar
     AV PAG / RE PAG: Ver más tipos

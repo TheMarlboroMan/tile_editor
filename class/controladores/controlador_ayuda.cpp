@@ -6,7 +6,7 @@ using namespace DLibV;
 
 Controlador_ayuda::Controlador_ayuda(Director_estados &DI, const Pantalla& p)
 	:Controlador_base(DI),
-	rep_txt(p.acc_renderer(), Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
+	rep_txt(Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
 	x(0), y(0), max_x(0), max_y(0)
 {
 	generar_cadena();

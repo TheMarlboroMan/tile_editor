@@ -13,13 +13,12 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	
 	info_zoom(1, pantalla.acc_w(), pantalla.acc_h()),
 	nombre_fichero(nombre_fichero),
-	renderer(pantalla.acc_renderer()),
 	tilesets(t),
 	sets_tipo_logica(s),
 	camara(0, 0, pantalla.acc_w(), pantalla.acc_h()),
 	rep_tiles(),
-	rep_info_capa(pantalla.acc_renderer(), DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
-	rep_info_pos(pantalla.acc_renderer(), DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
+	rep_info_capa(DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
+	rep_info_pos(DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
 	rejilla_actual(0),
 	capa_logica_actual(0),
 	modo_actual(modo_operacion::REJILLA),
@@ -113,7 +112,7 @@ void Controlador_rejilla::preparar_listado_logica(const Logica_set& s)
 	{
 		const auto& l=itemp.item.logica;
 		CAJA * rep_caja=new CAJA(Herramientas_SDL::nuevo_sdl_rect(2, itemp.y, 6, 6), l.acc_r_editor(), l.acc_g_editor(), l.acc_b_editor());
-		TXT * rep_txt=new TXT(renderer, Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), l.acc_nombre());
+		TXT * rep_txt=new TXT(Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), l.acc_nombre());
 		rep_txt->establecer_posicion(10, itemp.y);
 
 		rep_listado_logica.insertar_representacion(rep_caja);
@@ -481,6 +480,21 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	{
 		switch(modo_actual)
 		{
+			case modo_operacion::REJILLA: /* No hace nada... */ break;
+			case modo_operacion::CAPA_LOGICA: 
+				if(objeto_logica_actual!=nullptr)
+				{
+					capas_logica[capa_logica_actual].eliminar_objeto(objeto_logica_actual);
+					objeto_logica_actual=nullptr;
+					rep_info_capa.asignar("");
+				}
+			break;
+		}
+	}
+	else if(input.es_input_down(Input::I_BORRAR_PARTE)) 
+	{
+		switch(modo_actual)
+		{
 			case modo_operacion::REJILLA: eliminar_parte(rejillas, rejilla_actual, &Controlador_rejilla::seleccionar_rejilla_actual); break;
 			case modo_operacion::CAPA_LOGICA: eliminar_parte(capas_logica, capa_logica_actual, &Controlador_rejilla::seleccionar_capa_logica_actual); break;
 		}
@@ -520,6 +534,8 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 			if(ii.shift) objeto_logica_actual->movimiento_relativo(ii.down_x, ii.down_y);
 			else if(ii.control) objeto_logica_actual->movimiento_relativo(ii.down_x * r.acc_w_celda(), ii.down_y * r.acc_h_celda());
 			else objeto_logica_actual->movimiento_relativo(ii.x , ii.y);
+
+			reconstruir_rep_info_con_objeto_logica(*objeto_logica_actual);
 		}
 		else
 		{
@@ -568,15 +584,16 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 					}
 				}
 			}
-			else if(ii.click_d)
-			{
-				auto obj=capa.obtener_objeto(coords.x, coords.y);
-				if(obj)
-				{
-					if(objeto_logica_actual && *obj==*objeto_logica_actual) objeto_logica_actual=nullptr;
-					capa.eliminar_objeto(coords.x, coords.y);
-				}
-			}
+//			else if(ii.click_d)
+//			{
+//				auto obj=capa.obtener_objeto(coords.x, coords.y);
+//				if(obj)
+//				{
+//					if(objeto_logica_actual && *obj==*objeto_logica_actual) objeto_logica_actual=nullptr;
+//					capa.eliminar_objeto(coords.x, coords.y);
+//					rep_info_capa.asignar("");
+//				}
+//			}
 		}
 	}
 }

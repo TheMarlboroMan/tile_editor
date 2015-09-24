@@ -26,6 +26,7 @@ class Capa_logica
 
 	const std::vector<Objeto_logica>& acc_objetos() const {return objetos;}
 	void eliminar_objeto(int px, int py);
+	void eliminar_objeto(Objeto_logica*);
 	Objeto_logica * obtener_objeto(int px, int py);
 	
 	void cambiar_gestor(const Logica_set& g) {tipos=&g; indice_actual=1;}

@@ -55,6 +55,22 @@ void Capa_logica::eliminar_objeto(int x, int y)
 	}
 }
 
+void Capa_logica::eliminar_objeto(Objeto_logica * obj)
+{
+	auto it=std::find_if(std::begin(objetos), std::end(objetos),
+		[obj, this](const Objeto_logica& o) 
+		{
+			return obj==&o;
+		});
+
+	if(it!=std::end(objetos))
+	{
+		objetos.erase(it);
+	}
+}
+
+
+
 Objeto_logica * Capa_logica::obtener_objeto(int x, int y)
 {
 	Objeto_logica * resultado=nullptr;

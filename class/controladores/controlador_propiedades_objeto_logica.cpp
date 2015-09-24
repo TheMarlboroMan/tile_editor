@@ -6,7 +6,7 @@ using namespace DLibV;
 
 Controlador_propiedades_objeto_logica::Controlador_propiedades_objeto_logica(Director_estados &DI, const Pantalla& p)
 	:Controlador_base(DI), 
-	rep_txt(p.acc_renderer(), Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
+	rep_txt(Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
 	propiedad_actual(0), w(p.acc_w())
 {
 	rep_txt.establecer_posicion(POS_TXT_X, POS_TXT_Y);

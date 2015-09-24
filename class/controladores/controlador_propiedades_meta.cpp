@@ -5,7 +5,7 @@ using namespace DLibV;
 
 Controlador_propiedades_meta::Controlador_propiedades_meta(Director_estados &DI, const DLibV::Pantalla& p)
 	:Controlador_base(DI), 
-	rep_txt(p.acc_renderer(), Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
+	rep_txt(Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), "..."),
 	propiedades(nullptr), cadena_datos(""), valor_input(""),
 	propiedad_actual(0), max_propiedad(0), estado(estados::LISTA)
 {
