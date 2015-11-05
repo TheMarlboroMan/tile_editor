@@ -11,7 +11,11 @@ include _makefile_dependencias_main
 #Definiciones de targets.
 
 all: \
+$(DIR_O)dummy\
 $(EJECUTABLE) \
+
+$(DIR_O)dummy :
+	$(MKDIR) objects
 
 $(EJECUTABLE): \
 $(DEP_CLASES_APP) \

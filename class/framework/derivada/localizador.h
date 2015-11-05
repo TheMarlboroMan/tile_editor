@@ -36,8 +36,8 @@ class Localizador:public DLibH::Localizador_base
 
 	protected:
 	DLibH::t_lista_nombres_archivo obtener_lista_archivos();
-	DLibH::t_cadena const& cadena_no_cargado() {return c_no_cargado;}
-	DLibH::t_cadena const& cadena_no_encontrado() {return c_no_encontrado;}
+	DLibH::t_cadena const& cadena_no_cargado() const {return c_no_cargado;}
+	DLibH::t_cadena const& cadena_no_encontrado() const {return c_no_encontrado;}
 
 	public:
 	void inicializar(unsigned short int p_idioma);

@@ -8,15 +8,17 @@ CFLAGS=-c $(SIMBOLOS_DEBUG) $(OPTIMIZACION) $(FLAGS_BASE)
 CFLAGS_TARGET_FINAL=$(SIMBOLOS_DEBUG) $(OPTIMIZACION) $(FLAGS_BASE)
 CC=g++
 EJECUTABLE=a.out
-LIMPIAR=rm objects/*; rm $(EJECUTABLE);
+MKDIR=mkdir -p
+LIMPIAR=rm objects/*; rm ./$(EJECUTABLE); touch objects/dummy;
 
-DIR_HOME=/home/dani/programacion/c++/
+DIR_HOME=/home/daniel/Escritorio/stuff/
 DIR_LIBDAN2=$(DIR_HOME)libdansdl2
 DIR_HERRAMIENTAS_PROYECTO=$(DIR_HOME)herramientas_proyecto/class/
 DIR_O_HERRAMIENTAS_PROYECTO=$(DIR_HOME)herramientas_proyecto/objects/
+DIR_CAPA_COMPATIBILIDAD_LIBDANSDL2=$(DIR_HOME)/capa_compatibilidad_libdansdl2
 
-LINKER=-L$(DIR_LIBDAN2) -lDanSDL2 -L. -lSDL2 -lSDL2_mixer -lSDL2_image
-INCLUDES=-I $(DIR_LIBDAN2) -I $(DIR_HERRAMIENTAS_PROYECTO)
+LINKER=-L$(DIR_LIBDAN2) -lDanSDL2 -L. -lSDL2 -lSDL2_mixer -lSDL2_ttf -lSDL2_image
+INCLUDES=-I $(DIR_LIBDAN2) -I $(DIR_HERRAMIENTAS_PROYECTO) -I $(DIR_CAPA_COMPATIBILIDAD_LIBDANSDL2)
 LIBRERIAS=
 
 include makefile_comun
