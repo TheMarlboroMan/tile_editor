@@ -1,6 +1,6 @@
 #include "importador.h"
 
-#include <herramientas/lector_txt/lector_txt.h>
+#include <class/lector_txt.h>
 #include <herramientas/herramientas/herramientas.h>
 #include "definiciones_importacion_exportacion.h"
 
@@ -10,6 +10,7 @@ typedef Definiciones_importacion_exportacion DEFS;
 void Importador::importar(std::vector<Rejilla>& rejillas, std::vector<Capa_logica>& capas_logica, std::vector<Propiedad_meta>& propiedades_meta, 
 	const Contenedor_tilesets& contenedor_tilesets, const Contenedor_logica_sets& contenedor_logica_sets, const std::string nombre_fichero)
 {
+	using namespace Herramientas_proyecto;
 	Lector_txt L(nombre_fichero, '#');
 	if(!L)
 	{

@@ -3,6 +3,7 @@
 
 void Contenedor_tilesets::insertar_tileset(size_t indice, const std::string& ruta, const char comentario)
 {
+	using namespace Herramientas_proyecto;
 	Tile_set GT(indice);
 	Lector_txt L(ruta, comentario);	
 

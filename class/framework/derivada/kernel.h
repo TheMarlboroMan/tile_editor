@@ -32,7 +32,7 @@ class Kernel_app:public Kernel_base
 	std::string acc_nombre_fichero_salida() const {return nombre_fichero_salida;}
 	std::string acc_nombre_fichero_config_sesion() const {return nombre_fichero_config_sesion;}
 
-	Kernel_app(DLibH::Controlador_argumentos& CARG)
+	Kernel_app(Herramientas_proyecto::Controlador_argumentos& CARG)
 		:Kernel_base(CARG), w_pantalla(0), h_pantalla(0) 
 	{}
 

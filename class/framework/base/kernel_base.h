@@ -8,6 +8,8 @@
 #include "cargador_recursos_base.h"
 #include "../interface_controlador.h"
 #include <capa_compatibilidad_representaciones_libdansdl2.h>
+#include <class/lector_txt.h>
+#include <class/controlador_argumentos.h>
 
 class Kernel_excepcion
 {
@@ -29,7 +31,7 @@ class Kernel_base
 	bool mostrar_fps;
 	float paso_delta;
 
-	DLibH::Controlador_argumentos& controlador_argumentos;
+	Herramientas_proyecto::Controlador_argumentos& controlador_argumentos;
 	DLibH::Controlador_fps_SDL controlador_fps;
 	DLibV::Pantalla pantalla;
 
@@ -48,7 +50,7 @@ class Kernel_base
 
 	public:
 
-	Kernel_base(DLibH::Controlador_argumentos&);
+	Kernel_base(Herramientas_proyecto::Controlador_argumentos&);
 	~Kernel_base();
 
 	virtual void inicializar();
@@ -56,7 +58,7 @@ class Kernel_base
 	void ciclar_modo_pantalla();
 
 	DLibV::Pantalla& acc_pantalla() {return pantalla;}
-	DLibH::Controlador_argumentos& acc_controlador_argumentos() {return controlador_argumentos;}
+	Herramientas_proyecto::Controlador_argumentos& acc_controlador_argumentos() {return controlador_argumentos;}
 
 	bool es_mostrar_fps() const {return mostrar_fps;}
 	float acc_paso_delta() const {return paso_delta;}

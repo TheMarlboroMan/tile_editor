@@ -25,30 +25,30 @@ la cadena definida como c_no_encontrado. Si no se ha cargado el localizador
 devolverá la cadena definida como c_no_cargado.
 */
 
-#include <herramientas/localizador_base/localizador_base.h>
+#include <base/localizador_base.h>
 
-class Localizador:public DLibH::Localizador_base
+class Localizador:public Herramientas_proyecto::Localizador_base
 {
 	private:
-	DLibH::t_cadena ruta;
-	DLibH::t_cadena c_no_cargado;
-	DLibH::t_cadena c_no_encontrado;
+	Herramientas_proyecto::t_cadena ruta;
+	Herramientas_proyecto::t_cadena c_no_cargado;
+	Herramientas_proyecto::t_cadena c_no_encontrado;
 
 	protected:
-	DLibH::t_lista_nombres_archivo obtener_lista_archivos();
-	DLibH::t_cadena const& cadena_no_cargado() const {return c_no_cargado;}
-	DLibH::t_cadena const& cadena_no_encontrado() const {return c_no_encontrado;}
+	Herramientas_proyecto::t_lista_nombres_archivo obtener_lista_archivos();
+	Herramientas_proyecto::t_cadena const& cadena_no_cargado() const {return c_no_cargado;}
+	Herramientas_proyecto::t_cadena const& cadena_no_encontrado() const {return c_no_encontrado;}
 
 	public:
 	void inicializar(unsigned short int p_idioma);
 
 	Localizador(unsigned short int p_idioma=0)
-		:DLibH::Localizador_base(p_idioma), ruta(""),
+		:Herramientas_proyecto::Localizador_base(p_idioma), ruta(""),
 		c_no_cargado("ERROR 00"), c_no_encontrado("ERROR 01")
 	{}
 
-	Localizador(const DLibH::t_cadena& p_ruta, unsigned short int p_idioma=0)
-		:DLibH::Localizador_base(p_idioma), ruta(p_ruta),
+	Localizador(const Herramientas_proyecto::t_cadena& p_ruta, unsigned short int p_idioma=0)
+		:Herramientas_proyecto::Localizador_base(p_idioma), ruta(p_ruta),
 		c_no_cargado("ERROR 00"), c_no_encontrado("ERROR 01")
 	{}
 

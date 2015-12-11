@@ -5,6 +5,7 @@ using namespace DLibH;
 
 void Kernel_app::inicializar()
 {
+	using namespace Herramientas_proyecto;
 	auto& carg=acc_controlador_argumentos();
 
 	if(carg.size()==1)

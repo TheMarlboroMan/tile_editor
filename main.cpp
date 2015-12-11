@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
 		DLibH::Log_motor::arrancar("data/logs/log_motor.log");
 
 		//Inicializar control de argumentos.
-		DLibH::Controlador_argumentos CARG(argc, argv);
+		Herramientas_proyecto::Controlador_argumentos CARG(argc, argv);
 
 		try
 		{

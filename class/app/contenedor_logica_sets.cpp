@@ -1,5 +1,5 @@
 #include "contenedor_logica_sets.h"
-#include <herramientas/lector_txt/lector_txt.h>
+#include <class/lector_txt.h>
 #include <herramientas/log_base/log_base.h>
 #include <herramientas/herramientas/herramientas.h>
 
@@ -19,6 +19,7 @@ para diferenciar un tipo de su propiedad.
 
 void Contenedor_logica_sets::insertar_set(const std::string ruta)
 {
+	using namespace Herramientas_proyecto;
 	Lector_txt L(ruta, '#');
 
 	if(L)

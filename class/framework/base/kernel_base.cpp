@@ -1,6 +1,6 @@
 #include "kernel_base.h"
 
-Kernel_base::Kernel_base(DLibH::Controlador_argumentos& carg)
+Kernel_base::Kernel_base(Herramientas_proyecto::Controlador_argumentos& carg)
 	:
 	mostrar_fps(true),
 	paso_delta(0.01),

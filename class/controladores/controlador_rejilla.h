@@ -1,8 +1,8 @@
 #ifndef CONTROLADOR_REJILLA
 #define CONTROLADOR_REJILLA
 
-#include <listado_rejilla.h>
-#include <listado_vertical.h>
+#include <class/listado_rejilla.h>
+#include <class/listado_vertical.h>
 #include "controlador_base.h"
 #include "../app/propiedad_meta.h"
 #include "../app/tile.h"

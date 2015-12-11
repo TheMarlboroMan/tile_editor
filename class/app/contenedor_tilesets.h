@@ -3,7 +3,7 @@
 
 #include "contenedor_ciclico.h"
 #include "tile.h"
-#include <herramientas/lector_txt/lector_txt.h>
+#include <class/lector_txt.h>
 #include <stdexcept>
 
 class Contenedor_tilesets_exception:public std::runtime_error

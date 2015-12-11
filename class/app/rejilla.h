@@ -2,7 +2,7 @@
 #define REJILLA_H
 
 #include "tile.h"
-#include <matriz2d.h>
+#include <class/matriz2d.h>
 
 class Celda
 {

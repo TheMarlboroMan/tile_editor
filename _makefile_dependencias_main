@@ -1,9 +1,13 @@
-DEP_HERRAMIENTAS_PROYECTO=$(DIR_O_HERRAMIENTAS_PROYECTO)tabla_sprites.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)generador_numeros.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)estructura_paginacion.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)listado_rejilla.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)listado_vertical.o\
-$(DIR_O_HERRAMIENTAS_PROYECTO)matriz2d.o
+DEP_HERRAMIENTAS_PROYECTO=$(DIR_O_HERRAMIENTAS_PROYECTO)objects/tabla_sprites.o \
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/generador_numeros.o \
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/estructura_paginacion.o \
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/listado_rejilla.o \
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/listado_vertical.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/matriz2d.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/lector_txt.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/controlador_argumentos.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/localizador_base.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/string_utilidades.o\
 
 DEP_CLASES_APP=\
 $(DIR_O)propiedad_meta.o\
