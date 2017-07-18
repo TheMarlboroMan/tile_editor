@@ -1,9 +1,5 @@
 DEP_HERRAMIENTAS_PROYECTO=$(DIR_O_HERRAMIENTAS_PROYECTO)objects/tabla_sprites.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)objects/generador_numeros.o \
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/estructura_paginacion.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)objects/listado_rejilla.o \
-$(DIR_O_HERRAMIENTAS_PROYECTO)objects/listado_vertical.o\
-$(DIR_O_HERRAMIENTAS_PROYECTO)objects/matriz2d.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/lector_txt.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/controlador_argumentos.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/localizador_base.o\
@@ -22,7 +18,6 @@ $(DIR_O)contenedor_tilesets.o\
 $(DIR_O)contenedor_logica_sets.o\
 $(DIR_O)definiciones_importacion_exportacion.o\
 #$(DIR_O)tile_representacion.o\
-
 
 DEP_CONTROLADORES=$(DIR_O)controlador_base.o \
 $(DIR_O)controlador_rejilla.o \

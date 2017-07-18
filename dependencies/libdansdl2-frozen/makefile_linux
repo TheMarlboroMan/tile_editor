@@ -1,0 +1,5 @@
+CFLAGS=-c -g -O3 -Wno-deprecated -Wall -ansi -pedantic -std=c++11
+#CFLAGS=-c -O3 -Wno-deprecated -Wall -ansi -pedantic -std=c++11
+CC=g++
+LIMPIAR=rm objects/*; rm ./libDanSDL2.a; touch objects/dummy;
+include makefile_comun

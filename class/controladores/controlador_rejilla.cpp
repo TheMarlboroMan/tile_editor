@@ -838,7 +838,9 @@ void Controlador_rejilla::ciclar_zoom()
 	++info_zoom.zoom;
 	if(info_zoom.zoom==4) info_zoom.zoom=1;
 
-	camara.mut_enfoque(info_zoom.w * info_zoom.zoom, info_zoom.h * info_zoom.zoom);
+	//TODO: Check this works...
+//	camara.enfocar_a(info_zoom.w * info_zoom.zoom, info_zoom.h * info_zoom.zoom);
+	camara.mut_zoom(info_zoom.zoom);
 }
 
 void Controlador_rejilla::insertar_rejilla()
