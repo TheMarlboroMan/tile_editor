@@ -13,6 +13,7 @@ MODO REJILLA
     Cursores + RShift : Cambiar dimensiones rejilla
     Cursores + RControl : Desplazar rejilla
     Cursores + Espacio : Cambiar espaciado líneas de rejilla en rejilla
+    Cursores + Alt : Seleccionar tiles adyacentes.
     [1-6]: cambiar rejilla
     Control + [1-6]: cambiar visibilidad rejilla
     Click izquierdo: crear celda (LShift para línea, LControl para rectángulo)
@@ -27,6 +28,8 @@ MODO REJILLA
     S: Guardar
     L: Cargar
     AV PAG / RE PAG: Ver más celdas
+    [: Tile anterior
+    ]: Tile siguiente
 
 MODO OBJETOS
 

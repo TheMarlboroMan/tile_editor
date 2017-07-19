@@ -30,16 +30,16 @@ class Controlador_rejilla:public Controlador_base
 	struct Info_input
 	{
 		int x, y, raton_x, raton_y;		
-		bool click_i, click_d, movimiento_raton, shift, control, espacio;
+		bool click_i, click_d, movimiento_raton, shift, control, espacio, alt;
 		int down_x, down_y;
 	
 		Info_input(): x(0), y(0), raton_x(0), raton_y(0), click_i(false), 
 			click_d(false), movimiento_raton(false), shift(false), 
-			control(false), espacio(false), down_x(0), down_y(0) {}
-		Info_input(int px, int py, int rx, int ry, bool ci, bool cd, bool mr, bool s, bool c, bool e, int dx, int dy)
+			control(false), espacio(false), alt(false), down_x(0), down_y(0) {}
+		Info_input(int px, int py, int rx, int ry, bool ci, bool cd, bool mr, bool s, bool c, bool e, bool palt, int dx, int dy)
 			: x(px), y(py), raton_x(rx), raton_y(ry), click_i(ci), 
-			click_d(cd), movimiento_raton(mr), shift(s), control(c), 
-			espacio(e), down_x(dx), down_y(dy) {}
+			click_d(cd), movimiento_raton(mr), shift(s), control(c),
+			espacio(e), alt(palt), down_x(dx), down_y(dy) {}
 	};
 
 	struct Coordenadas

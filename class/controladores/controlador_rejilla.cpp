@@ -516,6 +516,7 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 		input.es_input_pulsado(Input::I_SHIFT),
 		input.es_input_pulsado(Input::I_CONTROL),
 		input.es_input_pulsado(Input::I_ESPACIO),
+		input.es_input_pulsado(Input::I_ALT),
 		downx, downy
 		);
 }
@@ -611,7 +612,21 @@ void Controlador_rejilla::procesar_input_rejilla(Info_input& ii, Rejilla& rejill
 {
 	if(ii.x || ii.y)
 	{
-		mover_camara(ii);
+		if(ii.alt)
+		{
+			if(ii.down_x) cambiar_tile_selector(ii.down_x);
+			else if(ii.down_y) 
+			{
+				for(size_t i=0; i<listado_tiles.acc_reg_fila(); ++i)
+				{
+					cambiar_tile_selector(ii.down_y);
+				}
+			}
+		}
+		else
+		{
+			mover_camara(ii);
+		}
 	}
 
 	if(ii.click_i || ii.click_d)
@@ -623,6 +638,7 @@ void Controlador_rejilla::procesar_input_rejilla(Info_input& ii, Rejilla& rejill
 				listado_tiles.mut_indice(itemp.indice);
 				rejilla.mut_indice_actual(itemp.item.tile.acc_tipo());
 				actualizar_seleccion_actual_listado();
+
 			};
 			//Convertir a "coordenadas" de listado...
 			listado_tiles.selector_topologico(ii.raton_x - rep_listado_tiles.acc_posicion().x, ii.raton_y, f);
@@ -924,17 +940,21 @@ void Controlador_rejilla::cambiar_tile_selector(int v)
 	switch(modo_actual)
 	{
 		case modo_operacion::REJILLA: 
+		{
 			if(listado_tiles.cambiar_item(v))
 			{
 				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
-				rejillas[rejilla_actual].mut_indice_actual(listado_tiles.linea_actual().item.tile.acc_tipo());
+				listado_tiles.mut_indice(listado_tiles.acc_indice_actual());
+				rejillas[rejilla_actual].mut_indice_actual(listado_tiles.item_actual().tile.acc_tipo());
 			}
+		}
 		break;
 		case modo_operacion::CAPA_LOGICA: 
 			if(listado_logica.cambiar_item(v))
 			{
 				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
 				capas_logica[capa_logica_actual].mut_indice_actual(listado_logica.linea_actual().item.logica.acc_tipo());
+				actualizar_seleccion_actual_listado();
 			}
 		break;
 	}

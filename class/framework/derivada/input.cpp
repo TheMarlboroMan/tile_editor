@@ -15,6 +15,7 @@ void Input::configurar()
 	mapa_teclado.insert(std::make_pair(I_CONTROL, SDL_SCANCODE_LCTRL));
 	mapa_teclado.insert(std::make_pair(I_RSHIFT, SDL_SCANCODE_RSHIFT));
 	mapa_teclado.insert(std::make_pair(I_RCONTROL, SDL_SCANCODE_RCTRL));
+	mapa_teclado.insert(std::make_pair(I_ALT, SDL_SCANCODE_LALT));
 
 	mapa_teclado.insert(std::make_pair(I_RE_PAG, SDL_SCANCODE_PAGEUP));
 	mapa_teclado.insert(std::make_pair(I_AV_PAG, SDL_SCANCODE_PAGEDOWN));
