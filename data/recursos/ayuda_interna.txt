@@ -9,11 +9,12 @@ MODO REJILLA
     F2: Modo rejilla.
     F3: Modo objetos.
     F4: Modo propiedades meta.
+    F5: Modo propiedades rejilla y fichero.
     Cursores: mover cámara
     Cursores + RShift : Cambiar dimensiones rejilla
     Cursores + RControl : Desplazar rejilla
     Cursores + Espacio : Cambiar espaciado líneas de rejilla en rejilla
-    Cursores + Alt : Seleccionar tiles adyacentes.
+    Cursores + Alt : Seleccionar tipo de tile adyacentes.
     [1-6]: cambiar rejilla
     Control + [1-6]: cambiar visibilidad rejilla
     Click izquierdo: crear celda (LShift para línea, LControl para rectángulo)
@@ -28,8 +29,6 @@ MODO REJILLA
     S: Guardar
     L: Cargar
     AV PAG / RE PAG: Ver más celdas
-    [: Tile anterior
-    ]: Tile siguiente
 
 MODO OBJETOS
 
@@ -75,3 +74,10 @@ MODO EDICION PROPIEDADES META [EDITANDO PROPIEDAD]
     Cursores izquierda y derecha: intercambiar entre nombre y valor
     Letras y números: introducir nuevo valor.
     ENTER: Confirmar valor.
+
+MODO PROPIEDADES REJILLA Y FICHERO
+
+    Cursores arriba y abajo: seleccionar entrada.
+    ENTER: Validar (sólo en "Aplicar")
+    ESCAPE: Volver sin guardar.
+    Letras y números: introducir nuevo valor.

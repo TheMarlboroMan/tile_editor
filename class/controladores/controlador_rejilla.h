@@ -78,7 +78,7 @@ class Controlador_rejilla:public Controlador_base
 		const Logica& logica;
 	};
 
-	const std::string& nombre_fichero;
+	std::string nombre_fichero;
 	const Contenedor_tilesets& tilesets;
 	const Contenedor_logica_sets& sets_tipo_logica;
 	std::vector<Rejilla> rejillas;
@@ -88,6 +88,7 @@ class Controlador_rejilla:public Controlador_base
 	DLibV::Representacion_bitmap_dinamica rep_tiles;
 	DLibV::Representacion_texto_auto_estatica rep_info_capa;
 	DLibV::Representacion_texto_auto_estatica rep_info_pos;
+	DLibV::Representacion_texto_auto_estatica rep_mensaje;
 
 	size_t rejilla_actual;
 	size_t capa_logica_actual;
@@ -99,6 +100,7 @@ class Controlador_rejilla:public Controlador_base
 
 	DLibV::Representacion_agrupada_estatica 		rep_listado_tiles;
 	DLibV::Representacion_agrupada_estatica 		rep_listado_logica;
+	DLibV::Representacion_primitiva_caja_estatica 		rep_fondo_listados;
 
 	DLibV::Representacion_primitiva_caja_estatica 		rep_seleccion_actual;
 
@@ -122,6 +124,7 @@ class Controlador_rejilla:public Controlador_base
 
 	void guardar();
 	void inicializar();
+	void actualizar_mensaje(const std::string&);
 
 	void dibujar_rejilla(DLibV::Pantalla& p, const int w, const int h, const int w_nivel, const int h_nivel, const int w_unidades_separador, const int h_unidades_separador);
 	void dibujar_celdas(DLibV::Pantalla& p, Rejilla& rejilla);
@@ -215,6 +218,12 @@ class Controlador_rejilla:public Controlador_base
 	virtual void dibujar(DLibV::Pantalla& pantalla);
 	void cargar();
 	void inicializar_sin_fichero();
+	int acc_w() const {return rejillas[rejilla_actual].acc_w();}
+	int acc_h() const {return rejillas[rejilla_actual].acc_h();}
+	size_t acc_indice_rejilla() const {return rejilla_actual;}
+	const std::string& acc_nombre_fichero() const {return nombre_fichero;}
+	void redimensionar_actual(int w, int h);
+	void cambiar_nombre_fichero(const std::string& nf) {nombre_fichero=nf;}
 
 	std::vector<Propiedad_meta>& acc_propiedades_meta() {return propiedades_meta;}
 	Objeto_logica& obtener_objeto_logica_actual() {return *objeto_logica_actual;}

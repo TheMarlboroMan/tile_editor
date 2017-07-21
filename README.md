@@ -58,13 +58,20 @@ PARAMETERS:
 
 - As of November 5th, 2015, the tool has been patched with a compatibility layer to support the many changes made to the original libdansdl2. Should the tool be updated, the compatibility layer will be removed. The tool now needs the SDL2_ttf library to link with (even though it's not used).
 - As of July 2017 the dependencies have been added and the project has been patched to work with the bundled dependencies.-
-- 19-6-2017: Added keyboard tile selection shortcuts.
+- 19-7-2017: Added keyboard tile selection shortcuts.
+- 21-7-2017: Many changes...
+	- Added grid and file properties dialog.
+	- Added also a little message in the bottom, to know what you are doing.
+	- Fixed bug in tile selection shortcut.
+	- Added background to tile selection list, to make it more usable.
+	- Removed old bracket input to change tiles.
 
 ##Todo
 
-- Add some kind of message to know things are being saved.
-- Add dialog for map size selection.
-- Fix tile page bug (try to switch pages with keyboard shortcuts).
-- Meta mode does not work.
+- Document the file format.
+- Perhaps everything would be easier if I turn the format into dnot.
 
 ##Bugs
+
+- There's a bug in the selector of tiles-objects, try changing layers.
+- Fix tile page bug (try to switch pages with keyboard shortcuts).

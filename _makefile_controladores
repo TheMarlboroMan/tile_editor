@@ -18,6 +18,12 @@ $(DIR_CONTROLADORES)controlador_propiedades_meta.h \
 $(DIR_CONTROLADORES)controlador_propiedades_meta.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_propiedades_meta.cpp -o $(DIR_O)controlador_propiedades_meta.o
 
+$(DIR_O)controlador_propiedades_rejilla.o :\
+$(DIR_O)controlador_base.o \
+$(DIR_CONTROLADORES)controlador_propiedades_rejilla.h \
+$(DIR_CONTROLADORES)controlador_propiedades_rejilla.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CONTROLADORES)controlador_propiedades_rejilla.cpp -o $(DIR_O)controlador_propiedades_rejilla.o
+
 $(DIR_O)controlador_propiedades_objeto_logica.o :\
 $(DIR_O)controlador_base.o \
 $(DIR_CONTROLADORES)controlador_propiedades_objeto_logica.h \

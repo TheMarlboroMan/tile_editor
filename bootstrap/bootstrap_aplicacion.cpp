@@ -4,6 +4,7 @@
 #include "../class/controladores/controlador_propiedades_objeto_logica.h"
 #include "../class/controladores/controlador_propiedades_meta.h"
 #include "../class/controladores/controlador_ayuda.h"
+#include "../class/controladores/controlador_propiedades_rejilla.h"
 #include "../class/app/recursos.h"
 #include "../class/app/contenedor_tilesets.h"
 #include "../class/app/contenedor_logica_sets.h"
@@ -82,6 +83,7 @@ void App::loop_aplicacion(Kernel_app& kernel)
 	Controlador_propiedades_objeto_logica CPOL(DI, kernel.acc_pantalla());
 	Controlador_propiedades_meta CPM(DI, kernel.acc_pantalla());
 	Controlador_ayuda CA(DI, kernel.acc_pantalla());
+	Controlador_propiedades_rejilla CPR(DI, kernel.acc_pantalla());
 	Interface_controlador * IC=&C_R;
 
 	//Últimos pasos antes de arrancar...
@@ -111,6 +113,13 @@ void App::loop_aplicacion(Kernel_app& kernel)
 				break;
 				case Director_estados::t_estados::PROPIEDADES_META: break;
 				case Director_estados::t_estados::AYUDA: break;
+				case Director_estados::t_estados::PROPIEDADES_REJILLA:
+					if(CPR.es_grabar())
+					{
+						C_R.redimensionar_actual(CPR.acc_w(), CPR.acc_h());
+						C_R.cambiar_nombre_fichero(CPR.acc_nombre_fichero());
+					}
+				break;
 			}
 
 			switch(DI.acc_estado_deseado())
@@ -118,7 +127,7 @@ void App::loop_aplicacion(Kernel_app& kernel)
 				case Director_estados::t_estados::REJILLA: IC=&C_R; break;
 				case Director_estados::t_estados::PROPIEDADES_OBJETO_LOGICA: 
 					CPOL.establecer_valores(C_R.obtener_objeto_logica_actual(), C_R.obtener_tipo_objeto_logica_actual());
-					IC=&CPOL;					
+					IC=&CPOL;
 				break;
 				case Director_estados::t_estados::PROPIEDADES_META: 
 					CPM.asignar_propiedades(C_R.acc_propiedades_meta());
@@ -127,6 +136,10 @@ void App::loop_aplicacion(Kernel_app& kernel)
 				case Director_estados::t_estados::AYUDA: 
 					CA.reiniciar();
 					IC=&CA; 
+				break;
+				case Director_estados::t_estados::PROPIEDADES_REJILLA:
+					CPR.ajustar_valores(C_R.acc_indice_rejilla(), C_R.acc_w(), C_R.acc_h(), C_R.acc_nombre_fichero());
+					IC=&CPR; 
 				break;
 			}
 

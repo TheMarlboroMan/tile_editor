@@ -23,6 +23,7 @@ DEP_CONTROLADORES=$(DIR_O)controlador_base.o \
 $(DIR_O)controlador_rejilla.o \
 $(DIR_O)controlador_propiedades_objeto_logica.o \
 $(DIR_O)controlador_propiedades_meta.o \
+$(DIR_O)controlador_propiedades_rejilla.o \
 $(DIR_O)controlador_ayuda.o \
 
 DEP_FRAMEWORK_BASE=$(DIR_O)input_base.o \

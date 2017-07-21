@@ -19,6 +19,7 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	rep_tiles(),
 	rep_info_capa(DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
 	rep_info_pos(DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
+	rep_mensaje(DLibV::Gestor_superficies::obtener(Recursos_graficos::RS_FUENTE_BASE), ""),
 	rejilla_actual(0),
 	capa_logica_actual(0),
 	modo_actual(modo_operacion::REJILLA),
@@ -27,6 +28,9 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	listado_logica(pantalla.acc_h(), ALTURA_LISTADO_VERTICAL),
 	rep_listado_tiles(true),
 	rep_listado_logica(true),
+	rep_fondo_listados(
+			DLibH::Herramientas_SDL::nuevo_sdl_rect(pantalla.acc_w()-W_LISTADOS-2, 0, W_LISTADOS+2, pantalla.acc_h() ),
+			0, 0, 0),
 	rep_seleccion_actual(
 			DLibH::Herramientas_SDL::nuevo_sdl_rect(0, 0, DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
 			64, 64, 192)
@@ -34,6 +38,7 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	rep_seleccion_actual.establecer_alpha(128);
 	rep_info_pos.establecer_posicion(16, 16);
 	rep_info_capa.establecer_posicion(16, 32);
+	rep_mensaje.establecer_posicion(8, pantalla.acc_h()-16);
 
 	listado_tiles.mut_margen_w(2);
 	listado_tiles.mut_margen_h(2);
@@ -45,6 +50,11 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 
 	rep_listado_logica.establecer_posicion(pantalla.acc_w()-W_LISTADOS, 0),
 	rep_listado_logica.establecer_modo_blend(DLibV::Representacion::BLEND_ALPHA);
+
+	rep_fondo_listados.establecer_alpha(128);
+	rep_fondo_listados.establecer_modo_blend(DLibV::Representacion::BLEND_ALPHA);
+
+	actualizar_mensaje("Abriendo "+nombre_fichero+"...");
 }
 
 void Controlador_rejilla::inicializar_sin_fichero()
@@ -166,6 +176,8 @@ void Controlador_rejilla::dibujar(Pantalla& pantalla)
 
 	dibujar_hud_rejillas(pantalla);
 
+	rep_fondo_listados.volcar(pantalla);
+
 	switch(modo_actual)
 	{
 		case modo_operacion::REJILLA: rep_listado_tiles.volcar(pantalla); break;
@@ -175,6 +187,7 @@ void Controlador_rejilla::dibujar(Pantalla& pantalla)
 	rep_seleccion_actual.volcar(pantalla);
 	rep_info_pos.volcar(pantalla);
 	rep_info_capa.volcar(pantalla);
+	rep_mensaje.volcar(pantalla);
 }
 
 void Controlador_rejilla::dibujar_rejilla(Pantalla& pantalla, const int w_rejilla, const int h_rejilla, const int w_nivel, const int h_nivel, const int w_unidades_separador, const int h_unidades_separador)
@@ -276,10 +289,10 @@ void Controlador_rejilla::dibujar_celdas(Pantalla& pantalla, Rejilla& rejilla)
 void Controlador_rejilla::dibujar_hud_rejillas(Pantalla& pantalla)
 {
 	const int ancho=20, alto=10, margen=4;
-	int pos_y=pantalla.acc_h()-margen-alto;
+	int pos_y=pantalla.acc_h()-margen-(3*alto);
 
 	rep_tiles.establecer_textura(Gestor_texturas::obtener(Recursos_graficos::RT_DEFECTO));
-	Representacion_primitiva_caja_estatica caja(Herramientas_SDL::nuevo_sdl_rect(margen, pos_y, ancho, alto), 216, 216, 216);	
+	Representacion_primitiva_caja_estatica caja(Herramientas_SDL::nuevo_sdl_rect(margen, pos_y, ancho, alto), 216, 216, 216);
 
 	for(size_t i=0; i < rejillas.size(); ++i)
 	{
@@ -402,6 +415,11 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	{
 		solicitar_cambio_estado(Director_estados::t_estados::PROPIEDADES_META);
 	}
+	//TODO.
+	else if(input.es_input_down(Input::I_MODO_PROPIEDADES))
+	{
+		solicitar_cambio_estado(Director_estados::t_estados::PROPIEDADES_REJILLA);
+	}
 	else if(input.es_input_down(Input::I_CICLAR_REJILLAS_1) || 
 		input.es_input_down(Input::I_CICLAR_REJILLAS_2) || 
 		input.es_input_down(Input::I_CICLAR_REJILLAS_3) || 
@@ -437,8 +455,10 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 			case modo_operacion::CAPA_LOGICA: 	r=&rep_listado_logica; 	break;
 		}
 
+			
 		r->intercambiar_visibilidad();
 		rep_seleccion_actual.cambiar_visibilidad(r->es_visible());
+		rep_fondo_listados.cambiar_visibilidad(r->es_visible());
 		actualizar_seleccion_actual_listado();
 	}
 	else if(input.es_input_down(Input::I_SWAP_REJILLAS)) 
@@ -504,8 +524,6 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	else if(input.es_input_down(Input::I_CARGAR)) cargar();
 	else if(input.es_input_down(Input::I_AV_PAG)) pasar_pagina_selector(1);
 	else if(input.es_input_down(Input::I_RE_PAG)) pasar_pagina_selector(-1);
-	else if(input.es_input_down(Input::I_SIGUIENTE_TILE)) cambiar_tile_selector(1);
-	else if(input.es_input_down(Input::I_ANTERIOR_TILE)) cambiar_tile_selector(-1);
 
 	//TODO: Al mover sólo la cámara no se refresca esto.
 	auto pos_raton=input.acc_posicion_raton();
@@ -720,6 +738,14 @@ bool Controlador_rejilla::es_click_en_selector(int x, int y)
 	return x >= rep_listado_tiles.acc_posicion().x;
 }
 
+
+void Controlador_rejilla::redimensionar_actual(int w, int h)
+{
+	auto nr=rejillas[rejilla_actual].copiar_redimensionada(w, h);
+	rejillas[rejilla_actual]=nr;
+	reconstruir_rep_info_con_rejilla(rejillas[rejilla_actual]);
+}
+
 void Controlador_rejilla::redimensionar_rejilla(int w, int h, Rejilla& r)
 {
 	auto nr=r.copiar_redimensionada(w, h);
@@ -883,10 +909,12 @@ void Controlador_rejilla::guardar()
 		LOG<<"Iniciando exportación de "<<nombre_fichero<<"\n";
 		Exportador E;
 		E.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+		actualizar_mensaje(nombre_fichero+" guardado con éxito");
 	}
 	catch(Exportador_exception& e)
 	{
 		LOG<<"Ha ocurrido un error en el proceso de exportación : "<<e.what()<<"\n";
+		actualizar_mensaje("Error al guardar"+ nombre_fichero);
 	}
 }
 
@@ -898,10 +926,12 @@ void Controlador_rejilla::cargar()
 		Importador I;
 		I.importar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
 		inicializar();
+		actualizar_mensaje(nombre_fichero+" cargado con éxito");
 	}
 	catch(Exportador_exception& e)
 	{
 		LOG<<"Ha ocurrido un error en el proceso de importación : "<<e.what()<<"\n";
+		actualizar_mensaje("Error al cargar"+ nombre_fichero);
 	}
 	
 }
@@ -943,18 +973,20 @@ void Controlador_rejilla::cambiar_tile_selector(int v)
 		{
 			if(listado_tiles.cambiar_item(v))
 			{
-				preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
 				listado_tiles.mut_indice(listado_tiles.acc_indice_actual());
 				rejillas[rejilla_actual].mut_indice_actual(listado_tiles.item_actual().tile.acc_tipo());
+				//TODO: Check si ha cambiado de página... Ojo con la línea siguiente que lo jode todo.
+				//preparar_listado_tiles(rejillas[rejilla_actual].acc_gestor());
 			}
 		}
 		break;
 		case modo_operacion::CAPA_LOGICA: 
 			if(listado_logica.cambiar_item(v))
 			{
-				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
 				capas_logica[capa_logica_actual].mut_indice_actual(listado_logica.linea_actual().item.logica.acc_tipo());
 				actualizar_seleccion_actual_listado();
+				//TODO: Quizás aquí también.
+//				preparar_listado_logica(capas_logica[capa_logica_actual].acc_gestor());
 			}
 		break;
 	}
@@ -986,4 +1018,9 @@ void Controlador_rejilla::actualizar_seleccion_actual_listado()
 		}
 		break;
 	}
+}
+
+void Controlador_rejilla::actualizar_mensaje(const std::string& m)
+{
+	rep_mensaje.asignar(m);
 }

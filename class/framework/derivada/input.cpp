@@ -41,9 +41,8 @@ void Input::configurar()
 	mapa_teclado.insert(std::make_pair(I_MODO_REJILLA, SDL_SCANCODE_F2));
 	mapa_teclado.insert(std::make_pair(I_MODO_OBJETOS, SDL_SCANCODE_F3));
 	mapa_teclado.insert(std::make_pair(I_MODO_META, SDL_SCANCODE_F4));
-
-	mapa_teclado.insert(std::make_pair(I_SIGUIENTE_TILE, SDL_SCANCODE_RIGHTBRACKET));
-	mapa_teclado.insert(std::make_pair(I_ANTERIOR_TILE, SDL_SCANCODE_LEFTBRACKET));
+	mapa_teclado.insert(std::make_pair(I_MODO_PROPIEDADES, SDL_SCANCODE_F5));
+	mapa_teclado.insert(std::make_pair(I_BACKSPACE, SDL_SCANCODE_BACKSPACE));
 
 	mapa_raton.insert(std::make_pair(I_CLICK_I, SDL_BUTTON_LEFT));
 	mapa_raton.insert(std::make_pair(I_CLICK_D, SDL_BUTTON_RIGHT));

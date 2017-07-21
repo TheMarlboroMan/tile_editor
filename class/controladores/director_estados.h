@@ -4,7 +4,7 @@
 class Director_estados
 {
 	public:
-	enum class t_estados {REJILLA, PROPIEDADES_OBJETO_LOGICA, PROPIEDADES_META, AYUDA};
+	enum class t_estados {REJILLA, PROPIEDADES_OBJETO_LOGICA, PROPIEDADES_META, AYUDA, PROPIEDADES_REJILLA};
 
 	private:
 	t_estados actual;
