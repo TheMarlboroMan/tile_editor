@@ -837,7 +837,16 @@ void Controlador_rejilla::reconstruir_rep_info_con_rejilla(const Rejilla& r)
 
 void Controlador_rejilla::reconstruir_rep_info_con_objeto_logica(const Objeto_logica& obj)
 {
-	std::string info_obj=obj.como_cadena();
+	//Get name of object from prototypes.
+	auto cb=[&obj](const Logica& l) {return (int)l.acc_tipo()==(int)obj.acc_tipo();};
+	auto * proto=capas_logica[capa_logica_actual].acc_gestor().buscar_unico_callback(cb);
+	if(!proto)
+	{
+		throw std::runtime_error("Objeto desconocido reconstruir_rep_info_con_objeto_logica "+std::to_string(obj.acc_tipo()));
+	}
+
+	//Get rest of data.
+	std::string info_obj=proto->acc_nombre()+" "+obj.como_cadena();
 	for(const auto&p : obj.acc_propiedades()) info_obj+="\n - "+p.first+"="+p.second;
 	rep_info_capa.asignar(info_obj);
 }

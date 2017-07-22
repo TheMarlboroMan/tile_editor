@@ -1,13 +1,14 @@
 #Tile editor
 
-A map-level editor for tile based applications. This perfectly represents the aftertought after aftertought school of design, so the code is a wild mess.
-
-It supports:
+A map-level editor for tile based applications. It supports:
 
 - Up to 6 (completely arbitrary) layers of tiles. Each one can have a different tileset and sizes.
 - Up to 6 layers of logic objects. Each one can feed from a custom object notation.
 - Basic meta-property editor, key-value pairs.
 - In-application help (accesible by pressing F1).
+
+Overall, it perfectly represents the aftertought after aftertought school of design, so the code is a wild mess wherever you look at it.
+
 
 #Building
 
@@ -128,6 +129,7 @@ The dnot structure is different, but symbolises the same data.
 
 - Document the file format in dnot.
 - Do dnot import.
+- Test with more than one layer of tiles and logic.
 
 ##Bugs
 

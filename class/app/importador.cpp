@@ -1,5 +1,6 @@
 #include "importador.h"
 
+#include <algorithm>
 #include <class/lector_txt.h>
 #include <herramientas/herramientas/herramientas.h>
 #include "definiciones_importacion_exportacion.h"
@@ -121,73 +122,72 @@ void Importador::leer_como_objeto_logica(const std::string& cadena, const Conten
 		x=std::atoi(partes[1].c_str()),
 		y=std::atoi(partes[2].c_str());
 
-	//Logic types are stored sequentially. If "tipo" is larger, the type does not exist
-	if(tipo > (int)capa.acc_gestor().size()-1 || tipo < 0)
+	Objeto_logica OBJ(tipo, x, y);
+
+	//Find prototype. Add default values for properties... This will prevent errors derived
+	//by new properties.
+
+	auto cb=[tipo](const Logica& l) {return l.acc_tipo()==tipo;};
+	auto * proto=capa.acc_gestor().buscar_unico_callback(cb);
+	if(!proto)
 	{
-		throw Importador_exception("Tipo logica no existe en '"+cadena+"'.");
+		throw Importador_exception("Tipo lógica desconocida '"+std::to_string(tipo)+"' en '"+cadena+"'.");
 	}
-	else
+	auto& base=*proto;
+	OBJ.reservar_propiedades(base.obtener_propiedades_defecto());
+
+	//Now for properties...
+	size_t total=partes.size();
+	if(total > 3)
 	{
-		Objeto_logica OBJ(tipo, x, y);
+		//There are two possible outcomes here... Either we use the old method, or the new method.
+		std::map<std::string, std::string> propiedades;
 
-		//Add default values for properties... This will prevent errors derived
-		//by new properties.
-		auto& base=capa.acc_gestor().at(tipo);
-		OBJ.reservar_propiedades(base.obtener_propiedades_defecto());
-
-		//Now for properties...
-		size_t total=partes.size();
-		if(total > 3)
+		//Old method... we don't have the property name in the files, so we
+		//assume the order matches the declaration. Any extra properties will fail.
+		if(cadena.find(":")==std::string::npos)
 		{
-			//There are two possible outcomes here... Either we use the old method, or the new method.
-			std::map<std::string, std::string> propiedades;
-
-			//Old method... we don't have the property name in the files, so we
-			//assume the order matches the declaration. Any extra properties will fail.
-			if(cadena.find(":")==std::string::npos)
+			size_t i=3, j=0;
+			while(i < total) 
 			{
-				size_t i=3, j=0;
-				while(i < total) 
+				try
 				{
-					try
-					{
-						std::string clave=base.nombre_propiedad_por_indice(j);
-						OBJ.asignar_propiedad(clave, partes[i++]);
-					}
-					catch(std::exception& e)
-					{
-						throw Importador_exception("Propiedad lógica desconocida para indice de propiedad '"+std::to_string(j)+"' en '"+partes[i]+"'.");
-					}
-					++j;
+					std::string clave=base.nombre_propiedad_por_indice(j);
+					OBJ.asignar_propiedad(clave, partes[i++]);
 				}
-			}
-			else
-			{
-				//This is much easier now... Get each part, split it into :. Create properties.
-				//Each property name is matched against the prototype, to see if it does not
-				//exist.
-
-				size_t i=3;
-				while(i < total) 
+				catch(std::exception& e)
 				{
-					auto vals=Herramientas::explotar(partes[i], ':');
-					if(vals.size() != 2)
-					{
-						throw Importador_exception("Propiedad lógica malformada en '"+partes[i]+"'.");
-					}
-					else
-					{
-						if(!base.existe_propiedad(vals[0]))
-						{
-							throw Importador_exception("Propiedad lógica inexistente '"+vals[0]+"' en '"+partes[i]+"'.");
-						}
-						OBJ.asignar_propiedad(vals[0], vals[1]);
-					}
-					++i;
+					throw Importador_exception("Propiedad lógica desconocida para indice de propiedad '"+std::to_string(j)+"' en '"+partes[i]+"'.");
 				}
+				++j;
 			}
 		}
+		else
+		{
+			//This is much easier now... Get each part, split it into :. Create properties.
+			//Each property name is matched against the prototype, to see if it does not
+			//exist.
 
-		capa.insertar_objeto(OBJ);
+			size_t i=3;
+			while(i < total) 
+			{
+				auto vals=Herramientas::explotar(partes[i], ':');
+				if(vals.size() != 2)
+				{
+					throw Importador_exception("Propiedad lógica malformada en '"+partes[i]+"'.");
+				}
+				else
+				{
+					if(!base.existe_propiedad(vals[0]))
+					{
+						throw Importador_exception("Propiedad lógica inexistente '"+vals[0]+"' en '"+partes[i]+"'.");
+					}
+					OBJ.asignar_propiedad(vals[0], vals[1]);
+				}
+				++i;
+			}
+		}
 	}
+
+	capa.insertar_objeto(OBJ);
 }

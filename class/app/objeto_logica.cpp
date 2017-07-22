@@ -6,7 +6,7 @@ unsigned int Objeto_logica::id_actual=0;
 std::string Objeto_logica::como_cadena() const
 {
 	std::stringstream ss;
-	ss<<"TIPO: "<<tipo<<" ID: "<<id<<" POS: "<<x<<","<<y;
+	ss<</*"TIPO: "<<tipo<<"*/" ID: "<<id<<" POS: "<<x<<","<<y;
 	return ss.str();
 }
 
