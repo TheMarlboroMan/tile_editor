@@ -837,19 +837,8 @@ void Controlador_rejilla::reconstruir_rep_info_con_rejilla(const Rejilla& r)
 
 void Controlador_rejilla::reconstruir_rep_info_con_objeto_logica(const Objeto_logica& obj)
 {
-	const auto& capa=capas_logica[capa_logica_actual];
-	int t=obj.acc_tipo();
-	auto cb=[t](const Logica& l) {return l.acc_tipo()==t;};
-	auto tipo=capa.acc_gestor().buscar_unico_callback(cb);
-
 	std::string info_obj=obj.como_cadena();
-	if(tipo!=nullptr)
-	{
-		info_obj=tipo->acc_nombre()+"\n"+info_obj;
-		const auto& propiedades=tipo->acc_propiedades();
-		for(const auto&p : propiedades) info_obj+="\n - "+p.nombre+"="+obj.valor_propiedad(p.id);
-	}
-
+	for(const auto&p : obj.acc_propiedades()) info_obj+="\n - "+p.first+"="+p.second;
 	rep_info_capa.asignar(info_obj);
 }
 
@@ -910,6 +899,9 @@ void Controlador_rejilla::guardar()
 		Exportador E;
 		E.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
 		actualizar_mensaje(nombre_fichero+" guardado con éxito");
+
+		Exportador_dnot ED;
+		ED.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
 	}
 	catch(Exportador_exception& e)
 	{
@@ -928,10 +920,10 @@ void Controlador_rejilla::cargar()
 		inicializar();
 		actualizar_mensaje(nombre_fichero+" cargado con éxito");
 	}
-	catch(Exportador_exception& e)
+	catch(Importador_exception& e)
 	{
 		LOG<<"Ha ocurrido un error en el proceso de importación : "<<e.what()<<"\n";
-		actualizar_mensaje("Error al cargar"+ nombre_fichero);
+		actualizar_mensaje("Error al cargar "+ nombre_fichero);
 	}
 	
 }

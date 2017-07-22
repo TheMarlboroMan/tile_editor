@@ -62,12 +62,7 @@ void Controlador_propiedades_objeto_logica::establecer_propiedad(size_t indice, 
 	{
 		case INDICE_X: objeto->mut_x(std::atoi(valor.c_str())); break;
 		case INDICE_Y: objeto->mut_y(std::atoi(valor.c_str())); break;
-		default:
-		{
-			int prop=indice-PROPIEDADES_DEFECTO+1;
-			objeto->asignar_propiedad(prop, valor);
-		}
-		break;
+		default: objeto->asignar_propiedad(prototipo->nombre_propiedad_por_indice(indice-PROPIEDADES_DEFECTO+1), valor); break;
 	}
 }
 
@@ -83,12 +78,12 @@ void Controlador_propiedades_objeto_logica::actualizar_cadena_datos()
 	if(propiedad_actual==INDICE_Y) ss<<"* Y : ["<<objeto->acc_y()<<"] >> "<<valor_input<<salto;
 	else ss<<"Y : "<<objeto->acc_y()<<salto;
 
-	const auto& propiedades=prototipo->acc_propiedades();
-	int prop=propiedad_actual-PROPIEDADES_DEFECTO+1;
-	for(const auto& p : propiedades) 
+	size_t i=0;
+	for(const auto& p : objeto->acc_propiedades()) 
 	{
-		if(prop==p.id) ss<<"* "<<p.nombre<<" : ["<<objeto->valor_propiedad(p.id)<<"] >> "<<valor_input<<salto;
-		else ss<<p.nombre<<" : "<<objeto->valor_propiedad(p.id)<<salto;
+		if(i==propiedad_actual-2) ss<<"* "<<p.first<<" : ["<<p.second<<"] >> "<<valor_input<<salto;
+		else ss<<p.first<<" : "<<p.second<<salto;
+		++i;
 	}
 
 	cadena_datos=ss.str();

@@ -13,6 +13,7 @@
 #include "../app/contenedor_logica_sets.h"
 #include "../app/exportador.h"
 #include "../app/importador.h"
+#include "../app/exportador_dnot.h"
 
 class Controlador_rejilla:public Controlador_base
 {

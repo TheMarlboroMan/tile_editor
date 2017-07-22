@@ -4,12 +4,14 @@ $(DIR_O_HERRAMIENTAS_PROYECTO)objects/lector_txt.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/controlador_argumentos.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/localizador_base.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/string_utilidades.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/dnot_token.o\
 
 DEP_CLASES_APP=\
 $(DIR_O)propiedad_meta.o\
 $(DIR_O)logica.o\
 $(DIR_O)capa_logica.o\
 $(DIR_O)objeto_logica.o\
+$(DIR_O)exportador_dnot.o\
 $(DIR_O)exportador.o\
 $(DIR_O)importador.o\
 $(DIR_O)tile.o\

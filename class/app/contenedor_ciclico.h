@@ -21,6 +21,7 @@ class Contenedor_ciclico
 
 	const std::vector<T>& acc_items() const {return items;}
 	const T& at(size_t indice) const {return items.at(indice);}
+	bool existe(size_t indice) const {return items.count(indice);}
 
 	template <typename TipoFunc> 
 	const T * buscar_unico_callback(TipoFunc& f) const

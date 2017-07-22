@@ -24,7 +24,7 @@ class Importador
 	Rejilla * leer_como_rejilla(const std::string& cadena, std::vector<Rejilla>& rejillas, const Contenedor_tilesets& contenedor_tilesets);
 	Capa_logica * leer_como_capa_logica(const std::string& cadena, std::vector<Capa_logica>& capas_logica, const Contenedor_logica_sets& contenedor_logica_sets);
 	void leer_como_celdas(const std::string& cadena, Rejilla& rejilla);
-	void leer_como_objeto_logica(const std::string& cadena, Capa_logica& capa);
+	void leer_como_objeto_logica(const std::string& cadena, const Contenedor_logica_sets& contenedor_logica_sets, Capa_logica& capa);
 	void leer_como_meta(const std::string& cadena, std::vector<Propiedad_meta>& propiedades);
 
 	public:

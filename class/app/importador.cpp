@@ -54,7 +54,7 @@ void Importador::importar(std::vector<Rejilla>& rejillas, std::vector<Capa_logic
 					case e::REJILLA: r=leer_como_rejilla(linea, rejillas, contenedor_tilesets); break;
 					case e::CELDA: leer_como_celdas(linea, *r); break;
 					case e::LOGICA: l=leer_como_capa_logica(linea, capas_logica, contenedor_logica_sets); break;
-					case e::OBJETOS: leer_como_objeto_logica(linea, *l); break;
+					case e::OBJETOS: leer_como_objeto_logica(linea, contenedor_logica_sets, *l); break;
 					case e::META: leer_como_meta(linea, propiedades_meta); break;
 				}
 			}
@@ -114,24 +114,80 @@ Capa_logica * Importador::leer_como_capa_logica(const std::string& cadena, std::
 	return &capas_logica.back();
 }
 
-void Importador::leer_como_objeto_logica(const std::string& cadena, Capa_logica& capa)
+void Importador::leer_como_objeto_logica(const std::string& cadena, const Contenedor_logica_sets& contenedor_logica_sets, Capa_logica& capa)
 {
 	auto partes=Herramientas::explotar(cadena, DEFS::SEPARADOR);
 	int tipo=std::atoi(partes[0].c_str()), 
 		x=std::atoi(partes[1].c_str()),
 		y=std::atoi(partes[2].c_str());
 
-	Objeto_logica OBJ(tipo, x, y);
-
-	size_t total=partes.size();
-	if(total > 3)
+	//Logic types are stored sequentially. If "tipo" is larger, the type does not exist
+	if(tipo > (int)capa.acc_gestor().size()-1 || tipo < 0)
 	{
-		std::vector<std::string> propiedades;
-		
-		size_t i=3;
-		while(i < total) propiedades.push_back(partes[i++]);
-		OBJ.reservar_propiedades(propiedades);
+		throw Importador_exception("Tipo logica no existe en '"+cadena+"'.");
 	}
-	
-	capa.insertar_objeto(OBJ);	
+	else
+	{
+		Objeto_logica OBJ(tipo, x, y);
+
+		//Add default values for properties... This will prevent errors derived
+		//by new properties.
+		auto& base=capa.acc_gestor().at(tipo);
+		OBJ.reservar_propiedades(base.obtener_propiedades_defecto());
+
+		//Now for properties...
+		size_t total=partes.size();
+		if(total > 3)
+		{
+			//There are two possible outcomes here... Either we use the old method, or the new method.
+			std::map<std::string, std::string> propiedades;
+
+			//Old method... we don't have the property name in the files, so we
+			//assume the order matches the declaration. Any extra properties will fail.
+			if(cadena.find(":")==std::string::npos)
+			{
+				size_t i=3, j=0;
+				while(i < total) 
+				{
+					try
+					{
+						std::string clave=base.nombre_propiedad_por_indice(j);
+						OBJ.asignar_propiedad(clave, partes[i++]);
+					}
+					catch(std::exception& e)
+					{
+						throw Importador_exception("Propiedad lógica desconocida para indice de propiedad '"+std::to_string(j)+"' en '"+partes[i]+"'.");
+					}
+					++j;
+				}
+			}
+			else
+			{
+				//This is much easier now... Get each part, split it into :. Create properties.
+				//Each property name is matched against the prototype, to see if it does not
+				//exist.
+
+				size_t i=3;
+				while(i < total) 
+				{
+					auto vals=Herramientas::explotar(partes[i], ':');
+					if(vals.size() != 2)
+					{
+						throw Importador_exception("Propiedad lógica malformada en '"+partes[i]+"'.");
+					}
+					else
+					{
+						if(!base.existe_propiedad(vals[0]))
+						{
+							throw Importador_exception("Propiedad lógica inexistente '"+vals[0]+"' en '"+partes[i]+"'.");
+						}
+						OBJ.asignar_propiedad(vals[0], vals[1]);
+					}
+					++i;
+				}
+			}
+		}
+
+		capa.insertar_objeto(OBJ);
+	}
 }

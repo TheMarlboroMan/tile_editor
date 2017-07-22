@@ -23,7 +23,7 @@ class Objeto_logica
 	unsigned int id;	//Su única utilidad es comparar.
 	int tipo, x, y;
 
-	std::map<int, std::string> propiedades;
+	std::map<std::string, std::string> propiedades;
 
 	public:
 
@@ -43,10 +43,10 @@ class Objeto_logica
 	void mut_x(int v) {x=v;}
 	void mut_y(int v) {y=v;}
 
-	void reservar_propiedades(const std::vector<std::string>& valores);
-	const std::map<int, std::string>& acc_propiedades() const {return propiedades;}
-	void asignar_propiedad(int clave, const std::string valor);
-	std::string valor_propiedad(int clave) const;
+	void reservar_propiedades(const std::map<std::string, std::string>& valores);
+
+	const std::map<std::string, std::string>& acc_propiedades() const {return propiedades;}
+	void asignar_propiedad(const std::string&, const std::string&);
 	void movimiento_relativo(int px, int py)
 	{
 		x+=px;
