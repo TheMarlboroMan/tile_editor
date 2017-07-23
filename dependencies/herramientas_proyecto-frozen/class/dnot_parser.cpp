@@ -1,4 +1,5 @@
 #include "dnot_parser.h"
+#include "../source/string_utilidades.h"
 
 using namespace Herramientas_proyecto;
 
@@ -170,7 +171,15 @@ void Dnot_parser::cierra_llave()
 	switch(estado)
 	{
 		case estados::leyendo:
-			asignar_valor_objeto();
+			Herramientas_proyecto::trim(buffer);
+			if(buffer!= "}")
+			{
+				asignar_valor_objeto();
+			}
+			else
+			{
+				buffer.clear();
+			}
 		break;
 		case estados::fin_subparser:
 			//NOOP.
@@ -216,7 +225,15 @@ void Dnot_parser::cierra_corchete()
 	switch(estado)
 	{
 		case estados::leyendo:
-			asignar_valor_lista();
+			Herramientas_proyecto::trim(buffer);
+			if(buffer!= "]")
+			{
+				asignar_valor_lista();
+			}
+			else
+			{
+				buffer.clear();
+			}
 		break;
 		case estados::fin_subparser:
 			//NOOP.
@@ -241,7 +258,7 @@ void Dnot_parser::asignar_valor_objeto()
 	size_t pos=buffer.find(":");
 	if(pos==std::string::npos)
 	{
-		error("No se localizan : para objeto");
+		error("No se localizan : para objeto. Buffer como "+buffer);
 	}
 	else
 	{
@@ -384,7 +401,7 @@ std::string Dnot_parser::traducir_estado()
 	switch(estado)
 	{
 		case estados::leyendo: return "LEYENDO"; break;
-		case estados::fin_subparser: return "FIN SUBPARSER"; break;		
+		case estados::fin_subparser: return "FIN SUBPARSER"; break;
 		case estados::salir: return "SALIR"; break;
 		default: return "DESCONOCIDO"; break;
 	}

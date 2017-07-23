@@ -132,3 +132,39 @@ std::string Herramientas_proyecto::reemplazar_str(const std::string& sujeto, con
 	reemplazar_str(res, busca, reemplaza);
 	return res;
 }
+
+
+std::string& Herramientas_proyecto::ltrim(std::string &s) 
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));	
+	return s;
+}
+
+std::string& Herramientas_proyecto::rtrim(std::string &s) 
+{
+	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+	return s;
+}
+
+std::string& Herramientas_proyecto::trim(std::string &s) 
+{
+	return ltrim(rtrim(s));
+}
+
+std::string Herramientas_proyecto::str_ltrim(const std::string &sub) 
+{
+	std::string s(sub);
+	return ltrim(s);
+}
+
+std::string Herramientas_proyecto::str_rtrim(const std::string &sub) 
+{
+	std::string s(sub);
+	return rtrim(s);
+}
+
+std::string Herramientas_proyecto::str_trim(const std::string &sub) 
+{
+	std::string s(sub);
+	return trim(s);
+}

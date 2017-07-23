@@ -5,6 +5,7 @@ $(DIR_O_HERRAMIENTAS_PROYECTO)objects/controlador_argumentos.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/localizador_base.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/string_utilidades.o\
 $(DIR_O_HERRAMIENTAS_PROYECTO)objects/dnot_token.o\
+$(DIR_O_HERRAMIENTAS_PROYECTO)objects/dnot_parser.o\
 
 DEP_CLASES_APP=\
 $(DIR_O)propiedad_meta.o\

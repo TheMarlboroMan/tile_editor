@@ -13,14 +13,15 @@ void Exportador_dnot::exportar(const std::vector<Rejilla>& rejillas, const std::
 
 	//Building the second level maps.
 	Dnot_token::t_mapa second_level;
-	second_level["info"]=Dnot_token(Dnot_token::t_mapa());
+//	second_level["info"]=Dnot_token(Dnot_token::t_mapa());
 	second_level["meta"]=Dnot_token();
 	second_level["layers"]=Dnot_token(Dnot_token::t_vector());
 	second_level["logic"]=Dnot_token(Dnot_token::t_vector());
 
 	//Building map info data... This is a way to build a dnot, very direct.
-	second_level["info"].acc_tokens().insert(Dnot_token::par_mapa("layers", Dnot_token((int)rejillas.size())));
-	second_level["info"].acc_tokens().insert(Dnot_token::par_mapa("logic", Dnot_token((int)capas_logica.size())));
+	//There's actually no need for this.
+//	second_level["info"].acc_tokens().insert(Dnot_token::par_mapa("layers", Dnot_token((int)rejillas.size())));
+//	second_level["info"].acc_tokens().insert(Dnot_token::par_mapa("logic", Dnot_token((int)capas_logica.size())));
 
 	//Building each layer...
 	//This is a less direct way... We are building a two-depth structure.

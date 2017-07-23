@@ -19,6 +19,7 @@ MODO REJILLA
     Control + [1-6]: cambiar visibilidad rejilla
     Click izquierdo: crear celda (LShift para línea, LControl para rectángulo)
     Click izquierdo + espacio : seleccionar tipo de celda
+    Click + espacio: Seleccionar tile en mapa.
     Click derecho: Borrar celda (LShift para línea, LControl para rectángulo)
     TAB: mostrar y ocultar selector celdas
     C: Intercambiar posición de rejilla y rejilla anterior

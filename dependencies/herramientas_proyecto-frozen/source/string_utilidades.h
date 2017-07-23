@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 /*
 Conjunto de utilidades libres con dependencias de pequeñas clases sueltas.
@@ -30,6 +31,14 @@ size_t					digitos_en_entero(int);
 void					reemplazar_str(std::string& sujeto, const std::string& busca, const std::string& reemplaza);
 std::string				reemplazar_str(const std::string& sujeto, const std::string& busca, const std::string& reemplaza);
 
+//Patch.
+std::string& 				ltrim(std::string&);
+std::string& 				rtrim(std::string&);
+std::string& 				trim(std::string&);
+
+std::string 				str_ltrim(const std::string&);
+std::string 				str_rtrim(const std::string&);
+std::string 				str_trim(const std::string&);
 
 }
 
