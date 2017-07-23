@@ -68,7 +68,11 @@ PARAMETERS:
 
 ##Output file format...
 
-The thing does output in dnot (think json... before it was fashionable) but a classic version used this structure:
+There is no official extension for this. I use ".dat", but the output is actually a simple text file.
+
+The thing does output in dnot (think json... before it was fashionable) but there was also a very simple "classic" structure. By default, the application will use the "dnot" format but will try to detect the kind of file when opening a new one. Classic files will be always saved with the classic format. It is, however, trivial to dive into the "controlador_rejilla.cpp" code and make the neccesary changes if this behaviour is undesirable.
+
+This is the classic format. ! denotes a comment on this description, but the real file allows for no comments.
 
 !Begin data. Only thing that closes, actually.
 [ESTRUCTURA] 
@@ -106,9 +110,75 @@ detonado:true
 
 The [REJILLA] + [CELDAS] structure repeats once for each layer, same as the [LOGICA] + [OBJETOS] one.
 
-The dnot structure is different, but symbolises the same data.
+The dnot structure is different, but symbolises the same data. The structure below has been expanded for readability. Again, the real one accepts no comments!!!
 
-//TODO!!!!!!
+data:{				!Main block.
+	info:{
+		layers:2, 	!Quantity of tile layers.
+		logic:2		!Quantity of object layers.
+	}, 
+	layers:[		!Definition of tile layers.
+		{		!First block of layers... Layers are presented in order.
+			data:[	!Definition of tiles....
+				{t:1, x:5, y:0}, 	!t=type, x and y are in 0-based index.
+				{t:1, x:8, y:10}], 
+			info:{	!Definition of layer structure..
+				h:11, 	!Height
+				hc:32, 	!Height of each cell, in pixels.
+				hu:8, 	!Cells until horizontal ruler in editor.
+				i:1, 	!Index of tileset used.
+				w:14, 	!Width.
+				wc:32, 	!Width of each cell, in pixels.
+				wu:8}	!Cells until vertical ruler in editor.
+			}, 	!End of first block of layers.
+		{		!Second block of tile layers. Same data.
+			data:[
+				{t:64, x:0, y:0}, 
+				{t:63, x:13, y:10}], 
+			info:{
+				h:11, 
+				hc:32, 
+				hu:8, 
+				i:0, 
+				w:14, 
+				wc:32, 
+				wu:8}
+			}
+		], 		!End of all tile layers.
+	logic:[			!Logic layers.
+		{		!Begin first logic layer.
+			data:[	!Data of first logic layer.
+				{
+					p:{bearing:"2"}, 	!Properties, in simple key-value notation.
+					t:1, x:64, y:160}, 	!t is type. x and y are in pixels.
+				{
+					p:{active:"0"}, 
+					t:4, x:352, y:160}
+			], 
+			info:{i:1}	!Definition of layer structure, i is the tileset.
+		}, 
+		{		!Second tile layer, same structure.
+			data:[
+				{
+					p:{bearing:"55", speed:"56"}, 
+					t:1, x:160, y:64}, 
+				{
+					p:{tag:"666"}, 
+					t:2, x:320, y:64}
+			], 
+			info:{i:0}
+		}
+	], 			!End of all tile layers.
+	meta:{			!Begin metadata. Always one key and one value, as strings.
+		ESTADO:"activo", 
+		categoria:"1", 
+		detonado:"true"
+	}
+}
+
+In all, the dnot format is larger and more verbose but much easier to parse and, most importantly, parseable with the utilities present in the repositories.
+
+As a side note, data compression was considered at a point (bind together ranges of equal tiles, for example) but was discarded.
 
 ##History
 
@@ -127,9 +197,7 @@ The dnot structure is different, but symbolises the same data.
 
 ##Todo
 
-- Document the file format in dnot.
 - Do dnot import.
-- Test with more than one layer of tiles and logic.
 
 ##Bugs
 

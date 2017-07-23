@@ -60,9 +60,12 @@ void Controlador_propiedades_objeto_logica::establecer_propiedad(size_t indice, 
 {
 	switch(indice)
 	{
-		case INDICE_X: objeto->mut_x(std::atoi(valor.c_str())); break;
-		case INDICE_Y: objeto->mut_y(std::atoi(valor.c_str())); break;
-		default: objeto->asignar_propiedad(prototipo->nombre_propiedad_por_indice(indice-PROPIEDADES_DEFECTO+1), valor); break;
+		case INDICE_X: objeto->mut_x(std::atoi(valor.c_str())); break; //0
+		case INDICE_Y: objeto->mut_y(std::atoi(valor.c_str())); break; //1
+		default: //2 ...
+			//This sucks balls
+			objeto->asignar_propiedad(prototipo->nombre_propiedad_por_indice(indice-PROPIEDADES_DEFECTO), valor); 
+		break;
 	}
 }
 

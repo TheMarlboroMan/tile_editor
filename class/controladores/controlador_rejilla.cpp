@@ -1,5 +1,6 @@
 #include "controlador_rejilla.h"
 #include "../app/recursos.h"
+#include "../app/definiciones_importacion_exportacion.h"
 #include <sstream>
 
 using namespace DLibV;
@@ -23,6 +24,7 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 	rejilla_actual(0),
 	capa_logica_actual(0),
 	modo_actual(modo_operacion::REJILLA),
+	tipo_output(modo_output::dnot),
 	objeto_logica_actual(nullptr),
 	listado_tiles(W_LISTADOS, pantalla.acc_h(), DIM_LISTADO_REJILLA, DIM_LISTADO_REJILLA),
 	listado_logica(pantalla.acc_h(), ALTURA_LISTADO_VERTICAL),
@@ -53,8 +55,6 @@ Controlador_rejilla::Controlador_rejilla(Director_estados &DI, Pantalla& pantall
 
 	rep_fondo_listados.establecer_alpha(128);
 	rep_fondo_listados.establecer_modo_blend(DLibV::Representacion::BLEND_ALPHA);
-
-	actualizar_mensaje("Abriendo "+nombre_fichero+"...");
 }
 
 void Controlador_rejilla::inicializar_sin_fichero()
@@ -64,6 +64,7 @@ void Controlador_rejilla::inicializar_sin_fichero()
 		rejillas.push_back(Rejilla(64, 64, 32, 32, 8, 8, tilesets[0]));
 		capas_logica.push_back(Capa_logica(sets_tipo_logica[0]));
 		inicializar();
+		actualizar_mensaje("Nuevo fichero "+nombre_fichero+"...");
 	}
 	catch(Contenedor_tilesets_exception& e)
 	{
@@ -415,7 +416,6 @@ Controlador_rejilla::Info_input Controlador_rejilla::recoger_input(const Input_b
 	{
 		solicitar_cambio_estado(Director_estados::t_estados::PROPIEDADES_META);
 	}
-	//TODO.
 	else if(input.es_input_down(Input::I_MODO_PROPIEDADES))
 	{
 		solicitar_cambio_estado(Director_estados::t_estados::PROPIEDADES_REJILLA);
@@ -877,9 +877,6 @@ void Controlador_rejilla::ciclar_zoom()
 {
 	++info_zoom.zoom;
 	if(info_zoom.zoom==4) info_zoom.zoom=1;
-
-	//TODO: Check this works...
-//	camara.enfocar_a(info_zoom.w * info_zoom.zoom, info_zoom.h * info_zoom.zoom);
 	camara.mut_zoom(info_zoom.zoom);
 }
 
@@ -905,12 +902,28 @@ void Controlador_rejilla::guardar()
 	try
 	{
 		LOG<<"Iniciando exportación de "<<nombre_fichero<<"\n";
-		Exportador E;
-		E.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
-		actualizar_mensaje(nombre_fichero+" guardado con éxito");
+	
+		switch(tipo_output)
+		{
+			case modo_output::classic:
+			{
+				Exportador E;
+				E.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+			}
+			break;
+			case modo_output::dnot:
+			{
+				Exportador_dnot E;
+				E.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+			}
+		}
 
-		Exportador_dnot ED;
-		ED.exportar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+		actualizar_mensaje(nombre_fichero+" guardado con éxito");
+	}
+	catch(Exportador_dnot_exception& e)
+	{
+		LOG<<"Ha ocurrido un error en el proceso de exportación : "<<e.what()<<"\n";
+		actualizar_mensaje("Error al guardar"+ nombre_fichero);
 	}
 	catch(Exportador_exception& e)
 	{
@@ -924,17 +937,57 @@ void Controlador_rejilla::cargar()
 	try
 	{
 		LOG<<"Iniciando importación de "<<nombre_fichero<<"\n";
-		Importador I;
-		I.importar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+
+		//Try to determine the type of file...
+		std::string primera_linea;
+		std::ifstream f(nombre_fichero);
+	
+		if(!f || f.eof()) 
+		{
+			throw std::runtime_error("Imposible abrir fichero");
+		}
+		
+		std::getline(f, primera_linea);
+		if(primera_linea==Definiciones_importacion_exportacion::ABRE_ESTRUCTURA)
+		{
+			LOG<<"Fichero classic detectado"<<std::endl;
+			tipo_output=modo_output::classic;
+		}
+
+		switch(tipo_output)
+		{
+			case modo_output::classic:
+			{
+				Importador I;
+				I.importar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+			}
+			break;
+			case modo_output::dnot:
+			{
+				Importador_dnot I;
+				I.importar(rejillas, capas_logica, propiedades_meta, tilesets, sets_tipo_logica, nombre_fichero);
+			}
+			break;
+		}
+
 		inicializar();
 		actualizar_mensaje(nombre_fichero+" cargado con éxito");
+	}
+	catch(Importador_dnot_exception& e)
+	{
+		LOG<<"Ha ocurrido un error en el proceso de importación : "<<e.what()<<"\n";
+		actualizar_mensaje("Error al cargar "+ nombre_fichero);
 	}
 	catch(Importador_exception& e)
 	{
 		LOG<<"Ha ocurrido un error en el proceso de importación : "<<e.what()<<"\n";
 		actualizar_mensaje("Error al cargar "+ nombre_fichero);
 	}
-	
+	catch(std::exception& e)
+	{
+		LOG<<"Ha ocurrido un error en el proceso de importación : "<<e.what()<<"\n";
+		actualizar_mensaje("Error al cargar "+ nombre_fichero);
+	}
 }
 
 void Controlador_rejilla::deseleccionar_objeto_logica_actual()

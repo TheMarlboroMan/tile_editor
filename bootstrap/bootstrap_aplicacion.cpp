@@ -35,6 +35,8 @@ void App::loop_aplicacion(Kernel_app& kernel)
 
 		for(std::string l; std::getline(cfg, l); )
 		{
+			if(l[0]=='#') continue;
+
 			auto partes=Herramientas::explotar(l, '\t');
 
 			if(partes.size())
@@ -91,7 +93,7 @@ void App::loop_aplicacion(Kernel_app& kernel)
 	if(fichero) 
 	{
 		LOG<<"Inicializando con fichero existente "<<nombre_fichero_salida<<"\n";
-		C_R.cargar();		
+		C_R.cargar();
 		fichero.close();
 	}
 	else 

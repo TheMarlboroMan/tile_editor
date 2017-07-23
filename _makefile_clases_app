@@ -57,7 +57,6 @@ $(DIR_O)rejilla.o\
 $(DIR_O)contenedor_tilesets.o\
 $(DIR_O)contenedor_logica_sets.o\
 $(DIR_O)capa_logica.o\
-$(DIR_O)definiciones_importacion_exportacion.o\
 $(DIR_CLASES_APP)exportador_dnot.h \
 $(DIR_CLASES_APP)exportador_dnot.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)exportador_dnot.cpp -o $(DIR_O)exportador_dnot.o
@@ -71,6 +70,15 @@ $(DIR_O)definiciones_importacion_exportacion.o\
 $(DIR_CLASES_APP)exportador.h \
 $(DIR_CLASES_APP)exportador.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)exportador.cpp -o $(DIR_O)exportador.o
+
+$(DIR_O)importador_dnot.o:\
+$(DIR_O)rejilla.o\
+$(DIR_O)contenedor_tilesets.o\
+$(DIR_O)contenedor_logica_sets.o\
+$(DIR_O)capa_logica.o\
+$(DIR_CLASES_APP)importador_dnot.h \
+$(DIR_CLASES_APP)importador_dnot.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) $(DIR_CLASES_APP)importador_dnot.cpp -o $(DIR_O)importador_dnot.o
 
 $(DIR_O)importador.o:\
 $(DIR_O)rejilla.o\

@@ -14,6 +14,7 @@
 #include "../app/exportador.h"
 #include "../app/importador.h"
 #include "../app/exportador_dnot.h"
+#include "../app/importador_dnot.h"
 
 class Controlador_rejilla:public Controlador_base
 {
@@ -27,6 +28,7 @@ class Controlador_rejilla:public Controlador_base
 	static const size_t W_LISTADOS=200;
 	
 	enum class modo_operacion {REJILLA, CAPA_LOGICA};
+	enum class modo_output{dnot, classic};
 
 	struct Info_input
 	{
@@ -91,10 +93,11 @@ class Controlador_rejilla:public Controlador_base
 	DLibV::Representacion_texto_auto_estatica rep_info_pos;
 	DLibV::Representacion_texto_auto_estatica rep_mensaje;
 
-	size_t rejilla_actual;
-	size_t capa_logica_actual;
-	modo_operacion modo_actual;
-	Objeto_logica * objeto_logica_actual;
+	size_t 			rejilla_actual;
+	size_t 			capa_logica_actual;
+	modo_operacion 		modo_actual;
+	modo_output 		tipo_output;
+	Objeto_logica * 	objeto_logica_actual;
 
 	Herramientas_proyecto::Listado_rejilla<Item_tile>	listado_tiles;
 	Herramientas_proyecto::Listado_vertical<Item_logica>	listado_logica;

@@ -6,33 +6,7 @@
 void Exportador_dnot::exportar(const std::vector<Rejilla>& rejillas, const std::vector<Capa_logica>& capas_logica, const std::vector<Propiedad_meta>& propiedades_meta,
 	const Contenedor_tilesets& contenedor_tilesets, const Contenedor_logica_sets& contenedor_logica_sets,  const std::string nombre_fichero)
 {
-/*
-data:{
-	info:{
-		layers:1,
-		logic:1}
-	,
-	meta:{
-		THIS CAN BE TRICKY...
-	},
-	layers:[
-		{
-			info: {},
-			data: {}
-		}
-	],
-	logic:[
-		{
-			info: {},
-			data: {}
-		}
-	]
-}
-*/
-
 	using namespace Herramientas_proyecto;
-
-//	auto add_tok=[](Dnot_token& tok, 
 
 	//Building the first level map
 	Dnot_token::t_mapa mroot;
@@ -156,7 +130,13 @@ data:{
 	Dnot_token root;
 	root.asignar(mroot);
 
-	//TODO: Now this should be saved to disk, right?
+	//Save to disk.
+	std::ofstream fichero(nombre_fichero.c_str());
+	if(!fichero)
+	{
+		throw Exportador_dnot_exception("El fichero "+nombre_fichero+" no pudo ser abierto");
+	}
 
-	std::cout<<root.serializar()<<std::endl;
+	fichero<<root.serializar();
+	fichero.close();
 }

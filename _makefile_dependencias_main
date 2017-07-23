@@ -12,6 +12,7 @@ $(DIR_O)logica.o\
 $(DIR_O)capa_logica.o\
 $(DIR_O)objeto_logica.o\
 $(DIR_O)exportador_dnot.o\
+$(DIR_O)importador_dnot.o\
 $(DIR_O)exportador.o\
 $(DIR_O)importador.o\
 $(DIR_O)tile.o\
