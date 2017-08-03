@@ -7,6 +7,7 @@ PARÁMETROS:
 	cfg: fichero de configuración que consta de N lineas con el formato siguiente:
 
 		T	nombre_hoja_sprites	caracter comentario	|	ruta recurso gráfico	transparencia	r transparencia	g transparencia	b transparencia
+		T	nombre_hoja_sprites	caracter comentario	|	ruta recurso gráfico (sin especificar transparencia para png).
 		O	ruta definición objetos
 
 	La T o O iniciales discrimian si es tipo Tile o Objeto.

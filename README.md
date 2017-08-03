@@ -48,6 +48,7 @@ PARAMETERS:
 	cfg: Name of the configuration file, made up of N lines with this format:
 
 		T	sprite_sheet_name	comment_character	|	path_to_graphics	alpha	r_value_for_alpha	g_value_for_alpha	b_value_for_alpha
+		T	sprite_sheet_name	comment_character	|	path_to_graphics	(for alpha channel pngs)
 		O	path_to_object_definition
 
 	The first T or O characters determine if the line defines a set of tiles or a set of objects. All sets specified will be loaded.
@@ -68,6 +69,8 @@ PARAMETERS:
 There is no official extension for this. I use ".dat", but the output is actually a simple text file.
 
 The thing does output in dnot (think json... before it was fashionable) but there was also a very simple "classic" structure. By default, the application will use the "dnot" format but will try to detect the kind of file when opening a new one. Classic files will be always saved with the classic format. It is, however, trivial to dive into the "controlador_rejilla.cpp" code and make the neccesary changes if this behaviour is undesirable.
+
+The dnot format saves additional presentational data, such as alpha values.
 
 This is the classic format. ! denotes a comment on this description, but the real file allows for no comments.
 
@@ -116,6 +119,7 @@ data:{				!Main block.
 				{t:1, x:5, y:0}, 	!t=type, x and y are in 0-based index.
 				{t:1, x:8, y:10}], 
 			info:{	!Definition of layer structure..
+				al:255, !Alpha of presentation.
 				h:11, 	!Height
 				hc:32, 	!Height of each cell, in pixels.
 				hu:8, 	!Cells until horizontal ruler in editor.
@@ -190,10 +194,18 @@ As a side note, data compression was considered at a point (bind together ranges
 - 23-7-2017: Changes.
 	- Added dnot export-import.
 	- Fixed bug in dnot_parser, of course, only in the frozen branch here.
+- 3-8-2017: Changes.
+	- Added alpha to each layer so shadow layers can be done. 
+	- Added alpha and separator space to layer properties controller.
+	- Added the possibility to change cell size, which previously was impossible without fiddling with the map files.
+	- Also added this value to importers and exporters.
+	- Changed a bit the structure of each layer to further presentational changes (such as background colours) can be changed easily.
+	- Hacked the life away to support png alpha.
 
 ##Todo
 
-- Nothing here so far.
+- Load not only tileset, but also animation sets.
+- Save visibility of each layer??
 
 ##Bugs
 

@@ -130,7 +130,7 @@ class Controlador_rejilla:public Controlador_base
 	void inicializar();
 	void actualizar_mensaje(const std::string&);
 
-	void dibujar_rejilla(DLibV::Pantalla& p, const int w, const int h, const int w_nivel, const int h_nivel, const int w_unidades_separador, const int h_unidades_separador);
+	void dibujar_rejilla(DLibV::Pantalla& p, const int w, const int h, const int w_nivel, const int h_nivel, const Rejilla::Datos_presentacion&);
 	void dibujar_celdas(DLibV::Pantalla& p, Rejilla& rejilla);
 	void dibujar_capa_logica(DLibV::Pantalla& p, Capa_logica& capa);
 	void dibujar_hud_rejillas(DLibV::Pantalla& p);
@@ -224,10 +224,18 @@ class Controlador_rejilla:public Controlador_base
 	void inicializar_sin_fichero();
 	int acc_w() const {return rejillas[rejilla_actual].acc_w();}
 	int acc_h() const {return rejillas[rejilla_actual].acc_h();}
+	int acc_w_celda() const {return rejillas[rejilla_actual].acc_w_celda();}
+	int acc_h_celda() const {return rejillas[rejilla_actual].acc_h_celda();}
+	int acc_w_separador() const {return rejillas[rejilla_actual].acc_presentacion().w_unidades_separador;}
+	int acc_h_separador() const {return rejillas[rejilla_actual].acc_presentacion().h_unidades_separador;}
+	int acc_alpha_rejilla() const {return rejillas[rejilla_actual].acc_presentacion().alpha;}
 	size_t acc_indice_rejilla() const {return rejilla_actual;}
 	const std::string& acc_nombre_fichero() const {return nombre_fichero;}
 	void redimensionar_actual(int w, int h);
 	void cambiar_nombre_fichero(const std::string& nf) {nombre_fichero=nf;}
+	void establecer_alpha(int);
+	void establecer_separador(int, int);
+	void establecer_dimensiones_celda(int, int);
 
 	std::vector<Propiedad_meta>& acc_propiedades_meta() {return propiedades_meta;}
 	Objeto_logica& obtener_objeto_logica_actual() {return *objeto_logica_actual;}

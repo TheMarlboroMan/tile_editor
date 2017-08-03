@@ -29,7 +29,6 @@ void Cargador_recursos_base::generar_recursos_texturas(DLibV::Pantalla &p)
 	pantalla=&p;
 	try
 	{
-
 		procesar(obtener_entradas_texturas(), &Cargador_recursos_base::procesar_entrada_textura);
 	}
 	catch(Excepcion_carga_recursos& e)
@@ -82,12 +81,7 @@ void Cargador_recursos_base::generar_recursos_musica()
 
 void Cargador_recursos_base::procesar_entrada_textura(const std::vector<std::string>& valores)
 {
-	if(valores.size()!=6) 
-	{
-		LOG<<"ERROR: No hay 6 parametros para recursos textura, en su lugar "<<valores.size()<<": "<<std::endl;
-		for(auto& v : valores) LOG<<v<<" "<<std::endl;
-	}
-	else 
+	if(valores.size()==6) 
 	{
 		unsigned int indice=std::atoi(valores[0].c_str());
 		std::string ruta=valores[1];
@@ -117,7 +111,38 @@ void Cargador_recursos_base::procesar_entrada_textura(const std::vector<std::str
 				LOG<<"ERROR: No se ha podido insertar textura "<<indice<<" en "<<ruta<<std::endl;
 			}	
 		}
-	}			
+	}
+	else if(valores.size()==2)
+	{
+		unsigned int indice=std::atoi(valores[0].c_str());
+		std::string ruta=valores[1];
+
+        	SDL_Surface * temp=IMG_Load(ruta.c_str());
+	        if (!temp) 
+        	{
+			LOG<<"ERROR: Cargador recursos base no se ha podido cargar superficie para textura en "<<ruta<<std::endl;
+        	}
+		else
+		{
+			SDL_Surface * optimizada=SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_ARGB8888, 0);
+	      	        SDL_FreeSurface(temp);
+
+			DLibV::Textura * t=new DLibV::Textura(pantalla->acc_renderer(), optimizada);
+			if(DLibV::Gestor_texturas::insertar(indice, t)==-1)
+			{
+				LOG<<"ERROR: No se ha podido insertar textura "<<indice<<" en "<<ruta<<std::endl;
+			}	
+		}
+
+//	return temp;
+
+///		SDL_Surface * superficie=DLibV::Utilidades_graficas_SDL::cargar_imagen(ruta.c_str(), pantalla->acc_ventana());
+	}
+	else
+	{
+		LOG<<"ERROR: No hay 6/2 parametros para recursos textura, en su lugar "<<valores.size()<<": "<<std::endl;
+		for(auto& v : valores) LOG<<v<<" "<<std::endl;
+	}
 }
 
 void Cargador_recursos_base::procesar_entrada_superficie(const std::vector<std::string>& valores)

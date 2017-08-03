@@ -25,17 +25,34 @@ class Celda
 
 class Rejilla
 {
+	public:
+
+	struct Datos_presentacion
+	{
+		int w_unidades_separador, h_unidades_separador;
+		int alpha;
+
+		Datos_presentacion(int wus, int hus, int alp=255):
+			w_unidades_separador(wus),
+			h_unidades_separador(hus),
+			alpha(alp)
+		{}
+	};
+
+
 	private:
 
 	//Ancho y alto de la rejilla, en celdas.
 	int w, h;
 	//Dimensiones de la celda.
 	int w_celda, h_celda;
-	//Cada x celdas hay una línea de un color diferente en la rejilla.
-	int w_unidades_separador, h_unidades_separador;
+
+	Datos_presentacion presentacion;
 
 	//Indice de tile seleccionado actualmente.
 	int indice_actual;
+
+
 
 	//Lo ponemos como puntero porque es posible cambiarlo en marcha.
 	const Tile_set * gestor_tiles;
@@ -43,18 +60,19 @@ class Rejilla
 	bool visible_siempre;
 
 	public:
-
+	
 	Herramientas_proyecto::Matriz_2d<Celda> r;	//La rejilla es PUBLICA. Si, pública... No tiene sentido hacer de este un objeto proxy para eso.
 
 	int acc_w() const {return w;}
 	int acc_h() const {return h;}
 	int acc_w_celda() const {return w_celda;}
 	int acc_h_celda() const {return h_celda;}
-	int acc_w_unidades_separador() const {return w_unidades_separador;}
-	int acc_h_unidades_separador() const {return h_unidades_separador;}
+	Datos_presentacion acc_presentacion() const {return presentacion;}
 
-	Rejilla(int pw, int ph, int pwc, int phc, int pws, int phs, const Tile_set& gt): 
-		w(pw), h(ph), w_celda(pwc), h_celda(phc), w_unidades_separador(pws), h_unidades_separador(phs), indice_actual(1), gestor_tiles(&gt), visible_siempre(false), r(w, h)
+	Rejilla(int pw, int ph, int pwc, int phc, Datos_presentacion dpres, const Tile_set& gt): 
+		w(pw), h(ph), w_celda(pwc), h_celda(phc), 
+		presentacion(dpres), indice_actual(1), 
+		gestor_tiles(&gt), visible_siempre(false), r(w, h)
 	{}
 
 	void cambiar_gestor(const Tile_set& gt) {gestor_tiles=&gt; indice_actual=1;}
@@ -67,11 +85,22 @@ class Rejilla
 	
 	void reajustar_espaciado(int px, int py)
 	{
-		w_unidades_separador+=px;
-		h_unidades_separador+=py;
+		presentacion.w_unidades_separador+=px;
+		presentacion.h_unidades_separador+=py;
 
-		if(w_unidades_separador <= 0) w_unidades_separador=1;
-		if(h_unidades_separador <= 0) h_unidades_separador=1;
+		if(presentacion.w_unidades_separador <= 0) presentacion.w_unidades_separador=1;
+		if(presentacion.h_unidades_separador <= 0) presentacion.h_unidades_separador=1;
+	}
+
+	void establecer_alpha(int alpha)
+	{
+		presentacion.alpha=alpha;
+	}
+
+	void establecer_dimensiones_celda(int w, int h)
+	{
+		w_celda=w;
+		h_celda=h;
 	}
 
 	static Rejilla copiar_sin_contenido(const Rejilla& r)
@@ -79,20 +108,20 @@ class Rejilla
 		return Rejilla(
 			r.w, r.h, 
 			r.w_celda, r.h_celda, 
-			r.w_unidades_separador, r.h_unidades_separador, 
+			r.presentacion,
 			*r.gestor_tiles );
 	}
 
 	Rejilla copiar_redimensionada(int pw, int ph)
 	{
-		Rejilla resultado(pw, ph, w_celda, h_celda, w_unidades_separador, h_unidades_separador, *gestor_tiles);
+		Rejilla resultado(pw, ph, w_celda, h_celda, presentacion, *gestor_tiles);
 		resultado.r=r.copiar_con_dimensiones(pw, ph);
 		return resultado;
 	}
 
 	Rejilla copiar_mover(int px, int py)
 	{
-		Rejilla resultado(w, h, w_celda, h_celda, w_unidades_separador, h_unidades_separador, *gestor_tiles);
+		Rejilla resultado(w, h, w_celda, h_celda, presentacion, *gestor_tiles);
 		auto& m=r.acc_matriz();
 		for(auto& par : m)
 		{

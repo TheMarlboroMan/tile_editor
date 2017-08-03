@@ -61,7 +61,7 @@ void Controlador_rejilla::inicializar_sin_fichero()
 {
 	try
 	{
-		rejillas.push_back(Rejilla(64, 64, 32, 32, 8, 8, tilesets[0]));
+		rejillas.push_back(Rejilla(64, 64, 32, 32, Rejilla::Datos_presentacion(8,8), tilesets[0]));
 		capas_logica.push_back(Capa_logica(sets_tipo_logica[0]));
 		inicializar();
 		actualizar_mensaje("Nuevo fichero "+nombre_fichero+"...");
@@ -100,6 +100,7 @@ void Controlador_rejilla::preparar_listado_tiles(const Tile_set& s)
 	for(const auto& itemp : pagina)
 	{
 		BMP * bmp=new BMP(rec);
+		bmp->establecer_modo_blend(Representacion::BLEND_ALPHA);
 		const auto& tile=itemp.item.tile;
 		bmp->establecer_recorte(tile.acc_x(), tile.acc_y(), tile.acc_w(), tile.acc_h());
 		bmp->establecer_posicion(itemp.x, itemp.y, 32, 32);
@@ -157,7 +158,7 @@ void Controlador_rejilla::dibujar(Pantalla& pantalla)
 	auto& c=capas_logica[capa_logica_actual];
 	const int wc=r.acc_w_celda(), hc=r.acc_h_celda();
 
-	dibujar_rejilla(pantalla, wc, hc, wc * r.acc_w(), hc * r.acc_h(), r.acc_w_unidades_separador(), r.acc_h_unidades_separador());
+	dibujar_rejilla(pantalla, wc, hc, wc * r.acc_w(), hc * r.acc_h(), r.acc_presentacion());
 
 	for(auto& rej : rejillas)
 	{
@@ -191,13 +192,15 @@ void Controlador_rejilla::dibujar(Pantalla& pantalla)
 	rep_mensaje.volcar(pantalla);
 }
 
-void Controlador_rejilla::dibujar_rejilla(Pantalla& pantalla, const int w_rejilla, const int h_rejilla, const int w_nivel, const int h_nivel, const int w_unidades_separador, const int h_unidades_separador)
+void Controlador_rejilla::dibujar_rejilla(Pantalla& pantalla, const int w_rejilla, const int h_rejilla, const int w_nivel, const int h_nivel, const Rejilla::Datos_presentacion& pres)
 {
 	Representacion_primitiva_linea_estatica lin(0, 0, 0, 0, 0, 0, 0);
 	auto const foco=camara.acc_caja_foco();
 	//TODO: Esto sigue sin estar bien... Estamos desperdiciando ciclos intentando dibujar fuera de la pantalla.
 	const int max_x=w_nivel, max_y=h_nivel;
 	int x=(w_rejilla - foco.x) % w_rejilla, y=(h_rejilla - foco.y) % h_rejilla, px=0, py=0;
+	int h_unidades_separador=pres.h_unidades_separador,
+		w_unidades_separador=pres.w_unidades_separador;
 
 	//En vertical... Solución de mierda para un problema de mierda.
 	int linea_x_actual=foco.x && foco.x < w_rejilla ? 1 : floor( (float)foco.x / (float)w_rejilla); 
@@ -266,6 +269,8 @@ void Controlador_rejilla::dibujar_celdas(Pantalla& pantalla, Rejilla& rejilla)
 	//TODO... Sacar sólo las que queden dentro de la cámara...
 	auto& celdas=rejilla.r.acc_matriz();
 	rep_tiles.establecer_textura(Gestor_texturas::obtener(rejilla.acc_indice_recurso()));
+	rep_tiles.establecer_modo_blend(Representacion::BLEND_ALPHA);
+	rep_tiles.establecer_alpha(rejilla.acc_presentacion().alpha);
 
 	for(const Matriz_2d<Celda>::par& p : celdas)
 	{
@@ -746,6 +751,24 @@ void Controlador_rejilla::redimensionar_actual(int w, int h)
 	reconstruir_rep_info_con_rejilla(rejillas[rejilla_actual]);
 }
 
+void Controlador_rejilla::establecer_alpha(int alpha)
+{
+	rejillas[rejilla_actual].establecer_alpha(alpha);
+}
+
+void Controlador_rejilla::establecer_separador(int w, int h)
+{
+	auto& r=rejillas[rejilla_actual];
+	r.reajustar_espaciado(w, h);
+	reconstruir_rep_info_con_rejilla(r);
+}
+
+void Controlador_rejilla::establecer_dimensiones_celda(int w, int h)
+{
+	auto& r=rejillas[rejilla_actual];
+	r.establecer_dimensiones_celda(w, h);
+}
+
 void Controlador_rejilla::redimensionar_rejilla(int w, int h, Rejilla& r)
 {
 	auto nr=r.copiar_redimensionada(w, h);
@@ -831,7 +854,7 @@ void Controlador_rejilla::reconstruir_rep_info_posicion(const Info_input& ii, co
 void Controlador_rejilla::reconstruir_rep_info_con_rejilla(const Rejilla& r)
 {
 	std::stringstream ss;
-	ss<<"DIM:["<<r.acc_w()<<", "<<r.acc_h()<<"] SEP: ["<<r.acc_w_unidades_separador()<<", "<<r.acc_h_unidades_separador()<<"]\n";
+	ss<<"DIM:["<<r.acc_w()<<", "<<r.acc_h()<<"] SEP: ["<<r.acc_presentacion().w_unidades_separador<<", "<<r.acc_presentacion().h_unidades_separador<<"]\n";
 	rep_info_capa.asignar(ss.str());
 }
 

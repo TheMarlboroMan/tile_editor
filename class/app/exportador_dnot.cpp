@@ -32,14 +32,22 @@ void Exportador_dnot::exportar(const std::vector<Rejilla>& rejillas, const std::
 		//We build it with an empty map.
 		Dnot_token tok_layer(Dnot_token::t_mapa{});
 
+		auto pres=r.acc_presentacion();
+
 		//This is one of the innermost structures. We are building the map separatedly...
 		Dnot_token::t_mapa mlayer_info;
+
+		//Layer data.
 		mlayer_info["w"]=Dnot_token(r.acc_w());
 		mlayer_info["h"]=Dnot_token(r.acc_h());
 		mlayer_info["wc"]=Dnot_token(r.acc_w_celda());
 		mlayer_info["hc"]=Dnot_token(r.acc_h_celda());
-		mlayer_info["wu"]=Dnot_token(r.acc_w_unidades_separador());
-		mlayer_info["hu"]=Dnot_token(r.acc_h_unidades_separador());
+
+		//Presentation data...
+		mlayer_info["wu"]=Dnot_token(pres.w_unidades_separador);
+		mlayer_info["hu"]=Dnot_token(pres.h_unidades_separador);
+		mlayer_info["al"]=Dnot_token(pres.alpha);
+
 		mlayer_info["i"]=Dnot_token((int)contenedor_tilesets.obtener_indice_item(r.acc_gestor()));
 
 		//Now we build this shit into tok_layer, as we did earlier. Sounds misterious, but all we

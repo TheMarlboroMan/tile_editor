@@ -20,12 +20,20 @@ void Importador_dnot::importar(std::vector<Rejilla>& rejillas, std::vector<Capa_
 		for(const auto& l : root["data"]["layers"].acc_lista())
 		{
 			const auto& info=l["info"];
+
+			//This may not be present, thus needs default values.
+			int alpha=255;
+			if(info.existe_clave("al")) alpha=info["al"];
+
+			Rejilla::Datos_presentacion pres(info["wu"], info["hu"], alpha);
+
 			rejillas.push_back(Rejilla(
 				info["w"], info["h"],
 				info["wc"], info["hc"],
-				info["wu"], info["hu"],
+				pres,
 				contenedor_tilesets[(int)info["i"]]));
 			auto& rej=rejillas.back();
+
 			for(const auto& t: l["data"].acc_lista())
 			{	
 				rej.r((int)t["x"], (int)t["y"], Celda(t["x"],t["y"],(int)t["t"]));

@@ -17,8 +17,6 @@ extern Log_base LOG;
 
 void App::loop_aplicacion(Kernel_app& kernel)
 {
-	//TODO: Usar archivo de configuración para escoger color de fondo, porcentaje de ancho de selectores, etc...
-
 	Contenedor_tilesets T;
 	Contenedor_logica_sets S;
 
@@ -118,8 +116,12 @@ void App::loop_aplicacion(Kernel_app& kernel)
 				case Director_estados::t_estados::PROPIEDADES_REJILLA:
 					if(CPR.es_grabar())
 					{
-						C_R.redimensionar_actual(CPR.acc_w(), CPR.acc_h());
-						C_R.cambiar_nombre_fichero(CPR.acc_nombre_fichero());
+						const auto dat=CPR.generar_datos_intercambio();
+						C_R.redimensionar_actual(dat.w, dat.h);
+						C_R.establecer_alpha(dat.alpha);
+						C_R.establecer_dimensiones_celda(dat.wcell, dat.hcell);
+						C_R.establecer_separador(dat.wsep, dat.hsep);
+						C_R.cambiar_nombre_fichero(dat.nombre_fichero);
 					}
 				break;
 			}
@@ -140,7 +142,15 @@ void App::loop_aplicacion(Kernel_app& kernel)
 					IC=&CA; 
 				break;
 				case Director_estados::t_estados::PROPIEDADES_REJILLA:
-					CPR.ajustar_valores(C_R.acc_indice_rejilla(), C_R.acc_w(), C_R.acc_h(), C_R.acc_nombre_fichero());
+					CPR.ajustar_valores(C_R.acc_indice_rejilla(), 
+								C_R.acc_w(), 
+								C_R.acc_h(),
+								C_R.acc_w_celda(), 
+								C_R.acc_h_celda(),  
+								C_R.acc_w_separador(),
+								C_R.acc_h_separador(),
+								C_R.acc_alpha_rejilla(), 
+								C_R.acc_nombre_fichero());
 					IC=&CPR; 
 				break;
 			}

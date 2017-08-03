@@ -88,7 +88,8 @@ Rejilla * Importador::leer_como_rejilla(const std::string& cadena, std::vector<R
 		hs=std::atoi(partes[5].c_str()),    
 		tile=std::atoi(partes[6].c_str());
 
-	rejillas.push_back(Rejilla(w, h, wc, hc, ws, hs, contenedor_tilesets[tile]));
+	//Again, not alpha... Old map format.
+	rejillas.push_back(Rejilla(w, h, wc, hc, Rejilla::Datos_presentacion(ws, hs), contenedor_tilesets[tile]));
 	return &rejillas.back();
 }
 

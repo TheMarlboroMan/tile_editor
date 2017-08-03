@@ -28,9 +28,12 @@ void Exportador::exportar(const std::vector<Rejilla>& rejillas, const std::vecto
 
 		for(auto& r: rejillas)
 		{
+			auto pres=r.acc_presentacion();
+
+			//There is no alpha here... This is old map format.
 			fichero<<DEFS::ABRE_REJILLA<<"\n"<<r.acc_w()<<DEFS::SEPARADOR<<r.acc_h()
 				<<DEFS::SEPARADOR<<r.acc_w_celda()<<DEFS::SEPARADOR<<r.acc_h_celda()
-				<<DEFS::SEPARADOR<<r.acc_w_unidades_separador()<<DEFS::SEPARADOR<<r.acc_h_unidades_separador()
+				<<DEFS::SEPARADOR<<pres.w_unidades_separador<<DEFS::SEPARADOR<<pres.h_unidades_separador
 				<<DEFS::SEPARADOR<<contenedor_tilesets.obtener_indice_item(r.acc_gestor())<<"\n"<<DEFS::ABRE_CELDA<<"\n";
 
 			auto& m=r.r.acc_matriz();
