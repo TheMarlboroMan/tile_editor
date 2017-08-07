@@ -25,8 +25,7 @@ void Contenedor_logica_sets::insertar_set(const std::string ruta)
 	if(L)
 	{		
 		Logica_set G;
-
-		Logica TOL(0, 0, 0, 0, 0, 0, "");
+		Logica TOL(0, 0, 0, false, 0, 0, 0, "");
 
 		while(true)
 		{
@@ -46,13 +45,20 @@ void Contenedor_logica_sets::insertar_set(const std::string ruta)
 				{
 					if(TOL.acc_tipo()) G.insertar(TOL);	//Insertar cuando tiene id...
 
-
-					if(ex.size()!=5) LOG<<"WARNING: Detectada cantidad de parámetros incorrectos para inicio de tipo de objeto en ["<<L.obtener_numero_linea()<<"] "<<c<<std::endl;
+					if(ex.size()!=6) LOG<<"WARNING: Detectada cantidad de parámetros incorrectos para inicio de tipo de objeto en ["<<L.obtener_numero_linea()<<"] "<<c<<std::endl;
 					else 
 					{
-						auto color=Herramientas::explotar(ex[4], ',');
+						auto str_resizable=ex[4];
+						bool resizable=true;
+
+						if(str_resizable=="resizable") resizable=true;
+						else if(str_resizable=="fixed") resizable=false;
+						else throw std::runtime_error("Valor incorrecto para propiedad resizable");
+
+						auto color=Herramientas::explotar(ex[5], ',');
 						if(color.size()!=3) LOG<<"WARNING: Color incorrecto en ["<<L.obtener_numero_linea()<<"] "<<c<<std::endl;
-						else TOL=Logica(toi(ex[0]), toi(ex[2]), toi(ex[3]), toi(color[0]), toi(color[1]), toi(color[2]), ex[1]);
+
+						else TOL=Logica(toi(ex[0]), toi(ex[2]), toi(ex[3]), resizable, toi(color[0]), toi(color[1]), toi(color[2]), ex[1]);
 					}
 				}
 				else	//Parámetro de objeto... #\t	id	nombre

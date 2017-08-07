@@ -15,11 +15,11 @@ PARÁMETROS:
 	La hoja de sprites se genera con el programa editor_sprites. 
 
 	El formato de los objetos es:
-		id	nombre	ancho	alto	color_defecto
+		id	nombre	ancho	alto	fixed|resizable	color_defecto[r,g,b]
 			nombre_propiedad	valor_defecto
 			nombre_propiedad	valor_defecto
 			nombre_propiedad	valor_defecto
-		id	nombre	ancho	alto	color_defecto
+		id	nombre	ancho	alto	fixed|resizable	color_defecto[r,g,b]
 			nombre_propiedad	valor_defecto
 		[...]
 

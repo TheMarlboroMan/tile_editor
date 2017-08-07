@@ -47,11 +47,23 @@ void Importador_dnot::importar(std::vector<Rejilla>& rejillas, std::vector<Capa_
 			for(const auto& o : l["data"].acc_lista())
 			{
 				int tipo=o["t"];
-				Objeto_logica obj(tipo, o["x"], o["y"]);
-			
+
 				auto cb=[tipo](const Logica& l) {return l.acc_tipo()==tipo;};
 				auto * proto=cl.acc_gestor().buscar_unico_callback(cb);
 				if(!proto) throw Importador_dnot_exception("Tipo lógica desconocida '"+std::to_string(tipo));
+
+				//Set width and height, from prototype or as set by the user.
+				int w=proto->acc_w_editor(), 
+					h=proto->acc_h_editor();
+
+				if(proto->es_resizable())
+				{
+					if(o.existe_clave("w")) w=o["w"];
+					if(o.existe_clave("h")) h=o["h"];
+				}
+
+				Objeto_logica obj(tipo, o["x"], o["y"], w, h);
+
 				
 				auto& base=*proto;
 				obj.reservar_propiedades(base.obtener_propiedades_defecto());

@@ -56,13 +56,22 @@ PARAMETERS:
 	Sprite sheets are generated with the "editor_sprites" tool.
 
 	Object format is:
-		id	name	width	height	default_color
-			property_name	default_color
-			property_name	default_color
-			property_name	default_color
-		id	name	width	height	default_color
+		id	name	width	height	fixed|resizable	default_color[r,g,b]
+			property_name	default_value
+			property_name	default_value
+			property_name	default_value
+		id	name	width	height	fixed|resizable	default_color[r,g,b]
 			property_name	default_color
 		[...]
+
+	Such as in
+
+		1	Start	32	32	fixed	32,32,32
+			id	0
+			bearing	90
+		2	Exit	32	32	resizable	64,64,64
+			map_id	0
+			start_id	0
 
 ##Output file format...
 
@@ -70,7 +79,10 @@ There is no official extension for this. I use ".dat", but the output is actuall
 
 The thing does output in dnot (think json... before it was fashionable) but there was also a very simple "classic" structure. By default, the application will use the "dnot" format but will try to detect the kind of file when opening a new one. Classic files will be always saved with the classic format. It is, however, trivial to dive into the "controlador_rejilla.cpp" code and make the neccesary changes if this behaviour is undesirable.
 
-The dnot format saves additional presentational data, such as alpha values.
+There are a few differences between formats:
+
+	- The dnot format saves additional presentational data, such as alpha values.
+	- The dnot format allows to save and load width and height of logic objects. The classic format will basically ignore these.
 
 This is the classic format. ! denotes a comment on this description, but the real file allows for no comments.
 
@@ -112,7 +124,11 @@ The [REJILLA] + [CELDAS] structure repeats once for each layer, same as the [LOG
 
 The dnot structure is different, but symbolises similar data. The structure below has been expanded for readability. Again, the real one accepts no comments!!!
 
-data:{				!Main block.
+	reset();
+
+	std::string filename="data/app_data/maps/"+fn;
+	auto root=dnot_parse_file(filename);
+:{				!Main block.
 	layers:[		!Definition of tile layers. There is no count of file layers, but this is a vector so...
 		{		!First block of layers... Layers are presented in order.
 			data:[	!Definition of tiles....
@@ -201,6 +217,8 @@ As a side note, data compression was considered at a point (bind together ranges
 	- Also added this value to importers and exporters.
 	- Changed a bit the structure of each layer to further presentational changes (such as background colours) can be changed easily.
 	- Hacked the life away to support png alpha.
+- 7-8-2017: Changes.
+	- Added the possibility to change the size of logic objects... This actually has consequences in many places (loaders, exporters, logic editor...).
 
 ##Todo
 

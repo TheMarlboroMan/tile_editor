@@ -13,9 +13,12 @@ class Controlador_propiedades_objeto_logica:public Controlador_base
 	//Propiedades
 	private:
 
-	static const size_t PROPIEDADES_DEFECTO=2;
+	static const size_t PROPIEDADES_DEFECTO=4;
 	static const size_t INDICE_X=0;
 	static const size_t INDICE_Y=1;
+	static const size_t INDICE_W=2;
+	static const size_t INDICE_H=3;
+
 	static const int POS_TXT_X=32;
 	static const int POS_TXT_Y=32;
 //	static const int ALTO_LINEA=16;
@@ -29,7 +32,7 @@ class Controlador_propiedades_objeto_logica:public Controlador_base
 	size_t max_propiedad;
 	int w;
 
-	void establecer_propiedad(size_t indice, const std::string& valor);
+	bool establecer_propiedad(size_t indice, const std::string& valor);
 	void actualizar_cadena_datos();
 
 	///////////////

@@ -42,8 +42,11 @@ void Controlador_propiedades_objeto_logica::loop(Input_base& input, float delta)
 		}
 		else if(input.es_input_down(Input::I_ENTER))
 		{
-			establecer_propiedad(propiedad_actual, valor_input); 
-			valor_input="";
+			if(establecer_propiedad(propiedad_actual, valor_input))
+			{
+				valor_input="";
+			}
+
 			input.vaciar_input_texto();
 			actualizar_cadena_datos();
 		}
@@ -56,17 +59,41 @@ void Controlador_propiedades_objeto_logica::loop(Input_base& input, float delta)
 	}
 }
 
-void Controlador_propiedades_objeto_logica::establecer_propiedad(size_t indice, const std::string& valor)
+bool Controlador_propiedades_objeto_logica::establecer_propiedad(size_t indice, const std::string& valor)
 {
 	switch(indice)
 	{
 		case INDICE_X: objeto->mut_x(std::atoi(valor.c_str())); break; //0
 		case INDICE_Y: objeto->mut_y(std::atoi(valor.c_str())); break; //1
-		default: //2 ...
+		case INDICE_W: 
+			if(prototipo->es_resizable())
+			{
+				objeto->mut_w(std::atoi(valor.c_str())); break; //2
+			}
+			else
+			{
+				valor_input=prototipo->acc_w_editor();
+				return false;
+			}
+		break;
+		case INDICE_H:
+			if(prototipo->es_resizable())
+			{
+				objeto->mut_h(std::atoi(valor.c_str())); break; //3
+			}
+			else
+			{
+				valor_input=prototipo->acc_h_editor();
+				return false;
+			}
+		break;
+		default: //4-...
 			//This sucks balls
 			objeto->asignar_propiedad(prototipo->nombre_propiedad_por_indice(indice-PROPIEDADES_DEFECTO), valor); 
 		break;
 	}
+
+	return true;
 }
 
 void Controlador_propiedades_objeto_logica::actualizar_cadena_datos()
@@ -81,10 +108,27 @@ void Controlador_propiedades_objeto_logica::actualizar_cadena_datos()
 	if(propiedad_actual==INDICE_Y) ss<<"* Y : ["<<objeto->acc_y()<<"] >> "<<valor_input<<salto;
 	else ss<<"Y : "<<objeto->acc_y()<<salto;
 
+	if(prototipo->es_resizable())
+	{
+		if(propiedad_actual==INDICE_W) ss<<"* W : ["<<objeto->acc_w()<<"] >> "<<valor_input<<salto;
+		else ss<<"W : "<<objeto->acc_w()<<salto;
+
+		if(propiedad_actual==INDICE_H) ss<<"* H : ["<<objeto->acc_h()<<"] >> "<<valor_input<<salto;
+		else ss<<"H : "<<objeto->acc_h()<<salto;
+	}
+	else
+	{
+		if(propiedad_actual==INDICE_W) ss<<"* W : "<<prototipo->acc_w_editor()<<" [protegido]"<<salto;
+		else ss<<"W : "<<prototipo->acc_w_editor()<<" [protegido]"<<salto;
+
+		if(propiedad_actual==INDICE_H) ss<<"* H : "<<prototipo->acc_h_editor()<<" [protegido]"<<salto;
+		else ss<<"H : "<<prototipo->acc_h_editor()<<" [protegido]"<<salto;
+	}
+
 	size_t i=0;
 	for(const auto& p : objeto->acc_propiedades()) 
 	{
-		if(i==propiedad_actual-2) ss<<"* "<<p.first<<" : ["<<p.second<<"] >> "<<valor_input<<salto;
+		if(i==propiedad_actual-PROPIEDADES_DEFECTO) ss<<"* "<<p.first<<" : ["<<p.second<<"] >> "<<valor_input<<salto;
 		else ss<<p.first<<" : "<<p.second<<salto;
 		++i;
 	}

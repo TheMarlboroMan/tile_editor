@@ -123,8 +123,6 @@ void Importador::leer_como_objeto_logica(const std::string& cadena, const Conten
 		x=std::atoi(partes[1].c_str()),
 		y=std::atoi(partes[2].c_str());
 
-	Objeto_logica OBJ(tipo, x, y);
-
 	//Find prototype. Add default values for properties... This will prevent errors derived
 	//by new properties.
 
@@ -135,6 +133,8 @@ void Importador::leer_como_objeto_logica(const std::string& cadena, const Conten
 		throw Importador_exception("Tipo lógica desconocida '"+std::to_string(tipo)+"' en '"+cadena+"'.");
 	}
 	auto& base=*proto;
+
+	Objeto_logica OBJ(tipo, x, y, base.acc_w_editor(), base.acc_h_editor());
 	OBJ.reservar_propiedades(base.obtener_propiedades_defecto());
 
 	//Now for properties...

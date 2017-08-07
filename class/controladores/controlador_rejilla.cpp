@@ -247,7 +247,7 @@ void Controlador_rejilla::dibujar_capa_logica(Pantalla& pantalla, Capa_logica& c
 		}
 		else
 		{
-			caja.establecer_posicion(obj.acc_x(), obj.acc_y(), tipo->acc_w_editor(), tipo->acc_h_editor());
+			caja.establecer_posicion(obj.acc_x(), obj.acc_y(), obj.acc_w(), obj.acc_h());
 			caja.mut_rgb(tipo->acc_r_editor(), tipo->acc_g_editor(), tipo->acc_b_editor());
 			caja.establecer_alpha(&obj==objeto_logica_actual ? 255 : 192);
 		}
@@ -593,6 +593,7 @@ void Controlador_rejilla::procesar_input_capa_logica(Info_input&ii, Capa_logica&
 				{
 					int x=(coords.x / r.acc_w_celda()) * r.acc_w_celda();
 					int y=(coords.y / r.acc_h_celda()) * r.acc_h_celda();
+
 					capa.insertar_objeto(x, y);
 				}
 				else

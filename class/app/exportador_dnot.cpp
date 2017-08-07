@@ -98,8 +98,20 @@ void Exportador_dnot::exportar(const std::vector<Rejilla>& rejillas, const std::
 		for(auto& o: objetos) 
 		{
 			Dnot_token::t_mapa mobj;
+
 			mobj["x"]=Dnot_token((int)o.acc_x());
 			mobj["y"]=Dnot_token((int)o.acc_y());
+
+			auto cb=[o](const Logica& l) {return l.acc_tipo()==o.acc_tipo();};
+			auto * proto=l.acc_gestor().buscar_unico_callback(cb);
+			if(!proto) throw Exportador_dnot_exception("Tipo lógica desconocida '"+std::to_string(o.acc_tipo()));
+
+			if(proto->es_resizable())
+			{
+				mobj["w"]=Dnot_token((int)o.acc_w());
+				mobj["h"]=Dnot_token((int)o.acc_h());
+			}
+
 			mobj["t"]=Dnot_token((int)o.acc_tipo());
 			mobj["p"]=Dnot_token(Dnot_token::t_mapa{});
 

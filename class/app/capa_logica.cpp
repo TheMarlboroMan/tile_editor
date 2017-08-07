@@ -18,14 +18,14 @@ void Capa_logica::insertar_objeto(int pt, int px, int py)
 	}
 	else
 	{
-		Objeto_logica ob(pt, px, py);
+		Objeto_logica ob(pt, px, py, t->acc_w_editor(), t->acc_h_editor());
 
 		auto& propiedades=t->acc_propiedades();
 		std::map<std::string, std::string> valores_defecto;
 		for(auto prop : propiedades) valores_defecto[prop.nombre]=prop.valor_defecto;
 
 		ob.reservar_propiedades(valores_defecto);
-		objetos.push_back(ob);	
+		objetos.push_back(ob);
 	}
 }
 

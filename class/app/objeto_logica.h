@@ -20,15 +20,16 @@ class Objeto_logica
 
 	static unsigned int id_actual;
 
-	unsigned int id;	//Su única utilidad es comparar.
-	int tipo, x, y;
+	unsigned int 		id;	//Su única utilidad es comparar.
+	int 			tipo, x, y;
+	unsigned int 		w, h;
 
 	std::map<std::string, std::string> propiedades;
 
 	public:
 
-	Objeto_logica(int pt, int px, int py):
-		id(id_actual++), tipo(pt), x(px), y(py)
+	Objeto_logica(int pt, int px, int py, int pw, int ph):
+		id(id_actual++), tipo(pt), x(px), y(py), w(pw), h(ph)
 	{}
 
 	bool operator==(const Objeto_logica& o) const {return id==o.id;}
@@ -36,12 +37,16 @@ class Objeto_logica
 	unsigned int acc_tipo() const {return tipo;}
 	int acc_x() const {return x;}
 	int acc_y() const {return y;}
+	int acc_w() const {return w;}
+	int acc_h() const {return h;}
 
 	std::string como_cadena() const;
 	void serializar(std::ostream &stream, const char separador) const;
 
 	void mut_x(int v) {x=v;}
 	void mut_y(int v) {y=v;}
+	void mut_w(int v) {w=v;}
+	void mut_h(int v) {h=v;}
 
 	void reservar_propiedades(const std::map<std::string, std::string>& valores);
 

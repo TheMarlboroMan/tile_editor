@@ -33,23 +33,30 @@ class Logica
 
 	private:
 
-	int tipo, w_editor, h_editor, r_editor, g_editor, b_editor;
-	std::string nombre;
-	std::vector<Propiedad> propiedades;
+	int 					tipo, 
+						w_editor, 
+						h_editor, 
+						r_editor, 
+						g_editor, 
+						b_editor;
+	bool					resizable;
+	std::string 				nombre;
+	std::vector<Propiedad> 			propiedades;
 
 	public:
 
-	int acc_tipo() const {return tipo;}
-	int acc_w_editor() const {return w_editor;}
-	int acc_h_editor() const {return h_editor;}
-	int acc_r_editor() const {return r_editor;}
-	int acc_g_editor() const {return g_editor;}
-	int acc_b_editor() const {return b_editor;}
-	const std::string& acc_nombre() const {return nombre;}
-	const std::vector<Propiedad>& acc_propiedades() const {return propiedades;}
-	size_t acc_total_propiedades() const {return propiedades.size();}
-	void insertar_propiedad(const std::string& pp, const std::string& pv) {propiedades.push_back(Propiedad(pp, pv));}
-	bool existe_propiedad(const std::string& pp) const 
+	bool					es_resizable() const {return resizable;}
+	int 					acc_tipo() const {return tipo;}
+	int 					acc_w_editor() const {return w_editor;}
+	int 					acc_h_editor() const {return h_editor;}
+	int 					acc_r_editor() const {return r_editor;}
+	int 					acc_g_editor() const {return g_editor;}
+	int 					acc_b_editor() const {return b_editor;}
+	const std::string& 			acc_nombre() const {return nombre;}
+	const std::vector<Propiedad>& 		acc_propiedades() const {return propiedades;}
+	size_t 					acc_total_propiedades() const {return propiedades.size();}
+	void 					insertar_propiedad(const std::string& pp, const std::string& pv) {propiedades.push_back(Propiedad(pp, pv));}
+	bool 					existe_propiedad(const std::string& pp) const 
 	{
 		return std::any_of(std::begin(propiedades), std::end(propiedades), [&pp](const Propiedad& p) {return p.nombre==pp;});
 	}
@@ -57,8 +64,10 @@ class Logica
 	std::string nombre_propiedad_por_indice(int) const;
 	std::map<std::string, std::string> obtener_propiedades_defecto() const;
 
-	Logica(int pt, int pw, int ph, int pr, int pg, int pb, const std::string& pn)
-		:tipo(pt), w_editor(pw), h_editor(ph), r_editor(pr), g_editor(pg), b_editor(pb), nombre(pn)
+	Logica(int pt, int pw, int ph, bool pres, int pr, int pg, int pb, const std::string& pn)
+		:tipo(pt), w_editor(pw), h_editor(ph), 
+		r_editor(pr), g_editor(pg), b_editor(pb), 
+		resizable(pres), nombre(pn)
 	{}
 };
 
