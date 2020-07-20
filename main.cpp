@@ -14,17 +14,23 @@ int main(int argc, char ** argv)
 		LOG.inicializar("data/logs/info.log");
 		LOG.activar();
 
+
 		DLibH::Log_motor::arrancar("data/logs/log_motor.log");
 
+		LOG<<"starting arg manager"<<std::endl;
 		//Inicializar control de argumentos.
 		Herramientas_proyecto::Controlador_argumentos CARG(argc, argv);
 
 		try
 		{
+			LOG<<"creating kernel"<<std::endl;
 			Kernel_app kernel(CARG);
+
+			LOG<<"starting kernel"<<std::endl;
 			kernel.inicializar();
 
 			//Función en el espacio de nombres "App", definida en "include_controladores.h"
+			LOG<<"starting app loop"<<std::endl;
 			using namespace App;
 			loop_aplicacion(kernel);
 		}
@@ -33,9 +39,9 @@ int main(int argc, char ** argv)
 			std::cout<<e.mensaje<<std::endl;
 		}
 	}
-	
+
 	DLibH::Log_motor::finalizar();
-	DLibH::Herramientas_SDL::apagar_SDL();	
+	DLibH::Herramientas_SDL::apagar_SDL();
 
 	return 0;
 }

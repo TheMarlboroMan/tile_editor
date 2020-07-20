@@ -1,5 +1,7 @@
 #include "kernel_base.h"
 
+extern DLibH::Log_base LOG;
+
 Kernel_base::Kernel_base(Herramientas_proyecto::Controlador_argumentos& carg)
 	:
 	mostrar_fps(true),
@@ -18,26 +20,42 @@ Kernel_base::~Kernel_base()
 
 void Kernel_base::inicializar()
 {
+	LOG<<"getting and starting config"<<std::endl;
+
 	//Cargar configuración.
 	Configuracion_base& configuracion=acc_configuracion();
 	configuracion.iniciar();
 
+	LOG<<"starting video"<<std::endl;
 	inicializar_entorno_grafico(pantalla, acc_w_pantalla_inicial(), acc_h_pantalla_inicial());
+
+	LOG<<"starting audio"<<std::endl;
 	inicializar_entorno_audio();
 
 	//Inicializar recursos.
+	LOG<<"loading resources"<<std::endl;
 	Cargador_recursos_base& cargador_recursos=acc_cargador_recursos();
+
+	LOG<<"loading textures"<<std::endl;
 	cargador_recursos.generar_recursos_texturas(pantalla);
+
+	LOG<<"loading surfaces"<<std::endl;
 	cargador_recursos.generar_recursos_superficies(pantalla);
+
+	LOG<<"loading sounds"<<std::endl;
 	cargador_recursos.generar_recursos_audio();
+
+	LOG<<"loading music"<<std::endl;
 	cargador_recursos.generar_recursos_musica();
-	
+
 	//Inicializar controles.
+	LOG<<"configuring input"<<std::endl;
 	Input_base& i=acc_input();
-	i.configurar(); 
+	i.configurar();
 
 	//Inicialización controlador tiempo.
-	controlador_fps.inicializar();	
+	LOG<<"starting ftp controller"<<std::endl;
+	controlador_fps.inicializar();
 }
 
 void Kernel_base::inicializar_entorno_grafico(DLibV::Pantalla& pantalla, unsigned int w, unsigned int h)
@@ -73,7 +91,7 @@ void Kernel_base::inicializar_entorno_audio()
 	Configuracion_base& configuracion=acc_configuracion();
 
 	Audio::inicializar_entorno_audio(
-		configuracion.acc_audio_ratio(), 
+		configuracion.acc_audio_ratio(),
 		configuracion.acc_audio_salidas(),
 		configuracion.acc_audio_buffers(),
 		configuracion.acc_audio_canales());
@@ -102,7 +120,7 @@ bool Kernel_base::loop(Interface_controlador& IC)
 	while(controlador_fps.consumir_loop(paso_delta) )
 	{
 		paso();
-		
+
 		input.turno();
 
 		IC.loop(input, paso_delta);
@@ -125,7 +143,7 @@ bool Kernel_base::loop(Interface_controlador& IC)
 		DLibV::Representacion_texto_auto_estatica txt(DLibV::Gestor_superficies::obtener(acc_recurso_fps()), fps);
 		txt.establecer_posicion(pantalla.acc_w()-128, 6);
 		txt.volcar(pantalla);
-	}	
+	}
 
 	pantalla.actualizar();
 

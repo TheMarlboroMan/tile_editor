@@ -3,6 +3,8 @@
 
 using namespace DLibH;
 
+extern DLibH::Log_base LOG;
+
 void Kernel_app::inicializar()
 {
 	using namespace Herramientas_proyecto;
@@ -21,13 +23,14 @@ void Kernel_app::inicializar()
 			for(std::string l; std::getline(fichero_ayuda, l); )
 				std::cout<<l<<std::endl;
 		}
-		
+
 		throw Kernel_exception("No se localizan los parámetros requeridos.");
 	}
 	try
 	{
 		try
 		{
+			LOG<<"setting screen size"<<std::endl;
 			auto arg_res=carg.valor_argumento("res");
 			auto ex=Herramientas::explotar(arg_res, 'x');
 
@@ -46,15 +49,18 @@ void Kernel_app::inicializar()
 			w_pantalla=800;
 			h_pantalla=600;
 		}
-		
 
+
+		LOG<<"setting out file"<<std::endl;
 		//Localizamos el fichero out, por si no se ha especificado poder lanzar la excepción.
 		nombre_fichero_salida=carg.valor_argumento("out");
 
 		//En este momento sólo nos interesa localizar los recursos gráficos del fichero de configuración, de modo
 		//que lo parseamos someramente. Ya en el bootstrap de la aplicación vamos a intentar localizar información de otro tipo.
+		LOG<<"setting config file"<<std::endl;
 		nombre_fichero_config_sesion=carg.valor_argumento("cfg");
 
+		LOG<<"opening config file"<<std::endl;
 		std::ifstream fichero(nombre_fichero_config_sesion.c_str());
 
 		if(!fichero)
@@ -72,6 +78,8 @@ void Kernel_app::inicializar()
 
 			const char delimitador_tile='T';
 
+			LOG<<"reading config file"<<std::endl;
+
 			for(std::string l; std::getline(fichero, l); )
 			{
 				if(l[0]==delimitador_tile)
@@ -83,6 +91,7 @@ void Kernel_app::inicializar()
 			fichero.close();
 		}
 
+		LOG<<"starting base kernel"<<std::endl;
 		Kernel_base::inicializar();
 	}
 	catch(Controlador_argumentos_exception& e)

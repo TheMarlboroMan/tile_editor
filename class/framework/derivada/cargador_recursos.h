@@ -11,9 +11,9 @@ class Cargador_recursos:public Cargador_recursos_base
 
 	std::vector<std::string> entradas;
 
-	protected: 
+	protected:
 
-	std::vector<std::string> obtener_entradas_audio() const 
+	std::vector<std::string> obtener_entradas_audio() const
 	{
 		std::vector<std::string> resultado;
 		return resultado;
@@ -35,7 +35,7 @@ class Cargador_recursos:public Cargador_recursos_base
 		std::stringstream ss;
 
 		for(auto& e : entradas)
-		{	
+		{
 			ss.str(std::string());
 			ss<<indice++<<'\t'<<e;
 			resultado.push_back(ss.str());
@@ -53,7 +53,7 @@ class Cargador_recursos:public Cargador_recursos_base
 	Cargador_recursos():Cargador_recursos_base() {}
 
 	void asignar_entrada(const std::string &e) {entradas.push_back(e);}
-	
+
 
 //	void establecer_textura(const std::string& v) {textura=v;}
 };

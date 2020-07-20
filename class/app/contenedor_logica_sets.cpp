@@ -9,9 +9,9 @@ extern Log_base LOG;
 /* La estructura de un fichero de tipos de objeto de lógica es:
 
 #tipo	nombre	w_editor h_editor
-	#id_param	#nombre	
-	#id_param	#nombre	
-	#id_param	#nombre	
+	#id_param	#nombre
+	#id_param	#nombre
+	#id_param	#nombre
 
 Atención a los tabuladores para los parámetros de los tipos. Deben estar ahí
 para diferenciar un tipo de su propiedad.
@@ -23,14 +23,14 @@ void Contenedor_logica_sets::insertar_set(const std::string ruta)
 	Lector_txt L(ruta, '#');
 
 	if(L)
-	{		
+	{
 		Logica_set G;
 		Logica TOL(0, 0, 0, false, 0, 0, 0, "");
 
 		while(true)
 		{
 			const std::string c=L.leer_linea();
-			if(!L) break;
+			if(L.es_eof()) break;
 
 			if(!c.size())
 			{
@@ -39,14 +39,14 @@ void Contenedor_logica_sets::insertar_set(const std::string ruta)
 			else
 			{
 				auto ex=Herramientas::explotar(c, SEPARADOR);
-				auto toi=[](const std::string& c) -> int {return std::atoi(c.c_str());}; 
+				auto toi=[](const std::string& c) -> int {return std::atoi(c.c_str());};
 
 				if(c[0]!=SEPARADOR)	//Definición de objeto... #tipo	nombre	w_editor h_editor
 				{
 					if(TOL.acc_tipo()) G.insertar(TOL);	//Insertar cuando tiene id...
 
 					if(ex.size()!=6) LOG<<"WARNING: Detectada cantidad de parámetros incorrectos para inicio de tipo de objeto en ["<<L.obtener_numero_linea()<<"] "<<c<<std::endl;
-					else 
+					else
 					{
 						auto str_resizable=ex[4];
 						bool resizable=true;
@@ -71,7 +71,7 @@ void Contenedor_logica_sets::insertar_set(const std::string ruta)
 		}
 
 		//Insertar el último...
-		if(TOL.acc_tipo()) G.insertar(TOL);	
+		if(TOL.acc_tipo()) G.insertar(TOL);
 
 		insertar(G);
 	}

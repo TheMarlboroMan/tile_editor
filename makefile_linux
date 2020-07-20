@@ -11,10 +11,10 @@ EJECUTABLE=a.out
 MKDIR=mkdir -p
 LIMPIAR=rm objects/*; rm ./$(EJECUTABLE); touch objects/dummy;
 
-DIR_HOME=/home/dani/programacion/
-#DIR_LIBDAN2=$(DIR_HOME)libdansdl2
-#DIR_HERRAMIENTAS_PROYECTO=$(DIR_HOME)herramientas_proyecto/
-#DIR_O_HERRAMIENTAS_PROYECTO=$(DIR_HOME)herramientas_proyecto/
+DIR_HOME=/home/daniel/devel/tile_editor/
+#DIR_LIBDAN2=$(DIR_HOME)dependencies/libdansdl2-frozen
+#DIR_HERRAMIENTAS_PROYECTO=$(DIR_HOME)dependencies/herramientas_proyecto-frozen
+#DIR_O_HERRAMIENTAS_PROYECTO=$(DIR_HOME)dependencies/herramientas_proyecto/objects
 
 DIR_LIBDAN2=./dependencies/libdansdl2-frozen
 DIR_HERRAMIENTAS_PROYECTO=./dependencies/herramientas_proyecto-frozen/

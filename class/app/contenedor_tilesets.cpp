@@ -5,20 +5,20 @@ void Contenedor_tilesets::insertar_tileset(size_t indice, const std::string& rut
 {
 	using namespace Herramientas_proyecto;
 	Tile_set GT(indice);
-	Lector_txt L(ruta, comentario);	
+	Lector_txt L(ruta, comentario);
 
 	if(L)
 	{
 		while(true)
 		{
 			const std::string c=L.leer_linea();
-			if(!L) break;
+			if(L.es_eof() ) break;
 			GT.insertar_tile_desde_cadena(c);
 		}
 
 		insertar(GT);
 	}
-	else 
+	else
 	{
 		throw Contenedor_tilesets_exception("No se ha localizado el archivo "+ruta+" para abrir tileset");
 	}
