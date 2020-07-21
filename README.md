@@ -87,7 +87,7 @@ There are a few differences between formats:
 This is the classic format. ! denotes a comment on this description, but the real file allows for no comments.
 
 !Begin data. Only thing that closes, actually.
-[ESTRUCTURA] 
+[ESTRUCTURA]
 !Info block.
 [INFO]
 !First number indicates number of tile layers. Second indicates number of object layers.
@@ -133,7 +133,7 @@ The dnot structure is different, but symbolises similar data. The structure belo
 		{		!First block of layers... Layers are presented in order.
 			data:[	!Definition of tiles....
 				{t:1, x:5, y:0}, 	!t=type, x and y are in 0-based index.
-				{t:1, x:8, y:10}], 
+				{t:1, x:8, y:10}],
 			info:{	!Definition of layer structure..
 				al:255, !Alpha of presentation.
 				h:11, 	!Height
@@ -146,15 +146,15 @@ The dnot structure is different, but symbolises similar data. The structure belo
 			}, 	!End of first block of layers.
 		{		!Second block of tile layers. Same data.
 			data:[
-				{t:64, x:0, y:0}, 
-				{t:63, x:13, y:10}], 
+				{t:64, x:0, y:0},
+				{t:63, x:13, y:10}],
 			info:{
-				h:11, 
-				hc:32, 
-				hu:8, 
-				i:0, 
-				w:14, 
-				wc:32, 
+				h:11,
+				hc:32,
+				hu:8,
+				i:0,
+				w:14,
+				wc:32,
 				wu:8}
 			}
 		], 		!End of all tile layers.
@@ -165,26 +165,26 @@ The dnot structure is different, but symbolises similar data. The structure belo
 					p:{bearing:"2"}, 	!Properties, in simple key-value notation.
 					t:1, x:64, y:160}, 	!t is type. x and y are in pixels.
 				{
-					p:{active:"0"}, 
+					p:{active:"0"},
 					t:4, x:352, y:160}
-			], 
+			],
 			info:{i:1}	!Definition of layer structure, i is the tileset.
-		}, 
+		},
 		{		!Second tile layer, same structure.
 			data:[
 				{
-					p:{bearing:"55", speed:"56"}, 
-					t:1, x:160, y:64}, 
+					p:{bearing:"55", speed:"56"},
+					t:1, x:160, y:64},
 				{
-					p:{tag:"666"}, 
+					p:{tag:"666"},
 					t:2, x:320, y:64}
-			], 
+			],
 			info:{i:0}
 		}
 	], 			!End of all tile layers.
 	meta:{			!Begin metadata. Always one key and one value, as strings.
-		ESTADO:"activo", 
-		categoria:"1", 
+		ESTADO:"activo",
+		categoria:"1",
 		detonado:"true"
 	}
 }
@@ -211,7 +211,7 @@ As a side note, data compression was considered at a point (bind together ranges
 	- Added dnot export-import.
 	- Fixed bug in dnot_parser, of course, only in the frozen branch here.
 - 3-8-2017: Changes.
-	- Added alpha to each layer so shadow layers can be done. 
+	- Added alpha to each layer so shadow layers can be done.
 	- Added alpha and separator space to layer properties controller.
 	- Added the possibility to change cell size, which previously was impossible without fiddling with the map files.
 	- Also added this value to importers and exporters.
@@ -229,3 +229,256 @@ As a side note, data compression was considered at a point (bind together ranges
 
 - There's a bug in the selector of tiles-objects, try changing layers.
 - Fix tile page bug (try to switch pages with keyboard shortcuts).
+
+
+
+
+{
+	"<<START LAYERS>>":"",
+	"layers": [
+		{
+			"<<START ONE LAYER>>":"",
+			"data": [
+				{
+					"<<LAYERS HAVE TYPE, X AND Y": "",
+					"t": 1,
+					"x": 0,
+					"y": 2,
+
+				},
+				{
+					"t": 1,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"t": 2,
+					"x": 2,
+					"y": 2
+				},
+				{
+					"t": 1,
+					"x": 3,
+					"y": 2
+				},
+				{
+					"t": 1,
+					"x": 4,
+					"y": 2
+				}
+			],
+			"<<LAYER METADATA": "",
+			"info": {
+					"<<THIS MUST BE THE ALPHA>>": "",
+				"al": 255,
+					"<<FULL LAYER H IN TILES>>": "",
+				"h": 64,
+					"<<CELL H IN PX>>": "",
+				"hc": 32,
+					"<<ADD A HORIZONTAL SEPARATOR EACH N CELLS >>": "",
+				"hu": 8,
+					"<<THIS MUST BE THE TILESET INDEX>>": "",
+				"i": 0,
+					"<<FULL LAYER W IN TILES>>": "",
+				"w": 64,
+
+					"<<CELL W IN PX>>": "",
+				"wc": 32,
+					"<<ADD A VERTIAL SEPARATOR EACH N CELLS >>": "",
+				"wu": 8
+			}
+		},
+		{
+			"<<START OTHER LAYER>>":"",
+			"data": [
+				{
+					"t": 4,
+					"x": 0,
+					"y": 2
+				},
+				{
+					"t": 3,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"t": 8,
+					"x": 2,
+					"y": 2
+				},
+				{
+					"t": 4,
+					"x": 3,
+					"y": 2
+				},
+				{
+					"t": 3,
+					"x": 4,
+					"y": 2
+				}
+			],
+			"info": {
+				"al": 255,
+				"h": 64,
+				"hc": 32,
+				"hu": 8,
+				"i": 1,
+				"w": 64,
+				"wc": 32,
+				"wu": : 8
+			}
+		}
+	],
+	"<<START LOGIC OBJECTS>>":"",
+	"logic": [
+		{
+			"<<START LAYER>>":"",
+		"data": [
+				{
+						"<<SPECIAL PROPERTIES>>":"",
+					"p": {
+						"bearing": "1", "id": "1"
+					},
+						"<<TYPE>>":"",
+					"t": 1,
+						"<<X>>":"",
+					"x": 0,
+						"<<Y>>":"",
+					"y": 32
+				},
+				{
+						"<<H, FOR NON FIXED>>":"",
+					"h": 32,
+						"<<SPECIAL PROPERTYES>>":"",
+					"p": {
+						"map_id": "1"
+					},
+					"t": 2,
+						"<<W, FOR NON FIXED>>":"",
+					"w": 32,
+					"x": 128,
+					"y": 32
+				}
+			],
+				"<<START LAYER METADATA>>":"",
+			"info": {
+					"<<OBJECT SET INDEX>>":"",
+				"i": 0
+			}
+		},
+		{"data": [
+				{"p": {},
+					"t": 1,
+					"x": 32,
+					"y": 32
+				},
+				{"p": {},
+					"t": 2,
+					"x": 64,
+					"y": 32
+				},
+				{"p": {},
+					"t": 3,
+					"x": 96,
+					"y": 32
+				}
+			],
+			"info": {
+				"i": 1
+			}
+		}
+	],
+	"<<START MAP METADATA>>":"",
+	"meta": {
+
+	}
+}
+
+I can produce code that reads and saves this kind of format, however there are
+some things I'd like to think about:
+
+- Layers are separate for objects and tiles... And that's actually good, now
+	that I think about it. Let's leave it like that.
+- Property names are somehow difficult to infer, but that can be easily fixed.
+- I don't like how custom properties are always strings, there could be a type
+	which would be easy to implement in object types, but hard to implement in
+	map metadata without using some kind of formatting or template... I could
+	think about that as long as we have very well defined types, such as
+	int, double, string and bool.
+	- The object files are no problem for this.
+	- The map files... well, I guess we could have a particular template for
+	these and be done with. There could be optional and non optional properties
+	in a file defined like this:
+
+beginproperty
+	name bearing
+	type number
+	default 90
+	comment Something something something
+endproperty
+
+- An object could be defined like this, which is a bit clearer than what we have
+now. More verbose, but also easier to parse and extend.
+
+beginobject
+	id 1
+	name start
+	w 32
+	h 32
+	size fixed
+	color 0,255,0
+	beginproperty
+		name id
+		type number
+		default 0
+		comment Something something something
+	endproperty
+	beginproperty
+		name bearing
+		type number
+		default 90
+		comment Something something something
+	endproperty
+endobject
+
+- An object could be defined like this, which is a bit clearer than what we have
+now. More verbose, but also easier to parse and extend.
+
+- The config file is horrendous:
+
+	T	logic.txt	#	|	logic.png	0	0	0	0
+	T	bg.txt	#	|	bg.png	0	0	0	0
+	O	gates.txt
+	O	objects.txt
+
+We could transform it into
+
+beginmapproperties
+	file logic.txt
+endmapproperties
+
+begintileset
+	file logic.txt
+	comment #
+	image logic.png
+endtileset
+
+begintileset
+	file bg.txt
+	comment #
+	image bg.png
+endtileset
+
+beginobject
+	file gates.txt
+endobject
+
+beginobject
+	file objects.txt
+endobject
+
+So, to sum up, I should start by creating code that reads the configuration
+file, property files, tileset files and object files. Each of these could
+share stuff, mainly the property types and some sort of parser which produces
+a "propertyname" or "verb" and its associated vaalue.
+
