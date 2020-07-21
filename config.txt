@@ -1,0 +1,4 @@
+T	logic.txt	#	|	logic.png	0	0	0	0
+T	bg.txt	#	|	bg.png	0	0	0	0
+O	gates.txt
+O	objects.txt

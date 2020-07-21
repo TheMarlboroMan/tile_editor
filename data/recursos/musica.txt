@@ -1,2 +1,0 @@
-#indice ruta
-#1	data/musica/defecto.ogg
