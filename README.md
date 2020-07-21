@@ -454,7 +454,7 @@ now. More verbose, but also easier to parse and extend.
 We could transform it into
 
 beginmapproperties
-	file logic.txt
+	file map_properties.txt
 endmapproperties
 
 begintileset

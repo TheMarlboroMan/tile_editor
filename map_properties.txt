@@ -1,0 +1,20 @@
+beginproperty
+	name name
+	type string
+	default unnamed-map
+	comment The name of the map
+endproperty
+
+beginproperty
+	name map_id
+	type int
+	default 0
+	comment An unique identifier for the map
+endproperty
+
+beginproperty
+	name special_effect_flags
+	type int
+	default 0
+	comment Special effects, 0 means none, 1 means darkened, 2 means underwater.
+endproperty

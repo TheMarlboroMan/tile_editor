@@ -1,4 +1,35 @@
-T	logic.txt	#	|	logic.png	0	0	0	0
-T	bg.txt	#	|	bg.png	0	0	0	0
-O	gates.txt
-O	objects.txt
+#The hash character indicates a comment.
+	#The loader must make sure that a line is a comment if the first meaningful
+#(non whitespace) character is a hash.
+#There can be only one map properties node, the loader must make sure of that.
+
+beginmapproperties
+#Tabulations mean nothing, actually.
+file map_properties.txt
+endmapproperties
+
+#There can be as many tilesets as we want.
+begintileset
+	file logic.txt
+	#The loader must make sure that the id is unique tough.
+	id 1
+	image logic.png
+endtileset
+
+begintileset
+	file bg.txt
+	id 2
+	image bg.png
+endtileset
+
+#There can be as many object sets as needed.
+beginobjectset
+	file gates.txt
+	#The loader must make sure thatr the id is unique.
+	id 1
+endobjectset
+
+beginobjectset
+	file objects.txt
+	id 2
+endobjectset

@@ -1,5 +1,7 @@
+.vscode
 a.out
 objects/*
 data/logs/*
 *.o
 *.a
+build/*

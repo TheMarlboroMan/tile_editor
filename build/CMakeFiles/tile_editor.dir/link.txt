@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/tile_editor.dir/main.cpp.o CMakeFiles/tile_editor.dir/src/dfwimpl/config.cpp.o CMakeFiles/tile_editor.dir/src/dfwimpl/state_driver.cpp.o  -o build/tile_editor /usr/local/lib/libdfw.a /usr/local/lib/libtools.a /usr/local/lib/libdansdl2.a /usr/local/lib/libldtools.a /usr/local/lib/liblm.a -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image -lGL 

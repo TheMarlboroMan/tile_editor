@@ -1,27 +1,41 @@
-begin object
+beginobject
 	id 1
 	name start
 	w 32
 	h 32
 	size fixed
-	color 0,255,0
+	color 0 255 0
 	begin property
 		name id
-		type number
+		type int
 		default 0
 		comment Something something something
 	end property
 	begin property
 		name bearing
-		type number
+		type int
 		default 90
 		comment Something something something
 	end property
-end object
+endobject
 
-1	start	32	32	fixed	0,255,0
-	id	0	number
-	bearing	90
-2	exit	32	32	resizable	0,0,255
-	map_id	0
-	start_id	0
+beginobject
+	id 2
+	name exit
+	w 32
+	h 32
+	size resizable
+	color 0 0 255
+	begin property
+		name map_id
+		type int
+		default 0
+		comment Destination map id
+	end property
+	begin property
+		name start_id
+		type int
+		default 0
+		comment Start id on the destination map
+	end property
+endobject
