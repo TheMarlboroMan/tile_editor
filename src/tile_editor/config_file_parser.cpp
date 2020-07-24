@@ -15,145 +15,181 @@ using namespace tile_editor;
 
 map_blueprint config_file_parser::read(const std::string& _filename) {
 
-
 	if(!tools::file_exists(_filename)) {
 
-		throw std::runtime_error(std::string{"cannot find config file '"}+_filename+"'");
+		throw std::runtime_error(std::string{"cannot find file '"}+_filename+"'");
 	}
 
-	std::ifstream file{_filename};
-	std::string line;
 	const std::string   beginprop{"beginmapproperties"},
 	                    begintile{"begintileset"},
 	                    beginobj{"beginobjectset"};
 
-	bool eof=false;
+	map_blueprint mb;
+	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
+	tools::text_reader reader{_filename, '#', flags};
 
-	while(true) {
+	try {
+		while(true) {
 
-		std::stringstream ss{preprocess_line(file, eof)};
+			std::stringstream ss{reader.read_line()};
+			if(reader.is_eof()) {
+				break;
+			}
+			
+			//We can only expect beginmapproperties, begintileset, beginobjectset...
+			//Skip all whitespace in the extraction operations that will follow.
+			std::string tag;
+			ss>>std::skipws>>tag;
 
-		if(eof) {
-			break;
-		}
+			if(tag==beginprop) {
 
-		//We can only expect beginmapproperties, begintileset, beginobjectset...
-		//Skip all whitespace in the extraction operations that will follow.
-		std::string tag;
-		ss>>std::skipws>>tag;
+				map_property_mode(reader);
+			}
+			else if(tag==begintile) {
 
-		if(tag==beginprop) {
+				tile_mode(reader);
+			}
+			else if(tag==beginobj) {
 
-			property_mode(file);
-		}
-		else if(tag==begintile) {
+				thing_mode(reader);
+			}
+			else {
 
-			tile_mode(file);
-		}
-		else if(tag==beginobj) {
-
-			thing_mode(file);
-		}
-		else {
-
-			throw std::runtime_error(std::string{"unexpected '"+tag+"' on config file"});
+				throw std::runtime_error(std::string{"unexpected '"+tag+"'"});
+			}
 		}
 	}
+	catch(std::exception& e) {
 
-	return map_blueprint{};
-}
-
-std::string config_file_parser::preprocess_line(std::ifstream& _file, bool& _eof) const {
-
-	while(true) {
-
-		std::string line;
-		std::getline(_file, line);
-		if(_file.eof()) {
-			_eof=true;
-			return "";
-		}
-
-		//Is it empty=
-		tools::trim(line);
-		if(!line.size()) {
-			continue;
-		}
-
-		//Is it a comment???
-		if('#'==line[0]) {
-			continue;
-		}
-
-		return line;
+		throw std::runtime_error(
+			std::string{e.what()}
+			+" on file "+_filename
+			+" line "+std::to_string(reader.get_line_number())
+		);
 	}
+
+	return mb;
 }
 
-void config_file_parser::property_mode(std::ifstream& _file) {
+void config_file_parser::map_property_mode(tools::text_reader& _reader) {
 
 	std::string line;
-	const std::string   end{"endmapproperties"};
-	bool eof=false;
+	const std::string   end{"endmapproperties"},
+	                    file{"file"};
 
-	while(true) {
+	auto filepair=from_reader(_reader);
+	if(filepair.eof) {
+		throw std::runtime_error("unexpected end of file, expected 'file'");
+	}
 
-		std::stringstream ss{preprocess_line(_file, eof)};
+	if(filepair.name!=file) {
+	
+		throw std::runtime_error(std::string{"unexpected '"}+filepair.name+"', expected 'file'");
+	}
 
-		if(eof) {
+	if(filepair.failed) {
 
-			throw std::runtime_error("unexpected end of file, expected 'endmapproperties'");
-		}
+		throw std::runtime_error("syntax error: file #filename#");
+	}
 
-		std::string tag;
-		ss>>std::skipws>>tag;
+	auto endpair=from_reader(_reader);
+	if(endpair.eof) {
 
-		//TODO: use some sort of pair that reads "key" (first word) and "value"
-		//(the rest) to extract shit. Then check keys and values here.
+		throw std::runtime_error("unexpected end of file, expected 'endmapproperties'");
+	}
 
-		if(tag==end) {
-
-			//TODO: Check all data has been set.
-			//TODO: add to caché.
-			return;
-		}
+	if(endpair.name!=end) {
+	
+		throw std::runtime_error(std::string{"unexpected '"}+endpair.name+"', expected 'endmapproperties'");
 	}
 }
 
-void config_file_parser::tile_mode(std::ifstream& _file) {
+void config_file_parser::tile_mode(tools::text_reader& _reader) {
 
-	const std::string   end{"endtileset"};
-	bool eof=false;
+	const std::string   end{"endtileset"},
+	                    file{"file"},
+	                    id{"id"},
+	                    image{"image"};
+
+	std::string fileval,
+	            idval,
+	            imgval;
+
+	std::vector<std::string> appeared;
 
 	while(true) {
 
-		std::stringstream ss{preprocess_line(_file, eof)};
+		auto pair=from_reader(_reader, {end, file, id, image});
 
-		if(eof) {
+		if(pair.eof) {
+
 			throw std::runtime_error("unexpected end of file, expected 'endtileset'");
 		}
 
-		std::string tag;
-		ss>>std::skipws>>tag;
+		if(pair.name==end) {
 
-		if(tag==end) {
+			break;
+		}
 
-			//TODO: Check all data has been set.
-			//TODO: add to caché.
-			return;
+		if(pair.disallowed) {
+
+			throw std::runtime_error{std::string{"unexpected '"}+pair.name+"'"};
+		}
+
+		if(pair.failed) {
+
+			throw std::runtime_error("syntax error: expected property value");
+		}
+
+		if(appeared.end() != std::find(std::begin(appeared), std::end(appeared), pair.name)) {
+
+			throw std::runtime_error("invalid repeated name");
+		}
+
+		appeared.push_back(pair.name);
+
+		if(pair.name==file) {
+
+			fileval=pair.value;
+		}
+		else if(pair.name==id) {
+
+			idval=pair.value;
+		}
+		else if(pair.name==image) {
+
+			imgval=pair.value;
 		}
 	}
+
+	if(!fileval.size()) {
+
+		throw new std::runtime_error("missing 'file'");
+	}
+	
+	if(!idval.size()) {
+
+		throw new std::runtime_error("missing 'id'");
+	}
+
+	if(!imgval.size()) {
+
+		throw new std::runtime_error("missing 'image'");
+	}
+
+	//TODO: check the types...
+	//TODO: add to caché.
 }
 
-void config_file_parser::thing_mode(std::ifstream& _file) {
+void config_file_parser::thing_mode(tools::text_reader& _reader) {
 
 	const std::string   end{"endobjectset"};
-	bool eof=false;
 
 	while(true) {
 
-		std::stringstream ss{preprocess_line(_file, eof)};
+		std::stringstream ss{_reader.read_line()};
 
-		if(eof) {
+		if(_reader.is_eof()) {
 			throw std::runtime_error("unexpected end of file, expected 'endobjectset'");
 		}
 
@@ -167,5 +203,56 @@ void config_file_parser::thing_mode(std::ifstream& _file) {
 			return;
 		}
 	}
+}
 
+config_file_parser::config_pair config_file_parser::from_reader(
+	tools::text_reader& _reader,
+	const std::vector<std::string>& _allowed) {
+
+	std::stringstream ss{_reader.read_line()};
+	config_pair result;
+
+	if(_reader.is_eof()) {
+	
+		result.eof=true;
+		return result;
+	}
+
+	ss>>std::skipws>>result.name;
+	result.value=ss.str();
+
+	if(_allowed.end()!=std::find(std::begin(_allowed), std::end(_allowed), result.value)) {
+
+		result.disallowed=true;
+	}
+
+	if(ss.fail()) {
+		result.failed=true;
+	}
+
+	return result;
+}
+
+config_file_parser::config_pair config_file_parser::from_reader(
+	tools::text_reader& _reader
+) {
+
+	config_pair result;
+
+	std::stringstream ss{_reader.read_line()};
+
+	if(_reader.is_eof()) {
+	
+		result.eof=true;
+		return result;
+	}
+
+	ss>>std::skipws>>result.name;
+	result.value=ss.str();
+
+	if(ss.fail()) {
+		result.failed=true;
+	}
+
+	return result;
 }
