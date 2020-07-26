@@ -10,7 +10,7 @@
 namespace tile_editor {
 
 //!The different blueprints for a map.
-class map_blueprint {
+struct map_blueprint {
 
 	//TODO: Nope, missing the background image file!!!!!
 	std::map<std::size_t, ldtools::sprite_table>    tilesets;

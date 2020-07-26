@@ -11,7 +11,11 @@ namespace tile_editor {
 //!blueprints for the properties, but not the properties themselves.
 class property_table {
 
+	public:
+
 	bool                            property_exists(const std::string&) const;
+
+	private:
 
 	std::map<std::string, property_definition<int>>         int_properties;
 	std::map<std::string, property_definition<double>>      double_properties;

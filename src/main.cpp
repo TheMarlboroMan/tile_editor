@@ -1,4 +1,4 @@
-#include "config_file_parser.h"
+#include "config_parser.h"
 
 #include <iostream>
 
@@ -10,7 +10,7 @@ int main(int argc, char ** argv) {
 		return 1;
 	}
 
-	tile_editor::config_file_parser cfp;
+	tile_editor::config_parser cfp;
 	cfp.read(std::string{argv[1]});
 
 	return 0;
