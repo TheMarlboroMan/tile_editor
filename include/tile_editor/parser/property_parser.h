@@ -1,6 +1,6 @@
 #pragma once
 
-#include "property_table.h"
+#include "../blueprint_types/property_table.h"
 
 #include <tools/text_reader.h>
 #include <string>

@@ -8,7 +8,7 @@ namespace tile_editor {
 
 //!A blueprint for a thing, contains the properties that it might have, but
 //!not its values.
-class thing_definition {
+struct thing_definition {
 
 	enum class size_type {fixed, resizable};
 	struct color{int r, g, b, a;};

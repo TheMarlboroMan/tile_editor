@@ -9,7 +9,7 @@ namespace tile_editor {
 
 //!A table of properties that may be used for a map or thing, contains the
 //!blueprints for the properties, but not the properties themselves.
-class property_table {
+struct property_table {
 
 	public:
 

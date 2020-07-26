@@ -1,9 +1,11 @@
-#include "config_parser.h"
-#include "property_parser.h"
-#include "parse_tools.h"
+#include "parser/config_parser.h"
+#include "parser/property_parser.h"
+#include "parser/parse_tools.h"
+#include "parser/thing_parser.h"
 
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
+#include <ldtools/sprite_table.h>
 
 #include <stdexcept>
 #include <fstream>
@@ -110,11 +112,10 @@ void config_parser::tile_mode(
 		throw std::runtime_error("repeated id value");
 	}
 
-	//TODO: we need a new parser now...
-	/*
-	tileset_parser tp;
-	_blueprint.tilesets[index]=tp.read_file(propmap["file"], propmap["image"]);
-	*/
+	_blueprint.tilesets[index]={
+		ldtools::sprite_table{propmap["file"]},
+		propmap["image"]
+	};
 }
 
 void config_parser::thing_mode(
@@ -139,10 +140,7 @@ void config_parser::thing_mode(
 		throw std::runtime_error("repeated id value");
 	}
 
-	//TODO: we need a new parser now...
-	/*
 	thing_parser tp;
 	_blueprint.thingsets[index]=tp.read_file(propmap["file"]);
-	*/
 }
 

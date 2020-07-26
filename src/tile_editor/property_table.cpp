@@ -1,4 +1,4 @@
-#include "property_table.h"
+#include "blueprint_types/property_table.h"
 
 using namespace tile_editor;
 

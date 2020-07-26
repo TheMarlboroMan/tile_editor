@@ -6,9 +6,7 @@
 namespace tile_editor {
 
 //!A container for the different properties that a thing or a map might have.
-class property_manager {
-
-	private:
+struct property_manager {
 
 	std::map<std::string, int>          int_properties;
 	std::map<std::string, double>       double_properties;

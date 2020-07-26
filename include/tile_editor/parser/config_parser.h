@@ -1,6 +1,6 @@
 #pragma once
 
-#include "map_blueprint.h"
+#include "../blueprint_types/map_blueprint.h"
 
 #include <tools/text_reader.h>
 

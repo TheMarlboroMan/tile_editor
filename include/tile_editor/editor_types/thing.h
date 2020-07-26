@@ -1,6 +1,6 @@
 #pragma once
 
-#include <property_manager.h>
+#include "../blueprint_types/property_manager.h"
 
 namespace tile_editor {
 

@@ -2,7 +2,7 @@
 
 #include "tile_layer.h"
 #include "thing_layer.h"
-#include "property_manager.h"
+#include "../blueprint_types/property_manager.h"
 
 #include <vector>
 

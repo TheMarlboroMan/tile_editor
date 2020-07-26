@@ -6,7 +6,7 @@ namespace tile_editor {
 
 //!This is a property definition, which can be used to fill for
 template<typename T>
-class property_definition {
+struct property_definition {
 
 	public:
 
@@ -26,12 +26,6 @@ class property_definition {
 	{
 
 	}
-
-	const std::string&  get_name() const {return name;}
-	const std::string&  get_description() const {return description;}
-	const T&            get_default() const {return default_value;}
-
-	private:
 
 	std::string         name;
 	T                   default_value;
