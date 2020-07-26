@@ -10,7 +10,12 @@ class property_definition {
 
 	public:
 
-						property_definition(
+	//Allow this thing to be default constructible.
+	                    property_definition() {
+
+	}
+
+	                    property_definition(
 		const std::string& _name,
 		const T& _value,
 		const std::string& _description

@@ -1,6 +1,7 @@
 #include "property_parser.h"
+#include "parse_tools.h"
 
-#include <sstream>
+#include <tools/file_utils.h>
 
 using namespace tile_editor;
 
@@ -14,7 +15,7 @@ property_table property_parser::read_file(const std::string& _path) {
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
 	tools::text_reader reader{_path, '#', flags};
 	property_table result;
-	const std::string beginprop{"beginproperty"},
+	const std::string beginprop{"beginproperty"};
 
 	while(true) {
 
@@ -44,17 +45,23 @@ void property_parser::read(
 
 	auto propmap=generic_first_level(_reader, "endproperty", {"name", "type", "default", "comment"});
 
+	if(_table.property_exists(propmap["name"])) {
+
+		throw std::runtime_error(std::string{"property '"}+propmap["name"]+"' already exists");
+	}
+
 	if(propmap["type"]=="int") {
 
-		//TODO: convert and insert.
+		insert(propmap["name"], propmap["default"], propmap["comment"], _table.int_properties);
+
 	}
 	else if(propmap["type"]=="string") {
 
-		//TODO: convert and insert.
+		insert(propmap["name"], propmap["default"], propmap["comment"], _table.string_properties);
 	}
 	else if(propmap["type"]=="double") {
 
-		//TODO: convert and insert.
+		insert(propmap["name"], propmap["default"], propmap["comment"], _table.double_properties);
 	}
 	else {
 

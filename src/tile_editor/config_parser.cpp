@@ -1,4 +1,5 @@
 #include "config_parser.h"
+#include "property_parser.h"
 #include "parse_tools.h"
 
 #include <tools/file_utils.h>
@@ -94,8 +95,26 @@ void config_parser::tile_mode(
 
 	auto propmap=generic_first_level(_reader, "endtileset", {"file", "id", "image"});
 
-	//TODO: check the types...
-	//TODO: add to caché.
+	std::stringstream ss{propmap["id"]};
+	std::size_t index{};
+	
+	ss>>index;
+
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid id value");
+	}
+
+	if(_blueprint.tilesets.count(index)) {
+
+		throw std::runtime_error("repeated id value");
+	}
+
+	//TODO: we need a new parser now...
+	/*
+	tileset_parser tp;
+	_blueprint.tilesets[index]=tp.read_file(propmap["file"], propmap["image"]);
+	*/
 }
 
 void config_parser::thing_mode(
@@ -104,8 +123,26 @@ void config_parser::thing_mode(
 ) {
 
 	auto propmap=generic_first_level(_reader, "endobjectset", {"file", "id"});
-	//TODO: check the types...
-	//TODO: add to caché.
-}
+	
+	std::stringstream ss{propmap["id"]};
+	std::size_t index{};
+	
+	ss>>index;
 
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid id value");
+	}
+
+	if(_blueprint.thingsets.count(index)) {
+
+		throw std::runtime_error("repeated id value");
+	}
+
+	//TODO: we need a new parser now...
+	/*
+	thing_parser tp;
+	_blueprint.thingsets[index]=tp.read_file(propmap["file"]);
+	*/
+}
 
