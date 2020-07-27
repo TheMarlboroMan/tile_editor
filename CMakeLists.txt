@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(tile_editor)
 
+option(BUILD_TESTS "Build test code" ON)
 option(BUILD_DEBUG "Build a debug release" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,7 +37,8 @@ set_target_properties(dansdl2 PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdan
 set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldtools.so)
 set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
 
-#Configure the executable, we want it into the "build directory" and we want all resources copied
-#to the build directory.
-add_executable(a.out src/main.cpp ${SOURCE})
-target_link_libraries(a.out dfw tools dansdl2 ldtools lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
+if(${BUILD_TESTS})
+	add_executable(config src/tests/config/main.cpp ${SOURCE})
+	target_link_libraries(config tools ldtools)
+	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
+endif()

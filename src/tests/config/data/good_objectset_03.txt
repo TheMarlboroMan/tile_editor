@@ -1,0 +1,8 @@
+beginobject
+	id 33
+	name Touch trigger
+	w 64
+	h 64
+	size resizable
+	color 255 0 255
+endobject

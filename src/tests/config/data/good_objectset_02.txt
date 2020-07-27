@@ -9,13 +9,13 @@ beginobject
 		name id
 		type int
 		default 0
-		comment Something something something
+		comment Unique id for the start
 	endproperty
 	beginproperty
 		name bearing
 		type int
 		default 90
-		comment Something something something
+		comment Exit bearing, 0 points right, 90 up.
 	endproperty
 endobject
 

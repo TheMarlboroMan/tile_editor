@@ -1,0 +1,31 @@
+beginmapproperties
+file data/good_map_properties.txt
+endmapproperties
+
+#There can be as many tilesets as we want.
+begintileset
+	file data/good_tileset_01.txt
+	id 1
+	image nah.png
+endtileset
+
+begintileset
+	file data/good_tileset_02.txt
+	id 2
+	image neh.png
+endtileset
+
+beginobjectset
+	file data/good_objectset_01.txt
+	id 1
+endobjectset
+
+beginobjectset
+	file data/good_objectset_03.txt
+	id 3
+endobjectset
+
+beginobjectset
+	file data/good_objectset_02.txt
+	id 2
+endobjectset
