@@ -17,7 +17,7 @@ beginobject
 endobject
 
 beginobject
-	id 2
+	id 3
 	name enemy
 	w 32
 	h 16
@@ -29,4 +29,38 @@ beginobject
 		default 1
 		comment Enemy type id
 	endproperty
+endobject
+
+beginobject
+	id 4
+	name friend
+	w 32
+	#The properties may appear anywhere.
+	beginproperty
+		name type_id
+		type int
+		default 1
+		comment Friend type id
+	endproperty
+	h 16
+	beginproperty
+		name health
+		type int
+		default 100
+		comment Basic friend health level
+	endproperty
+	size fixed
+	beginproperty
+		name name
+		type string
+		default Unnamed
+		comment Friend name to be displayed
+	endproperty
+	beginproperty
+		name factor
+		type double
+		default 2.5
+		comment Movement factor
+	endproperty
+	color 255 200 128
 endobject

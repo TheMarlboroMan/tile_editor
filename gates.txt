@@ -5,18 +5,18 @@ beginobject
 	h 32
 	size fixed
 	color 0 255 0
-	begin property
+	beginproperty
 		name id
 		type int
 		default 0
 		comment Something something something
-	end property
-	begin property
+	endproperty
+	beginproperty
 		name bearing
 		type int
 		default 90
 		comment Something something something
-	end property
+	endproperty
 endobject
 
 beginobject
@@ -26,16 +26,16 @@ beginobject
 	h 32
 	size resizable
 	color 0 0 255
-	begin property
+	beginproperty
 		name map_id
 		type int
 		default 0
 		comment Destination map id
-	end property
-	begin property
+	endproperty
+	beginproperty
 		name start_id
 		type int
 		default 0
 		comment Start id on the destination map
-	end property
+	endproperty
 endobject

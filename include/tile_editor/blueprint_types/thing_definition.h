@@ -11,7 +11,7 @@ namespace tile_editor {
 struct thing_definition {
 
 	enum class size_type {fixed, resizable};
-	struct color{int r, g, b, a;};
+	struct color{int r, g, b;};
 
 	std::size_t                     type_id;
 	int                             w, h;
