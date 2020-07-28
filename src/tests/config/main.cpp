@@ -208,22 +208,19 @@ int main(int /*argc*/, char ** /*argv*/) {
 	must_throw([&cfp](){cfp.read("data/bad-012.txt");}, "repeated property 'file'", "config parser with repeated tileset property definition");
 
 	//config parser with invalid thingset definition
+	must_throw([&cfp](){cfp.read("data/bad-013.txt");}, "missing value for 'id'", "config parser with invalid thingset definition");
 
 	//config parser with unclosed thingset definition
+	must_throw([&cfp](){cfp.read("data/bad-014.txt");}, "unexpected end of file before 'endobjectset'", "config parser with unclosed thingset definition");
 
 	//config parser with invalid thingset id
+	must_throw([&cfp](){cfp.read("data/bad-015.txt");}, "invalid id value", "config parser with invalid thingset id");
 
 	//config parser with repeated thingset id
+	must_throw([&cfp](){cfp.read("data/bad-016.txt");}, "repeated id value", "config parser with repeated thingset id");
 
 	//config parser with repeated thingset property definition
-
-	//unclosed property definition
-
-	//malformed property definition, missing parameters
-
-	//malformed property definition, missing values
-
-	//malformed property definition, invalid types
+	must_throw([&cfp](){cfp.read("data/bad-017.txt");}, "repeated property 'id'", "config parser with repeated thingset property definition");
 
 	//unclosed thing definition
 
@@ -239,7 +236,15 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 	//malformed thing definition, repeated property
 
-	std::cout<<"done"<<std::endl;
+	//unclosed property definition
+
+	//malformed property definition, missing parameters
+
+	//malformed property definition, missing values
+
+	//malformed property definition, invalid types
+
+	std::cout<<"done, all good"<<std::endl;
 
 	return 0;
 }

@@ -1,0 +1,4 @@
+beginobjectset
+	file data/good_objectset_01.txt
+	id oops
+endobjectset

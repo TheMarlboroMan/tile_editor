@@ -1,0 +1,9 @@
+beginobjectset
+	file data/good_objectset_01.txt
+	id 1
+endobjectset
+
+beginobjectset
+	file data/good_objectset_01.txt
+	id 1
+endobjectset
