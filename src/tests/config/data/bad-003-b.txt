@@ -1,0 +1,6 @@
+beginproperty
+	nothing meh
+	type string
+	default unnamed-map
+	comment The name of the map
+endproperty

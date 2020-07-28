@@ -1,0 +1,4 @@
+begintileset
+	file data/good_tileset_01.txt
+	id 1
+	image ouch.png

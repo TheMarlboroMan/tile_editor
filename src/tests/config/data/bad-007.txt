@@ -1,0 +1,3 @@
+beginmapproperties
+file data/not-really-a-file
+endmapproperties

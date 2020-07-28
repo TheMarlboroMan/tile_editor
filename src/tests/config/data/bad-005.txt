@@ -1,0 +1,8 @@
+beginmapproperties
+file data/good_map_properties.txt
+endmapproperties
+
+beginmapproperties
+file data/good_map_properties.txt
+endmapproperties
+

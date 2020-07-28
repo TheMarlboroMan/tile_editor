@@ -30,6 +30,8 @@ template<typename T> void must_throw(
 			std::exit(1);
 		}
 	}
+
+	std::cout<<"caught: "<<_type<<std::endl;
 }
 
 //Generic property content checks.
@@ -170,28 +172,40 @@ int main(int /*argc*/, char ** /*argv*/) {
 	must_throw([&cfp](){cfp.read("data/this-is-not-a-file");}, "cannot find file", "config parser with non existing file");
 
 	//config parser with invalid opening tag
+	must_throw([&cfp](){cfp.read("data/bad-001.txt");}, "expected beginmapproperties, begintileset or beginobjectset", "config parser with invalid opening tag");
 
 	//config parser without file value in property set
+	must_throw([&cfp](){cfp.read("data/bad-002.txt");}, "missing value for 'file'", "config parser without file value in property set");
 
 	//config parser with invalid map property definition
+	must_throw([&cfp](){cfp.read("data/bad-003.txt");}, "unrecognised 'nothing'", "config parser with invalid map property definition");
 
 	//config parser with repeated property definition
+	must_throw([&cfp](){cfp.read("data/bad-004.txt");}, "repeated property 'default'", "config parser with repeated property definition");
 
 	//config parser with two map property sets.
+	must_throw([&cfp](){cfp.read("data/bad-005.txt");}, "only one mapproperty node can be specified", "config parser with two map property sets");
 
 	//config parser with unclosed property set.
+	must_throw([&cfp](){cfp.read("data/bad-006.txt");}, "unexpected end of file before 'endmapproperties'", "config parser with unclosed property set");
 
 	//config parser with invalid map property file
+	must_throw([&cfp](){cfp.read("data/bad-007.txt");}, "cannot find properties file 'data/not-really-a-file'", "config parser with invalid map property file");
 
 	//config parser with invalid tileset definition
+	must_throw([&cfp](){cfp.read("data/bad-008.txt");}, "missing value for 'image'", "config parser with invalid tileset definition");
 
 	//config parser with unclosed tileset definition
+	must_throw([&cfp](){cfp.read("data/bad-009.txt");}, "unexpected end of file before 'endtileset'", "config parser with unclosed tileset definition");
 
 	//config parser with invalid tileset id
+	must_throw([&cfp](){cfp.read("data/bad-010.txt");}, "invalid id value", "config parser with invalid tileset id");
 
 	//config parser with repeated tileset id
+	must_throw([&cfp](){cfp.read("data/bad-011.txt");}, "repeated id value", "config parser with repeated tileset id");
 
 	//config parser with repeated tileset property definition
+	must_throw([&cfp](){cfp.read("data/bad-012.txt");}, "repeated property 'file'", "config parser with repeated tileset property definition");
 
 	//config parser with invalid thingset definition
 

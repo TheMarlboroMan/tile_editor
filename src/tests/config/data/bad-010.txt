@@ -1,0 +1,6 @@
+begintileset
+	file data/good_tileset_01.txt
+	id ouch
+	image ouch.png
+endtileset
+

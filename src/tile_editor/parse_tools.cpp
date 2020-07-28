@@ -92,7 +92,7 @@ std::map<std::string, std::string> tile_editor::generic_first_level(
 		//Empty properties are not allowed, so this is legal.
 		if(propmap[pair.name].size()) {
 
-			throw std::runtime_error("repeated property");
+			throw std::runtime_error(std::string{"repeated property '"}+pair.name+"'");
 		}
 
 		propmap[pair.name]=pair.value;

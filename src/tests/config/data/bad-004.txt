@@ -1,0 +1,3 @@
+beginmapproperties
+file data/bad-004-b.txt
+endmapproperties
