@@ -123,7 +123,7 @@ void thing_parser::parse_object(
 	}
 
 	std::size_t id=convert_value<std::size_t>(properties, "id");
-	if(_result.data.count(id)) {
+	if(_result.count(id)) {
 
 		throw std::runtime_error("repeated thing definition id");
 	}
@@ -154,7 +154,7 @@ void thing_parser::parse_object(
 		throw std::runtime_error("invalid color schema, values are red, green and blue separated by spaces");
 	}
 
-	_result.data[id]={
+	_result[id]={
 		id,
 		w, 
 		h,

@@ -8,3 +8,8 @@ bool property_table::property_exists(const std::string& _key) const {
 		|| string_properties.count(_key)
 		|| double_properties.count(_key);
 }
+
+std::size_t property_table::size() const {
+
+	return int_properties.size() + string_properties.size() + double_properties.size();
+}

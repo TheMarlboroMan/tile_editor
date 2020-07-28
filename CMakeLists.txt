@@ -39,6 +39,6 @@ set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
 
 if(${BUILD_TESTS})
 	add_executable(config src/tests/config/main.cpp ${SOURCE})
-	target_link_libraries(config tools ldtools)
+	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
 	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
 endif()
