@@ -1,4 +1,4 @@
-#include "parser/config_parser.h"
+#include "parser/blueprint_parser.h"
 #include "parser/property_parser.h"
 #include "parser/parse_tools.h"
 #include "parser/thing_parser.h"
@@ -14,7 +14,7 @@
 
 using namespace tile_editor;
 
-map_blueprint config_parser::read(const std::string& _filename) {
+map_blueprint blueprint_parser::read(const std::string& _filename) {
 
 	if(!tools::file_exists(_filename)) {
 
@@ -79,7 +79,7 @@ map_blueprint config_parser::read(const std::string& _filename) {
 	return mb;
 }
 
-void config_parser::map_property_mode(
+void blueprint_parser::map_property_mode(
 	tools::text_reader& _reader,
 	map_blueprint& _blueprint
 ) {
@@ -90,7 +90,7 @@ void config_parser::map_property_mode(
 	_blueprint.properties=pp.read_file(propmap["file"]);
 }
 
-void config_parser::tile_mode(
+void blueprint_parser::tile_mode(
 	tools::text_reader& _reader,
 	map_blueprint& _blueprint
 ) {
@@ -118,7 +118,7 @@ void config_parser::tile_mode(
 	};
 }
 
-void config_parser::thing_mode(
+void blueprint_parser::thing_mode(
 	tools::text_reader& _reader,
 	map_blueprint& _blueprint
 ) {

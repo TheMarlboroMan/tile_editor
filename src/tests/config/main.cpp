@@ -2,7 +2,7 @@
 This file test the configuration file parsers.
 */
 
-#include "parser/config_parser.h"
+#include "parser/blueprint_parser.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -105,7 +105,7 @@ template<> void check_property(
 int main(int /*argc*/, char ** /*argv*/) {
 
 	std::cout<<"testing complete valid config file"<<std::endl;
-	tile_editor::config_parser cfp;
+	tile_editor::blueprint_parser cfp;
 	auto blueprint=cfp.read("data/good_config.txt");
 
 	try {

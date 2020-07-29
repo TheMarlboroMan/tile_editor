@@ -12,7 +12,7 @@ namespace tools {
 
 namespace tile_editor {
 
-class config_parser {
+class blueprint_parser {
 
 	public:
 
