@@ -4,5 +4,5 @@ beginobject
 	w 16
 	h 16
 	size ouch
-	color 255 255 0
+	color 255 255 0 0
 endobject

@@ -4,5 +4,5 @@ beginobject
 	w 16
 	h 16
 	size resizable
-	color 255 g 0
+	color 255 g 0 0
 endobject

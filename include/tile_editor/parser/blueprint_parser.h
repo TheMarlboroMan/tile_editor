@@ -23,5 +23,6 @@ class blueprint_parser {
 	void                    map_property_mode(tools::text_reader&, map_blueprint&);
 	void                    tile_mode(tools::text_reader&, map_blueprint&);
 	void                    thing_mode(tools::text_reader&, map_blueprint&);
+	void                    poly_mode(tools::text_reader&, map_blueprint&);
 };
 }

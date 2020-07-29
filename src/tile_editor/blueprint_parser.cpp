@@ -2,6 +2,7 @@
 #include "parser/property_parser.h"
 #include "parser/parse_tools.h"
 #include "parser/thing_parser.h"
+#include "parser/poly_parser.h"
 
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
@@ -23,7 +24,8 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 
 	const std::string   beginprop{"beginmapproperties"},
 	                    begintile{"begintileset"},
-	                    beginobj{"beginobjectset"};
+	                    beginobj{"beginobjectset"},
+	                    beginpoly{"beginpolyset"};
 
 	map_blueprint mb;
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
@@ -60,6 +62,10 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 			else if(tag==beginobj) {
 
 				thing_mode(reader, mb);
+			}
+			else if(tag==beginpoly) {
+
+				poly_mode(reader, mb);
 			}
 			else {
 
@@ -142,5 +148,31 @@ void blueprint_parser::thing_mode(
 
 	thing_parser tp;
 	_blueprint.thingsets[index]=tp.read_file(propmap["file"]);
+}
+
+void blueprint_parser::poly_mode(
+	tools::text_reader& _reader, 
+	map_blueprint& _blueprint
+) {
+
+auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id"});
+	
+	std::stringstream ss{propmap["id"]};
+	std::size_t index{};
+	
+	ss>>index;
+
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid id value");
+	}
+
+	if(_blueprint.polysets.count(index)) {
+
+		throw std::runtime_error("repeated id value");
+	}
+
+	poly_parser pp;
+	_blueprint.polysets[index]=pp.read_file(propmap["file"]);
 }
 

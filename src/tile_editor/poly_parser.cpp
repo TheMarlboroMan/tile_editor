@@ -1,4 +1,4 @@
-#include "parser/thing_parser.h"
+#include "parser/poly_parser.h"
 #include "parser/parse_tools.h"
 #include "parser/property_parser.h"
 #include "blueprint_types/property_table.h"
@@ -10,16 +10,16 @@
 
 using namespace tile_editor;
 
-thing_definition_table thing_parser::read_file(const std::string& _filename) {
+poly_definition_table poly_parser::read_file(const std::string& _filename) {
 
 	if(!tools::file_exists(_filename)) {
 
 		throw std::runtime_error(std::string{"cannot find file '"}+_filename+"'");
 	}
 
-	const std::string   begin{"beginobject"};
+	const std::string   begin{"beginpoly"};
 
-	thing_definition_table result;
+	poly_definition_table result;
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
 	tools::text_reader reader{_filename, '#', flags};
 
@@ -39,7 +39,7 @@ thing_definition_table thing_parser::read_file(const std::string& _filename) {
 				throw std::runtime_error(std::string{"unexpected '"+tag+"', expected beginobject"});
 			}
 
-			parse_object(reader, result);
+			parse_poly(reader, result);
 		}
 	}
 	catch(std::exception& e) {
@@ -54,25 +54,22 @@ thing_definition_table thing_parser::read_file(const std::string& _filename) {
 	return result;
 }
 
-void thing_parser::parse_object(
+void poly_parser::parse_poly(
 	tools::text_reader& _reader, 
-	thing_definition_table& _result
+	poly_definition_table& _result
 ) {
 
-	//Given the nested structure of this file, we cannot use exactly the same
-	//tools as we used in other parsers. It is, however, not that different.
+	//This works mostly the same as a thing definition.
 
-	const std::string   end{"endobject"},
+	const std::string   end{"endpoly"},
 	                    propstart{"beginproperty"};
 
 	property_table pt;
 	std::map<std::string, std::string> properties{
 		{"id", ""},
 		{"name", ""},
-		{"w", ""},
-		{"h", ""},
-		{"size", ""},
-		{"color", ""}
+		{"color", ""},
+		{"colortype", ""}
 	};
 
 	while(true) {
@@ -81,7 +78,7 @@ void thing_parser::parse_object(
 
 		if(pair.eof) {
 
-			throw std::runtime_error{"unexpected file end before 'endobject'"};
+			throw std::runtime_error{"unexpected file end before 'endpoly'"};
 		}
 
 		if(pair.name==propstart) {
@@ -122,38 +119,33 @@ void thing_parser::parse_object(
 		}
 	}
 
-	std::size_t id=convert_value<std::size_t>(properties, "id");
+	std::size_t id=std::stoi(properties["id"]);
 	if(_result.count(id)) {
 
-		throw std::runtime_error("repeated thing definition id");
+		throw std::runtime_error("repeated poly definition id");
 	}
 
-	int w=convert_value<int>(properties, "w"),
-		h=convert_value<int>(properties, "h");
-
-	thing_definition::size_type size=thing_definition::size_type::fixed;
-	if(properties["size"]=="fixed") {
+	poly_definition::color_type colortype=poly_definition::color_type::fixed;
+	if(properties["colortype"]=="fixed") {
 
 		//Noop
 	}
-	else if(properties["size"]=="resizable") {
+	else if(properties["colortype"]=="customizable") {
 
-		size=thing_definition::size_type::resizable;
+		colortype=poly_definition::color_type::customizable;
 	}
 	else {
 
-		throw std::runtime_error("invalid size type, valid values are 'fixed' and 'resizable'");
+		throw std::runtime_error("invalid color type, valid values are 'fixed' and 'customizable'");
 	}
 
 	auto color=parse_color(properties["color"]);
 
 	_result[id]={
 		id,
-		w, 
-		h,
-		size,
 		properties["name"],
 		color,
+		colortype,
 		pt
 	};
 }

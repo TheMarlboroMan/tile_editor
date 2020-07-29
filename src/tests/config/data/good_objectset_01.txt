@@ -4,7 +4,7 @@ beginobject
 	w 16
 	h 16
 	size fixed
-	color 255 255 0
+	color 255 255 0 0
 endobject
 
 beginobject
@@ -13,7 +13,7 @@ beginobject
 	w 16
 	h 16
 	size fixed
-	color 0 255 255
+	color 0 255 255 0
 endobject
 
 beginobject
@@ -22,7 +22,7 @@ beginobject
 	w 32
 	h 16
 	size fixed
-	color 255 255 128
+	color 255 255 128 0
 	beginproperty
 		name type_id
 		type int
@@ -62,5 +62,5 @@ beginobject
 		default 2.5
 		comment Movement factor
 	endproperty
-	color 255 200 128
+	color 255 200 128 0
 endobject

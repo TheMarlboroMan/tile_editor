@@ -10,7 +10,7 @@ This file test the configuration file parsers.
 
 void fail(const std::string& _msg);
 void assert(bool _thing, const std::string& _msg);
-void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, const std::string&, int, int, int, std::size_t);
+void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, const std::string&, int, int, int, int, std::size_t);
 
 template<typename T> void must_throw(
 	T _whatever, 
@@ -129,10 +129,10 @@ int main(int /*argc*/, char ** /*argv*/) {
 		assert(3==blueprint.thingsets.size(), "failed to assert that there are 3 thingsets");
 
 		assert(4==blueprint.thingsets[1].size(), "failed to assert item count on thingset 1");
-		check_thing(blueprint.thingsets[1], 1, "extra_life", 16, 16, "fixed", 255, 255, 0, 0);
-		check_thing(blueprint.thingsets[1], 2, "health", 16, 16, "fixed", 0, 255, 255, 0);
-		check_thing(blueprint.thingsets[1], 3, "enemy", 32, 16, "fixed", 255, 255, 128, 1);
-		check_thing(blueprint.thingsets[1], 4, "friend", 32, 16, "fixed", 255, 200, 128, 4);
+		check_thing(blueprint.thingsets[1], 1, "extra_life", 16, 16, "fixed", 255, 255, 0, 0, 0);
+		check_thing(blueprint.thingsets[1], 2, "health", 16, 16, "fixed", 0, 255, 255, 0, 0);
+		check_thing(blueprint.thingsets[1], 3, "enemy", 32, 16, "fixed", 255, 255, 128, 0, 1);
+		check_thing(blueprint.thingsets[1], 4, "friend", 32, 16, "fixed", 255, 200, 128, 0, 4);
 
 		check_property<int>(blueprint.thingsets[1][3].properties, "type_id", 1, "Enemy type id");
 
@@ -142,8 +142,8 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_property<double>(blueprint.thingsets[1][4].properties, "factor", 2.5, "Movement factor");
 
 		assert(2==blueprint.thingsets[2].size(), "failed to assert item count on thingset 2");
-		check_thing(blueprint.thingsets[2], 1, "start", 32, 32, "fixed", 0, 255, 0, 2);
-		check_thing(blueprint.thingsets[2], 2, "exit", 32, 32, "resizable", 0, 0, 255, 2);
+		check_thing(blueprint.thingsets[2], 1, "start", 32, 32, "fixed", 0, 255, 0, 0, 2);
+		check_thing(blueprint.thingsets[2], 2, "exit", 32, 32, "resizable", 0, 0, 255, 0, 2);
 
 		check_property<int>(blueprint.thingsets[2][1].properties, "id", 0, "Unique id for the start");
 		check_property<int>(blueprint.thingsets[2][1].properties, "bearing", 90, "Exit bearing, 0 points right, 90 up.");
@@ -152,7 +152,9 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_property<int>(blueprint.thingsets[2][2].properties, "start_id", 0, "Start id on the destination map");
 
 		assert(1==blueprint.thingsets[3].size(), "failed to assert item count on thingset 3");
-		check_thing(blueprint.thingsets[3], 33, "Touch trigger", 64, 64, "resizable", 255, 0, 255, 0);
+		check_thing(blueprint.thingsets[3], 33, "Touch trigger", 64, 64, "resizable", 255, 0, 255, 0, 0);
+
+		//TODO: Test poly types...
 
 		//Same goes for map properties
 		std::cout<<"testing map property contents..."<<std::endl;
@@ -262,6 +264,33 @@ int main(int /*argc*/, char ** /*argv*/) {
 	//repeated property name, even of different types
 	must_throw([&cfp](){cfp.read("data/bad-030.txt");}, "property 'prop' already exists", "repeated property name, even of different types");
 
+	//TODO...
+	//config parser with invalid polyset definition
+
+	//config parser with repeated polyset id
+
+	//config parser with non existing polyset name
+
+	//config parser with unclosed polyset definition
+
+	//poly parser with unclosed polyset definition
+
+	//poly parser with unexpected tag
+
+	//poly parser with missing property
+
+	//poly parser with missing values
+
+	//poly parser with bad colortype value
+
+	//poly parser with bad color
+
+	//poly parser with bad id
+
+	//poly parser with repeated id
+
+	//let us not repeat the whole property thing again...
+
 	std::cout<<"done, all good"<<std::endl;
 
 	return 0;
@@ -289,6 +318,7 @@ void check_thing(
 	int _r, 
 	int _g, 
 	int _b, 
+	int _a,
 	std::size_t _propcount
 ) {
 
@@ -315,6 +345,7 @@ void check_thing(
 	assert(_r==thing.color.r, std::to_string(_r)+" does not match thing red");
 	assert(_g==thing.color.g, std::to_string(_g)+" does not match thing green");
 	assert(_b==thing.color.b, std::to_string(_b)+" does not match thing blue");
+	assert(_a==thing.color.a, std::to_string(_a)+" does not match thing alpha+");
 	assert(_propcount==thing.properties.size(), "propsize does not match");
 }
 

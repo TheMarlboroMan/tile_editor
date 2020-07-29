@@ -1,0 +1,13 @@
+beginpoly
+	id 1
+	name background
+	color 255 0 0 0
+	colortype customizable
+endpoly
+
+beginpoly
+	id 2
+	name foreground
+	color 255 0 0 0
+	colortype customizable
+endpoly

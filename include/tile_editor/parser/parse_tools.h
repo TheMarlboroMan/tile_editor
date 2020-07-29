@@ -1,5 +1,7 @@
 #pragma once
 
+#include "blueprint_types/color.h"
+
 #include <tools/text_reader.h>
 
 #include <string>
@@ -20,4 +22,5 @@ struct config_pair {
 config_pair     from_reader(tools::text_reader&);
 config_pair     from_reader(tools::text_reader&, const std::vector<std::string>&);
 std::map<std::string, std::string> generic_first_level(tools::text_reader&, const std::string&, const std::vector<std::string>&);
+color           parse_color(const std::string&);
 }

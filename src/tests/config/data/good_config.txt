@@ -29,3 +29,13 @@ beginobjectset
 	file data/good_objectset_02.txt
 	id 2
 endobjectset
+
+beginpolyset
+	file data/good_polyset_01.txt
+	id 1
+endpolyset
+
+beginpolyset
+	file data/good_polyset_02.txt
+	id 2
+endpolyset

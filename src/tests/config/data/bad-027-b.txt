@@ -4,7 +4,7 @@ beginobject
 	w 16
 	h 16
 	size resizable
-	color 255 255 0
+	color 255 255 0 0
 	beginproperty
 		name prop
 		default 33

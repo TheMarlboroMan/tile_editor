@@ -1,0 +1,25 @@
+beginpoly
+	id 1
+	name collisionable
+	color 255 255 0 0
+	colortype fixed
+endpoly
+
+beginpoly
+	id 2
+	name touch_trigger
+	color 255 255 255 128
+	colortype fixed
+	beginproperty
+		name trigger_id
+		type int
+		default 1
+		comment Trigger id
+	endproperty
+	beginproperty
+		name repeatable
+		type int
+		default -1
+		comment -1 for infinite, a number for the exact number of times
+	endproperty
+endpoly

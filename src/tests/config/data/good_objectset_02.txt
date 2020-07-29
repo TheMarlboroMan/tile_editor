@@ -4,7 +4,7 @@ beginobject
 	w 32
 	h 32
 	size fixed
-	color 0 255 0
+	color 0 255 0 0
 	beginproperty
 		name id
 		type int
@@ -25,7 +25,7 @@ beginobject
 	w 32
 	h 32
 	size resizable
-	color 0 0 255
+	color 0 0 255 0
 	beginproperty
 		name map_id
 		type int
