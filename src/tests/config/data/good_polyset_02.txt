@@ -8,6 +8,6 @@ endpoly
 beginpoly
 	id 2
 	name foreground
-	color 255 0 0 0
+	color 0 255 0 0
 	colortype customizable
 endpoly

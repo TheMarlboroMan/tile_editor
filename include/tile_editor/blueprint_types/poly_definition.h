@@ -14,7 +14,7 @@ struct poly_definition {
 	std::size_t                     poly_id;
 	std::string                     name;
 	tile_editor::color              color;
-	color_type                      colortype;
+	poly_definition::color_type     color_type;
 	property_table                  properties;
 };
 

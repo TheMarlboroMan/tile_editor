@@ -11,6 +11,7 @@ This file test the configuration file parsers.
 void fail(const std::string& _msg);
 void assert(bool _thing, const std::string& _msg);
 void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, const std::string&, int, int, int, int, std::size_t);
+void check_poly(const tile_editor::poly_definition_table&, std::size_t, const std::string&, int, int, int, int, const std::string&, std::size_t);
 
 template<typename T> void must_throw(
 	T _whatever, 
@@ -154,7 +155,20 @@ int main(int /*argc*/, char ** /*argv*/) {
 		assert(1==blueprint.thingsets[3].size(), "failed to assert item count on thingset 3");
 		check_thing(blueprint.thingsets[3], 33, "Touch trigger", 64, 64, "resizable", 255, 0, 255, 0, 0);
 
-		//TODO: Test poly types...
+		//as do poly sets...
+		std::cout<<"testing polyset contents..."<<std::endl;
+		assert(2==blueprint.polysets.size(), "failed to assert that there are 2 polysets");
+		assert(1==blueprint.polysets.count(1), "failed to assert that polyset 1 exists");
+		assert(2==blueprint.polysets[1].size(), "failed to assert size of polyset 1");
+		check_poly(blueprint.polysets[1], 1, "collisionable", 255, 255, 0, 0, "fixed", 0);
+		check_poly(blueprint.polysets[1], 2, "touch_trigger", 255, 255, 255, 128, "fixed", 2);
+		check_property<int>(blueprint.polysets[1][2].properties, "trigger_id", 1, "Trigger id");
+		check_property<int>(blueprint.polysets[1][2].properties, "repeatable", -1, "-1 for infinite, a number for the exact number of times");
+
+		assert(1==blueprint.polysets.count(2), "failed to assert that polyset 2 exists");
+		assert(2==blueprint.polysets[2].size(), "failed to assert size of polyset 2");
+		check_poly(blueprint.polysets[2], 1, "background", 255, 0, 0, 0, "customizable", 0);
+		check_poly(blueprint.polysets[2], 2, "foreground", 0, 255, 0, 0, "customizable", 0);
 
 		//Same goes for map properties
 		std::cout<<"testing map property contents..."<<std::endl;
@@ -162,6 +176,8 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_property<std::string>(blueprint.properties, "name", "unnamed-map", "The name of the map");
 		check_property<int>(blueprint.properties, "map_id", 0, "An unique identifier for the map");
 		check_property<int>(blueprint.properties, "special_effect_flags", 0, "Special effects, 0 means none, 1 means darkened, 2 means underwater.");
+
+		//TODO: Test session data...
 	}
 	catch(std::exception& e) {
 
@@ -347,5 +363,42 @@ void check_thing(
 	assert(_b==thing.color.b, std::to_string(_b)+" does not match thing blue");
 	assert(_a==thing.color.a, std::to_string(_a)+" does not match thing alpha+");
 	assert(_propcount==thing.properties.size(), "propsize does not match");
+}
+
+void check_poly(
+	const tile_editor::poly_definition_table& _polys, 
+	std::size_t _index, 
+	const std::string& _name, 
+	int _r, 
+	int _g, 
+	int _b, 
+	int _a, 
+	const std::string& _colortype, 
+	std::size_t _propcount
+) {
+
+	assert(1==_polys.count(_index), std::string{"undefined poly index '"}+std::to_string(_index)+"'");
+	
+	const auto& poly=_polys.at(_index);
+	assert(_name==poly.name, _name+"does not match poly name");
+
+	if(_colortype=="fixed") {
+
+		assert(tile_editor::poly_definition::color_type::fixed==poly.color_type, "mismatched color type");
+	}
+	else if(_colortype=="customizable") {
+
+		assert(tile_editor::poly_definition::color_type::customizable==poly.color_type, "mismatched color type");
+	}
+	else {
+
+		fail("invalid color type");
+	}
+
+	assert(_r==poly.color.r, std::to_string(_r)+" does not match poly red");
+	assert(_g==poly.color.g, std::to_string(_g)+" does not match poly green");
+	assert(_b==poly.color.b, std::to_string(_b)+" does not match poly blue");
+	assert(_a==poly.color.a, std::to_string(_a)+" does not match poly alpha+");
+	assert(_propcount==poly.properties.size(), "propsize does not match");
 }
 

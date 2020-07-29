@@ -54,7 +54,8 @@ config_pair tile_editor::from_reader(
 std::map<std::string, std::string> tile_editor::generic_first_level(
 	tools::text_reader& _reader,
 	const std::string& _end,
-	const std::vector<std::string>& _properties
+	const std::vector<std::string>& _properties,
+	bool strict
 ) {
 
 	std::map<std::string, std::string> propmap;
@@ -79,7 +80,7 @@ std::map<std::string, std::string> tile_editor::generic_first_level(
 			break;
 		}
 
-		if(pair.disallowed) {
+		if(pair.disallowed && strict) {
 
 			throw std::runtime_error{std::string{"unrecognised '"}+pair.name+"', not within allowed properties"};
 		}

@@ -4,30 +4,41 @@
 #include "poly_definition_table.h"
 #include "property_table.h"
 #include "tileset.h"
+#include "color.h"
 
 #include <map>
 
 namespace tile_editor {
 
-//!The different blueprints for a map.
+//!Grid data for a session.
+struct grid_data {
+
+	int                 size=32,
+	                    vertical_ruler=8,
+	                    horizontal_ruler=8;
+	tile_editor::color  color={0,0,0,0},
+	                    rulercolor={0,255,0,0};
+};
+
+//!The different blueprints for a map session.
 struct map_blueprint {
+
+	enum class thing_centers {
+		center,
+		top_left,
+		top_right,
+		bottom_right,
+		bottom_left
+	};
+
+	tile_editor::grid_data                          grid_data;
+	tile_editor::color                              bgcolor{32,32,32,0};
+	thing_centers                                   thing_center{thing_centers::center};
 
 	std::map<std::size_t, tileset>                  tilesets;
 	std::map<std::size_t, thing_definition_table>   thingsets;
 	std::map<std::size_t, poly_definition_table>    polysets;
 	property_table                                  properties;
-
-	//TODO:
-	/*
-	bd color
-	grid color
-	grid ruler color
-	vertical grid size
-	horizontal grid size
-	vertical grid rule each
-	horizontal grid rule each
-	thing center type
-	*/
 };
 
 }

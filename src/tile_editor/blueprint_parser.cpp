@@ -25,7 +25,8 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 	const std::string   beginprop{"beginmapproperties"},
 	                    begintile{"begintileset"},
 	                    beginobj{"beginobjectset"},
-	                    beginpoly{"beginpolyset"};
+	                    beginpoly{"beginpolyset"},
+	                    beginsession{"beginsession"};
 
 	map_blueprint mb;
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
@@ -66,6 +67,10 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 			else if(tag==beginpoly) {
 
 				poly_mode(reader, mb);
+			}
+			else if(tag==beginsession) {
+
+				session_mode(reader, mb);
 			}
 			else {
 
@@ -155,7 +160,7 @@ void blueprint_parser::poly_mode(
 	map_blueprint& _blueprint
 ) {
 
-auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id"});
+	auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id"});
 	
 	std::stringstream ss{propmap["id"]};
 	std::size_t index{};
@@ -174,5 +179,94 @@ auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id"});
 
 	poly_parser pp;
 	_blueprint.polysets[index]=pp.read_file(propmap["file"]);
+}
+
+void blueprint_parser::session_mode(
+	tools::text_reader& _reader, 
+	map_blueprint& _blueprint
+) {
+
+	auto propmap=generic_first_level(_reader, "endsession", {
+		"thingcenter", 
+		"bgcolor",
+		"gridsize",
+		"gridvruler",
+		"gridhruler",
+		"gridcolor",
+		"gridrulercolor",
+	}, false);
+
+	const std::string& thingcenter=propmap["thingcenter"];
+	if(thingcenter.size()) {
+
+		if(thingcenter=="center") {
+
+			_blueprint.thing_center=map_blueprint::thing_centers::center;
+		}
+		else if(thingcenter=="topleft") {
+
+			_blueprint.thing_center=map_blueprint::thing_centers::top_left;
+		}
+		else if(thingcenter=="topright") {
+
+			_blueprint.thing_center=map_blueprint::thing_centers::top_right;
+		}
+		else if(thingcenter=="bottomright") {
+
+			_blueprint.thing_center=map_blueprint::thing_centers::bottom_right;
+		}
+		else if(thingcenter=="bottomleft") {
+
+			_blueprint.thing_center=map_blueprint::thing_centers::bottom_left;
+		}
+		else {
+
+			throw std::runtime_error("invalid value for thingcenter, valid values are center, topleft, topright, bottomright and bottomleft");
+		}
+	}
+
+	if(propmap["bgcolor"].size()) {
+
+		_blueprint.bgcolor=parse_color(propmap["bgcolor"]);
+	}
+
+	if(propmap["gridcolor"].size()) {
+
+		_blueprint.grid_data.color=parse_color(propmap["gridcolor"]);
+	}
+
+	if(propmap["gridrulercolor"].size()) {
+
+		_blueprint.grid_data.rulercolor=parse_color(propmap["gridrulercolor"]);
+	}
+
+	auto to_int=[](const std::string& _str, const std::string& _key) -> int {
+
+		std::stringstream ss(_str);
+		int result{};
+		ss>>result;
+
+		if(ss.fail()) {
+
+			throw std::runtime_error(std::string{"invalid int value for '"}+_key+"'");
+		}
+
+		return result;
+	};
+
+	if(propmap["gridsize"].size()) {
+
+		_blueprint.grid_data.size=to_int(propmap["gridsize"], "gridsize");
+	}
+
+	if(propmap["gridvruler"].size()) {
+
+		_blueprint.grid_data.vertical_ruler=to_int(propmap["gridvruler"], "gridvruler");
+	}
+
+	if(propmap["gridhruler"].size()) {
+
+		_blueprint.grid_data.horizontal_ruler=to_int(propmap["gridhruler"], "gridhruler");
+	}
 }
 
