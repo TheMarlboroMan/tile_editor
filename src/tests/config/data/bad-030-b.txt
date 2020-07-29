@@ -1,0 +1,20 @@
+beginobject
+	id 1
+	name extra_life
+	w 16
+	h 16
+	size resizable
+	color 255 255 0
+	beginproperty
+		name prop
+		type int
+		default 12
+		comment This is one
+	endproperty
+	beginproperty
+		name prop
+		type double
+		default 12.0
+		comment This is the other
+	endproperty
+endobject

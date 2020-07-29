@@ -1,0 +1,5 @@
+beginobjectset
+	file data/bad-029-b.txt
+	id 1
+endobjectset
+

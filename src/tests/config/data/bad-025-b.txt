@@ -1,0 +1,10 @@
+beginobject
+	id 1
+	name extra_life
+	w 16
+	h 16
+	size resizable
+	color 255 0 0
+	name extra_life
+endobject
+

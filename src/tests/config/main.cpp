@@ -11,6 +11,7 @@ This file test the configuration file parsers.
 void fail(const std::string& _msg);
 void assert(bool _thing, const std::string& _msg);
 void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, const std::string&, int, int, int, std::size_t);
+
 template<typename T> void must_throw(
 	T _whatever, 
 	const std::string& _errmsg,
@@ -223,26 +224,43 @@ int main(int /*argc*/, char ** /*argv*/) {
 	must_throw([&cfp](){cfp.read("data/bad-017.txt");}, "repeated property 'id'", "config parser with repeated thingset property definition");
 
 	//unclosed thing definition
+	must_throw([&cfp](){cfp.read("data/bad-018.txt");}, "unexpected file end before 'endobject'", "unclosed thing definition");
 
 	//malformed thing definition, missing parameters
+	must_throw([&cfp](){cfp.read("data/bad-019.txt");}, "missing property 'color'", "malformed thing definition, missing parameters");
 
 	//malformed thing definition, missing values
+	must_throw([&cfp](){cfp.read("data/bad-020.txt");}, "missing property value for 'size'", "malformed thing definition, missing values");
+
+	//malformed thing definition, unknown property
+	must_throw([&cfp](){cfp.read("data/bad-021.txt");}, "unknown property name 'ouch'", "malformed thing definition, unknown property");
 
 	//malformed thing definition, malformed size
+	must_throw([&cfp](){cfp.read("data/bad-022.txt");}, "invalid size type, valid values are 'fixed' and 'resizable'", "malformed thing definition, malformed size");
 
 	//malformed thing definition, malformed color
+	must_throw([&cfp](){cfp.read("data/bad-023.txt");}, "invalid color schema, values are red, green and blue separated by spaces", "malformed thing definition, malformed color");
 
 	//malformed thing definition, repeated id
+	must_throw([&cfp](){cfp.read("data/bad-024.txt");}, "repeated thing definition id", "malformed thing definition, repeated id");
 
 	//malformed thing definition, repeated property
+	must_throw([&cfp](){cfp.read("data/bad-025.txt");}, "repeated property 'name'", "malformed thing definition, repeated property");
 
 	//unclosed property definition
+	must_throw([&cfp](){cfp.read("data/bad-026.txt");}, "unexpected end of file before 'endproperty'", "unclosed property definition");
 
 	//malformed property definition, missing parameters
+	must_throw([&cfp](){cfp.read("data/bad-027.txt");}, "missing value for 'type'", "malformed property definition, missing parameters");
 
 	//malformed property definition, missing values
+	must_throw([&cfp](){cfp.read("data/bad-028.txt");}, "syntax error: expected property value", "malformed property definition, missing values");
 
 	//malformed property definition, invalid types
+	must_throw([&cfp](){cfp.read("data/bad-029.txt");}, "invalid property type 'float', expected int, double or string", "malformed property definition, invalid types");
+
+	//repeated property name, even of different types
+	must_throw([&cfp](){cfp.read("data/bad-030.txt");}, "property 'prop' already exists", "repeated property name, even of different types");
 
 	std::cout<<"done, all good"<<std::endl;
 

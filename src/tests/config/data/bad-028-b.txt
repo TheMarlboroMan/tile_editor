@@ -1,0 +1,12 @@
+beginobject
+	id 1
+	name extra_life
+	w 16
+	h 16
+	size resizable
+	color 255 255 0
+	beginproperty
+		name prop
+		type
+	endproperty
+endobject

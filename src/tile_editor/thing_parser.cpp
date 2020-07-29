@@ -81,7 +81,7 @@ void thing_parser::parse_object(
 
 		if(pair.eof) {
 
-			throw std::runtime_error{"unexpected file end"};
+			throw std::runtime_error{"unexpected file end before 'endobject'"};
 		}
 
 		if(pair.name==propstart) {
@@ -98,17 +98,17 @@ void thing_parser::parse_object(
 
 		if(pair.failed) {
 
-			throw std::runtime_error("missing property value");
+			throw std::runtime_error(std::string{"missing property value for '"}+pair.name+"'");
 		}
 
 		if(!properties.count(pair.name)) {
 
-			throw std::runtime_error("unknown property name");
+			throw std::runtime_error(std::string{"unknown property name '"}+pair.name+"'");
 		}
 
 		if(properties[pair.name].size()) {
 
-			throw std::runtime_error("repeated property");
+			throw std::runtime_error(std::string{"repeated property '"}+pair.name+"'");
 		}
 
 		properties[pair.name]=pair.value;
