@@ -177,7 +177,23 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_property<int>(blueprint.properties, "map_id", 0, "An unique identifier for the map");
 		check_property<int>(blueprint.properties, "special_effect_flags", 0, "Special effects, 0 means none, 1 means darkened, 2 means underwater.");
 
-		//TODO: Test session data...
+		std::cout<<"testing session data..."<<std::endl;
+		assert(tile_editor::map_blueprint::thing_centers::top_right==blueprint.thing_center, "failed to assert center type");
+		assert(1==blueprint.bg_color.r, "failed to assert red component of background color");
+		assert(2==blueprint.bg_color.g, "failed to assert green component of background color");
+		assert(32==blueprint.bg_color.b, "failed to assert blue component of background color");
+		assert(0==blueprint.bg_color.a, "failed to assert alpha component of background color");
+		assert(64==blueprint.grid_data.size, "failed to assert grid size");
+		assert(4==blueprint.grid_data.vertical_ruler, "failed to assert grid vertical ruler");
+		assert(6==blueprint.grid_data.horizontal_ruler, "failed to assert grid horizontal ruler");
+		assert(2==blueprint.grid_data.color.r, "failed to assert red component of grid color");
+		assert(32==blueprint.grid_data.color.g, "failed to assert green component of grid color");
+		assert(1==blueprint.grid_data.color.b, "failed to assert blue component of grid color");
+		assert(0==blueprint.grid_data.color.a, "failed to assert alpha component of grid color");
+		assert(32==blueprint.grid_data.ruler_color.r, "failed to assert red component of grid ruler color");
+		assert(2==blueprint.grid_data.ruler_color.g, "failed to assert green component of grid ruler color");
+		assert(1==blueprint.grid_data.ruler_color.b, "failed to assert blue component of grid ruler color");
+		assert(0==blueprint.grid_data.ruler_color.a, "failed to assert alpha component of grid ruler color");
 	}
 	catch(std::exception& e) {
 
@@ -257,7 +273,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	must_throw([&cfp](){cfp.read("data/bad-022.txt");}, "invalid size type, valid values are 'fixed' and 'resizable'", "malformed thing definition, malformed size");
 
 	//malformed thing definition, malformed color
-	must_throw([&cfp](){cfp.read("data/bad-023.txt");}, "invalid color schema, values are red, green and blue separated by spaces", "malformed thing definition, malformed color");
+	must_throw([&cfp](){cfp.read("data/bad-023.txt");}, "invalid color schema, values are red, green, blue and alpha", "malformed thing definition, malformed color");
 
 	//malformed thing definition, repeated id
 	must_throw([&cfp](){cfp.read("data/bad-024.txt");}, "repeated thing definition id", "malformed thing definition, repeated id");
@@ -281,6 +297,22 @@ int main(int /*argc*/, char ** /*argv*/) {
 	must_throw([&cfp](){cfp.read("data/bad-030.txt");}, "property 'prop' already exists", "repeated property name, even of different types");
 
 	//TODO...
+	//unclosed beginsession
+
+	//unknown property in session data
+
+	//missing value for session data property
+
+	//bad bg color in session data
+
+	//bad grid color in session data
+
+	//bad ruler color in session data
+
+	//bad thingcenter value
+
+	//bad gridsize
+
 	//config parser with invalid polyset definition
 
 	//config parser with repeated polyset id
@@ -347,11 +379,11 @@ void check_thing(
 
 	if(_sizetype=="fixed") {
 
-		assert(tile_editor::thing_definition::size_type::fixed==thing.sizetype, "mismatched size type");
+		assert(tile_editor::thing_definition::size_types::fixed==thing.size_type, "mismatched size type");
 	}
 	else if(_sizetype=="resizable") {
 
-		assert(tile_editor::thing_definition::size_type::resizable==thing.sizetype, "mismatched size type");
+		assert(tile_editor::thing_definition::size_types::resizable==thing.size_type, "mismatched size type");
 	}
 	else {
 
@@ -384,11 +416,11 @@ void check_poly(
 
 	if(_colortype=="fixed") {
 
-		assert(tile_editor::poly_definition::color_type::fixed==poly.color_type, "mismatched color type");
+		assert(tile_editor::poly_definition::color_types::fixed==poly.color_type, "mismatched color type");
 	}
 	else if(_colortype=="customizable") {
 
-		assert(tile_editor::poly_definition::color_type::customizable==poly.color_type, "mismatched color type");
+		assert(tile_editor::poly_definition::color_types::customizable==poly.color_type, "mismatched color type");
 	}
 	else {
 

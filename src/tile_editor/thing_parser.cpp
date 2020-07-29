@@ -131,14 +131,14 @@ void thing_parser::parse_object(
 	int w=convert_value<int>(properties, "w"),
 		h=convert_value<int>(properties, "h");
 
-	thing_definition::size_type size=thing_definition::size_type::fixed;
+	thing_definition::size_types size=thing_definition::size_types::fixed;
 	if(properties["size"]=="fixed") {
 
 		//Noop
 	}
 	else if(properties["size"]=="resizable") {
 
-		size=thing_definition::size_type::resizable;
+		size=thing_definition::size_types::resizable;
 	}
 	else {
 

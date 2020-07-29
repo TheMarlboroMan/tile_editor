@@ -17,7 +17,7 @@ struct grid_data {
 	                    vertical_ruler=8,
 	                    horizontal_ruler=8;
 	tile_editor::color  color={0,0,0,0},
-	                    rulercolor={0,255,0,0};
+	                    ruler_color={0,255,0,0};
 };
 
 //!The different blueprints for a map session.
@@ -32,7 +32,7 @@ struct map_blueprint {
 	};
 
 	tile_editor::grid_data                          grid_data;
-	tile_editor::color                              bgcolor{32,32,32,0};
+	tile_editor::color                              bg_color{32,32,32,0};
 	thing_centers                                   thing_center{thing_centers::center};
 
 	std::map<std::size_t, tileset>                  tilesets;

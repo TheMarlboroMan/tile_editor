@@ -227,7 +227,7 @@ void blueprint_parser::session_mode(
 
 	if(propmap["bgcolor"].size()) {
 
-		_blueprint.bgcolor=parse_color(propmap["bgcolor"]);
+		_blueprint.bg_color=parse_color(propmap["bgcolor"]);
 	}
 
 	if(propmap["gridcolor"].size()) {
@@ -237,7 +237,7 @@ void blueprint_parser::session_mode(
 
 	if(propmap["gridrulercolor"].size()) {
 
-		_blueprint.grid_data.rulercolor=parse_color(propmap["gridrulercolor"]);
+		_blueprint.grid_data.ruler_color=parse_color(propmap["gridrulercolor"]);
 	}
 
 	auto to_int=[](const std::string& _str, const std::string& _key) -> int {

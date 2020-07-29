@@ -11,11 +11,11 @@ namespace tile_editor {
 //!not its values.
 struct thing_definition {
 
-	enum class size_type {fixed, resizable};
+	enum class size_types {fixed, resizable};
 
 	std::size_t                     type_id;
 	int                             w, h;
-	size_type                       sizetype;
+	size_types                      size_type;
 	std::string                     name;
 	tile_editor::color              color;
 	property_table                  properties;

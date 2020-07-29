@@ -125,14 +125,14 @@ void poly_parser::parse_poly(
 		throw std::runtime_error("repeated poly definition id");
 	}
 
-	poly_definition::color_type colortype=poly_definition::color_type::fixed;
+	poly_definition::color_types colortype=poly_definition::color_types::fixed;
 	if(properties["colortype"]=="fixed") {
 
 		//Noop
 	}
 	else if(properties["colortype"]=="customizable") {
 
-		colortype=poly_definition::color_type::customizable;
+		colortype=poly_definition::color_types::customizable;
 	}
 	else {
 
