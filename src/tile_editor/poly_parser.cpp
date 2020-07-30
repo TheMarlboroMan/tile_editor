@@ -119,7 +119,15 @@ void poly_parser::parse_poly(
 		}
 	}
 
-	std::size_t id=std::stoi(properties["id"]);
+	std::size_t id{};
+	std::stringstream ss{properties["id"]};
+	ss>>id;
+
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid id value");
+	}
+
 	if(_result.count(id)) {
 
 		throw std::runtime_error("repeated poly definition id");

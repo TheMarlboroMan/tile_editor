@@ -1,0 +1,4 @@
+beginsession
+	thingcenter center
+	gridcolor 1 2 a 0
+endsession

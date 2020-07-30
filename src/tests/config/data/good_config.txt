@@ -43,7 +43,7 @@ endpolyset
 beginsession
 	thingcenter topright
 	bgcolor 1 2 32 0
-	gridsize 64
+#	gridsize 64
 	gridvruler 4
 	gridhruler 6
 	gridcolor 2 32 1 0

@@ -1,0 +1,6 @@
+beginpoly
+	id ouch
+	name collisionable
+	color 255 0 0 0
+	colortype fixed
+endpoly

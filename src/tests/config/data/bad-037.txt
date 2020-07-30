@@ -1,0 +1,3 @@
+beginsession
+	thingcenter nowhere
+endsession

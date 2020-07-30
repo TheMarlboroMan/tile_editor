@@ -1,0 +1,3 @@
+beginpolyset
+	file data/good_polyset_02.txt
+	id 1

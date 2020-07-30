@@ -80,7 +80,7 @@ std::map<std::string, std::string> tile_editor::generic_first_level(
 			break;
 		}
 
-		if(pair.disallowed && strict) {
+		if(pair.disallowed) {
 
 			throw std::runtime_error{std::string{"unrecognised '"}+pair.name+"', not within allowed properties"};
 		}
@@ -101,7 +101,7 @@ std::map<std::string, std::string> tile_editor::generic_first_level(
 
 	for(const auto& pair : propmap) {
 
-		if(!pair.second.size()) {
+		if(!pair.second.size() && strict) {
 			throw std::runtime_error(std::string{"missing value for '"}+pair.first+"'");
 		}
 	}

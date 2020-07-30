@@ -1,0 +1,3 @@
+beginsession
+	gridsize ouch
+endsession
