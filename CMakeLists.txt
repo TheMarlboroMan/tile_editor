@@ -41,4 +41,8 @@ if(${BUILD_TESTS})
 	add_executable(config src/tests/config/main.cpp ${SOURCE})
 	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
 	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
+
+	add_executable(map src/tests/map/main.cpp ${SOURCE})
+	target_link_libraries(map tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
+	add_custom_command(TARGET map POST_BUILD COMMAND cp -r ../src/tests/map/data ./)
 endif()

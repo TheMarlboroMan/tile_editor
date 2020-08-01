@@ -6,6 +6,8 @@ set(SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/property_table.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/thing_parser.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/poly_parser.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/map_parser.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/property_manager.cpp
 	PARENT_SCOPE
 )
 

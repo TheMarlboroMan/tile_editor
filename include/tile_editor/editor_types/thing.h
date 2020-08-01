@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../blueprint_types/property_manager.h"
+#include "../editor_types/property_manager.h"
 
 namespace tile_editor {
 
@@ -14,8 +14,8 @@ struct thing {
 	int                                 x,
 	                                    y,
 	                                    w,
-	                                    h,
-	                                    type;
+	                                    h;
+	std::size_t                         type;
 
 	property_manager                    properties;
 };

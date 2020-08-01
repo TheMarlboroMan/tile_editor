@@ -1,0 +1,23 @@
+{
+	"meta":{
+		"version": "1.0.0"
+	},
+	"attributes": {
+		"apropos":"custom attributes go here",
+		"name":"Test map",
+		"overworld_position_x": 0,
+		"overworld_position_y": 0,
+		"special_effects": 12,
+		"gravity_factor": 1.2
+	},
+	"tiles":[
+
+	],
+	"things":[
+
+	],
+	"polys":[
+
+	]
+}
+
