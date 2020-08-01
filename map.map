@@ -1,248 +1,118 @@
 {
-	"<<START LAYERS>>":"",
-	"layers": [
+	"meta":{
+		"version": "1.0.0"
+	},
+	"attributes": {
+		"apropos":"custom attributes go here"
+		"name":"Test map",
+		"overworld_position_x": 0,
+		"overworld_position_y": 0,
+		"special_effects": 12,
+		"gravity_factor": 1.2
+	},
+	"tiles":[
 		{
-			"<<START ONE LAYER>>":"",
+			"meta": {
+				"set" : 1,
+				"alpha" : 0
+			},
 			"data": [
 				{
-					"<<LAYERS HAVE TYPE, X AND Y": "",
 					"t": 1,
-					"x": 0,
-					"y": 2,
-
-				},
-				{
-					"t": 1,
-					"x": 1,
-					"y": 2
+					"p":[-1, 0]
 				},
 				{
 					"t": 2,
-					"x": 2,
-					"y": 2
-				},
-				{
-					"t": 1,
-					"x": 3,
-					"y": 2
-				},
-				{
-					"t": 1,
-					"x": 4,
-					"y": 2
+					"p":[0,0]
 				}
-			],
-			"<<LAYER METADATA": "",
-			"info": {
-					"<<THIS MUST BE THE ALPHA>>": "",
-				"al": 255,
-					"<<FULL LAYER H IN TILES>>": "",
-				"h": 64,
-					"<<CELL H IN PX>>": "",
-				"hc": 32,
-					"<<ADD A HORIZONTAL SEPARATOR EACH N CELLS >>": "",
-				"hu": 8,
-					"<<THIS MUST BE THE TILESET INDEX>>": "",
-				"i": 0,
-					"<<FULL LAYER W IN TILES>>": "",
-				"w": 64,
-
-					"<<CELL W IN PX>>": "",
-				"wc": 32,
-					"<<ADD A VERTIAL SEPARATOR EACH N CELLS >>": "",
-				"wu": 8
-			}
-		},
-		{
-			"<<START OTHER LAYER>>":"",
+			]
+		}, {
+			"meta": {
+				"set" : 2,
+				"alpha" : 128
+			},
 			"data": [
 				{
-					"t": 4,
-					"x": 0,
-					"y": 2
+					"t": 2,
+					"p":[10,10]
 				},
 				{
 					"t": 3,
-					"x": 1,
-					"y": 2
-				},
-				{
-					"t": 8,
-					"x": 2,
-					"y": 2
-				},
-				{
-					"t": 4,
-					"x": 3,
-					"y": 2
-				},
-				{
-					"t": 3,
-					"x": 4,
-					"y": 2
+					"p":[10,10]
 				}
-			],
-			"info": {
-				"al": 255,
-				"h": 64,
-				"hc": 32,
-				"hu": 8,
-				"i": 1,
-				"w": 64,
-				"wc": 32,
-				"wu": : 8
-			}
+			]
 		}
 	],
-	"<<START LOGIC OBJECTS>>":"",
-	"logic": [
+	"things":[
 		{
-			"<<START LAYER>>":"",
-		"data": [
+			"meta":{
+				"set": 1,
+				"alpha": 0
+			},
+			"data":[
 				{
-						"<<SPECIAL PROPERTIES>>":"",
-					"p": {
-						"bearing": "1", "id": "1"
-					},
-						"<<TYPE>>":"",
 					"t": 1,
-						"<<X>>":"",
-					"x": 0,
-						"<<Y>>":"",
-					"y": 32
-				},
+					"p": [0,0],
+					"a":{}},
 				{
-						"<<H, FOR NON FIXED>>":"",
-					"h": 32,
-						"<<SPECIAL PROPERTYES>>":"",
-					"p": {
-						"map_id": "1"
-					},
-					"t": 2,
-						"<<W, FOR NON FIXED>>":"",
-					"w": 32,
-					"x": 128,
-					"y": 32
+					"t": 1, 
+					"p": [0,32],
+					"a":{}
 				}
-			],
-				"<<START LAYER METADATA>>":"",
-			"info": {
-					"<<OBJECT SET INDEX>>":"",
-				"i": 0
-			}
-		},
-		{"data": [
-				{"p": {},
-					"t": 1,
-					"x": 32,
-					"y": 32
-				},
-				{"p": {},
-					"t": 2,
-					"x": 64,
-					"y": 32
-				},
-				{"p": {},
-					"t": 3,
-					"x": 96,
-					"y": 32
+			]
+		}, {
+			"meta":{
+				"set": 2,
+				"alpha": 0
+			},
+			"data":[
+				{
+					"t": 1, 
+					"p": [0,0], 
+					"a":{
+						"health": 100,
+						"name": "something",
+						"bearing": 15.5,
+						"w": 32,
+						"h": 64
+					}
 				}
-			],
-			"info": {
-				"i": 1
-			}
+			]
 		}
 	],
-	"<<START MAP METADATA>>":"",
-	"meta": {
-
-	}
+	"polys":[
+		{
+			"meta":{
+				"set": 1,
+				"alpha": 64
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [
+						[0,0], [0, 10], [10,10], [5,0]
+					]
+					"a": {
+						"trigger_id" : 12,
+						"color": [0, 0, 255, 128],
+					}
+				},
+				{
+					"t": 2,
+					"p": [
+						[10,0], [10, 10], [20,10], [25,0]
+					]
+					"a": {}
+				}
+			]
+		}
+	]
 }
 
-I can produce code that reads and saves this kind of format, however there are
-some things I'd like to think about:
+t always stands for type: that's good.
+a always stands for attributes (properties): good. Better to be specific than
+	vague: even if no properties exists, the node should be there.
+p always stands for position but has different meanings:
+	x, y -> tile, thing
+	list of points -> poly
 
-- Layers are separate for objects and tiles... And that's actually good, now
-	that I think about it. Let's leave it like that.
-- Property names are somehow difficult to infer, but that can be easily fixed.
-- I don't like how custom properties are always strings, there could be a type
-	which would be easy to implement in object types, but hard to implement in
-	map metadata without using some kind of formatting or template... I could
-	think about that as long as we have very well defined types, such as
-	int, double, string and bool.
-	- The object files are no problem for this.
-	- The map files... well, I guess we could have a particular template for
-	these and be done with. There could be optional and non optional properties
-	in a file defined like this:
-
-beginproperty
-	name bearing
-	type number
-	default 90
-	comment Something something something
-endproperty
-
-- An object could be defined like this, which is a bit clearer than what we have
-now. More verbose, but also easier to parse and extend.
-
-beginobject
-	id 1
-	name start
-	w 32
-	h 32
-	size fixed
-	color 0,255,0
-	beginproperty
-		name id
-		type number
-		default 0
-		comment Something something something
-	endproperty
-	beginproperty
-		name bearing
-		type number
-		default 90
-		comment Something something something
-	endproperty
-endobject
-
-- An object could be defined like this, which is a bit clearer than what we have
-now. More verbose, but also easier to parse and extend.
-
-- The config file is horrendous:
-
-	T	logic.txt	#	|	logic.png	0	0	0	0
-	T	bg.txt	#	|	bg.png	0	0	0	0
-	O	gates.txt
-	O	objects.txt
-
-We could transform it into
-
-beginmapproperties
-	file logic.txt
-endmapproperties
-
-begintileset
-	file logic.txt
-	comment #
-	image logic.png
-endtileset
-
-begintileset
-	file bg.txt
-	comment #
-	image bg.png
-endtileset
-
-beginobject
-	file gates.txt
-endobject
-
-beginobject
-	file objects.txt
-endobject
-
-So, to sum up, I should start by creating code that reads the configuration
-file, property files, tileset files and object files. Each of these could
-share stuff, mainly the property types and some sort of parser which produces
-a "propertyname" or "verb" and its associated vaalue.

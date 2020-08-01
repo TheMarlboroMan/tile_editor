@@ -5,6 +5,13 @@
 
 using namespace tile_editor;
 
+property_parser::property_parser(
+	bool _map_mode
+):
+	map_mode{_map_mode}
+{
+}
+
 property_table property_parser::read_file(const std::string& _path) {
 
 	if(!tools::file_exists(_path)) {
@@ -43,25 +50,76 @@ void property_parser::read(
 	property_table& _table
 ) {
 
-	auto propmap=generic_first_level(_reader, "endproperty", {"name", "type", "default", "comment"});
+	std::vector<std::string> propnames={"name", "type", "default", "comment"};
+	if(!map_mode) {
+		propnames.push_back({"linkedto"});
+	}
+
+	auto propmap=generic_first_level(_reader, "endproperty", propnames);
 
 	if(_table.property_exists(propmap["name"])) {
 
 		throw std::runtime_error(std::string{"property '"}+propmap["name"]+"' already exists");
 	}
 
+	property_links linked_to=property_links::nothing;
+	if(!map_mode) {
+
+		if(propmap["linkedto"]=="w") {
+
+			linked_to=property_links::w;
+		}
+		else if(propmap["linkedto"]=="h") {
+
+			linked_to=property_links::h;
+		}
+		else if(propmap["linkedto"]=="colorred") {
+
+			linked_to=property_links::color_red;
+		}
+		else if(propmap["linkedto"]=="colorgreen") {
+
+			linked_to=property_links::color_green;
+		}
+		else if(propmap["linkedto"]=="colorblue") {
+
+			linked_to=property_links::color_blue;
+		}
+		else if(propmap["linkedto"]=="coloralpha") {
+
+			linked_to=property_links::color_alpha;
+		}
+		else if(propmap["linkedto"]=="nothing") {
+
+			linked_to=property_links::nothing;
+		}
+		else {
+
+			throw std::runtime_error(std::string{"invalid link type '"+propmap["linkedto"]+"'"});
+		}
+	}
+
 	if(propmap["type"]=="int") {
 
-		insert(propmap["name"], propmap["default"], propmap["comment"], _table.int_properties);
-
+		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.int_properties);
 	}
 	else if(propmap["type"]=="string") {
 
-		insert(propmap["name"], propmap["default"], propmap["comment"], _table.string_properties);
+		if(linked_to!=property_links::nothing) {
+
+			throw std::runtime_error(std::string{"string property '"}+propmap["name"]+"' cannot be linked");
+		}
+
+		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.string_properties);
 	}
 	else if(propmap["type"]=="double") {
 
-		insert(propmap["name"], propmap["default"], propmap["comment"], _table.double_properties);
+		if(linked_to!=property_links::nothing) {
+
+			throw std::runtime_error(std::string{"double property '"}+propmap["name"]+"' cannot be linked");
+		}
+
+		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.double_properties);
 	}
 	else {
 

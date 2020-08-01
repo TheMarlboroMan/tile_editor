@@ -71,7 +71,6 @@ void thing_parser::parse_object(
 		{"name", ""},
 		{"w", ""},
 		{"h", ""},
-		{"size", ""},
 		{"color", ""}
 	};
 
@@ -86,7 +85,7 @@ void thing_parser::parse_object(
 
 		if(pair.name==propstart) {
 
-			property_parser pp;
+			property_parser pp(false);
 			pp.read(_reader, pt);
 			continue;
 		}
@@ -131,27 +130,12 @@ void thing_parser::parse_object(
 	int w=convert_value<int>(properties, "w"),
 		h=convert_value<int>(properties, "h");
 
-	thing_definition::size_types size=thing_definition::size_types::fixed;
-	if(properties["size"]=="fixed") {
-
-		//Noop
-	}
-	else if(properties["size"]=="resizable") {
-
-		size=thing_definition::size_types::resizable;
-	}
-	else {
-
-		throw std::runtime_error("invalid size type, valid values are 'fixed' and 'resizable'");
-	}
-
 	auto color=parse_color(properties["color"]);
 
 	_result[id]={
 		id,
 		w, 
 		h,
-		size,
 		properties["name"],
 		color,
 		pt

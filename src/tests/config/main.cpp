@@ -10,8 +10,8 @@ This file test the configuration file parsers.
 
 void fail(const std::string& _msg);
 void assert(bool _thing, const std::string& _msg);
-void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, const std::string&, int, int, int, int, std::size_t);
-void check_poly(const tile_editor::poly_definition_table&, std::size_t, const std::string&, int, int, int, int, const std::string&, std::size_t);
+void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, int, int, int, int, std::size_t);
+void check_poly(const tile_editor::poly_definition_table&, std::size_t, const std::string&, int, int, int, int, std::size_t);
 
 template<typename T> void must_throw(
 	T _whatever, 
@@ -42,12 +42,50 @@ void check_property_values(
 	const T& _property, 
 	const std::string& _name,
 	const std::string& _comment,
-	const V& _default
+	const V& _default,
+	const std::string& _link
 ) {
 
 	assert(_property.name==_name, _name+" does not match property name");
 	assert(_property.description==_comment, _comment+" does not match property description");
 	assert(_property.default_value==_default, "property default value does not match");
+
+	tile_editor::property_links linktype{tile_editor::property_links::nothing};
+
+	if(_link=="nothing") {
+
+		linktype=tile_editor::property_links::nothing;
+	}
+	else if(_link=="w") {
+
+		linktype=tile_editor::property_links::w;
+	}
+	else if(_link=="h") {
+
+		linktype=tile_editor::property_links::h;
+	}
+	else if(_link=="color_red") {
+
+		linktype=tile_editor::property_links::color_red;
+	}
+	else if(_link=="color_green") {
+
+		linktype=tile_editor::property_links::color_green;
+	}
+	else if(_link=="color_blue") {
+
+		linktype=tile_editor::property_links::color_blue;
+	}
+	else if(_link=="color_alpha") {
+
+		linktype=tile_editor::property_links::color_alpha;
+	}
+	else {
+
+		assert(false, "invalid colortype in test");
+	}
+
+	assert(linktype==_property.linked_to, "mismatched link type");
 }
 
 template<typename T> struct can_be_property {static const bool value=false;};
@@ -61,6 +99,7 @@ void check_property(
 	const tile_editor::property_table&, 
 	const std::string&, 
 	T, 
+	const std::string&,
 	const std::string&
 ) {
 
@@ -72,11 +111,12 @@ template<> void check_property(
 	const tile_editor::property_table& _properties, 
 	const std::string& _name, 
 	int _default, 
-	const std::string& _comment
+	const std::string& _comment,
+	const std::string& _link
 ) {
 
 	assert(1==_properties.int_properties.count(_name), _name+" is undefined as int property");
-	check_property_values(_properties.int_properties.at(_name), _name, _comment, _default);
+	check_property_values(_properties.int_properties.at(_name), _name, _comment, _default, _link);
 }
 
 //Double property check.
@@ -84,11 +124,12 @@ template<> void check_property(
 	const tile_editor::property_table& _properties, 
 	const std::string& _name, 
 	double _default, 
-	const std::string& _comment
+	const std::string& _comment,
+	const std::string& _link
 ) {
 
 	assert(1==_properties.double_properties.count(_name), _name+" is undefined as double property");
-	check_property_values(_properties.double_properties.at(_name), _name, _comment, _default);
+	check_property_values(_properties.double_properties.at(_name), _name, _comment, _default, _link);
 }
 
 //String property check.
@@ -96,11 +137,12 @@ template<> void check_property(
 	const tile_editor::property_table& _properties, 
 	const std::string& _name, 
 	const std::string& _default, 
-	const std::string& _comment
+	const std::string& _comment,
+	const std::string& _link
 ) {
 
 	assert(1==_properties.string_properties.count(_name), _name+" is undefined as string property");
-	check_property_values(_properties.string_properties.at(_name), _name, _comment, _default);
+	check_property_values(_properties.string_properties.at(_name), _name, _comment, _default, _link);
 }
 
 int main(int /*argc*/, char ** /*argv*/) {
@@ -130,52 +172,69 @@ int main(int /*argc*/, char ** /*argv*/) {
 		assert(3==blueprint.thingsets.size(), "failed to assert that there are 3 thingsets");
 
 		assert(4==blueprint.thingsets[1].size(), "failed to assert item count on thingset 1");
-		check_thing(blueprint.thingsets[1], 1, "extra_life", 16, 16, "fixed", 255, 255, 0, 0, 0);
-		check_thing(blueprint.thingsets[1], 2, "health", 16, 16, "fixed", 0, 255, 255, 0, 0);
-		check_thing(blueprint.thingsets[1], 3, "enemy", 32, 16, "fixed", 255, 255, 128, 0, 1);
-		check_thing(blueprint.thingsets[1], 4, "friend", 32, 16, "fixed", 255, 200, 128, 0, 4);
+		check_thing(blueprint.thingsets[1], 1, "extra_life", 16, 16, 255, 255, 0, 0, 0);
+		check_thing(blueprint.thingsets[1], 2, "health", 16, 16, 0, 255, 255, 0, 0);
+		check_thing(blueprint.thingsets[1], 3, "enemy", 32, 16, 255, 255, 128, 0, 1);
+		check_thing(blueprint.thingsets[1], 4, "friend", 32, 16, 255, 200, 128, 0, 4);
 
-		check_property<int>(blueprint.thingsets[1][3].properties, "type_id", 1, "Enemy type id");
+		check_property<int>(blueprint.thingsets[1][3].properties, "type_id", 1, "Enemy type id", "nothing");
 
-		check_property<int>(blueprint.thingsets[1][4].properties, "type_id", 1, "Friend type id");
-		check_property<int>(blueprint.thingsets[1][4].properties, "health", 100, "Basic friend health level");
-		check_property<std::string>(blueprint.thingsets[1][4].properties, "name", "Unnamed", "Friend name to be displayed");
-		check_property<double>(blueprint.thingsets[1][4].properties, "factor", 2.5, "Movement factor");
+		check_property<int>(blueprint.thingsets[1][4].properties, "type_id", 1, "Friend type id", "nothing");
+		check_property<int>(blueprint.thingsets[1][4].properties, "health", 100, "Basic friend health level", "nothing");
+		check_property<std::string>(blueprint.thingsets[1][4].properties, "name", "Unnamed", "Friend name to be displayed", "nothing");
+		check_property<double>(blueprint.thingsets[1][4].properties, "factor", 2.5, "Movement factor", "nothing");
 
 		assert(2==blueprint.thingsets[2].size(), "failed to assert item count on thingset 2");
-		check_thing(blueprint.thingsets[2], 1, "start", 32, 32, "fixed", 0, 255, 0, 0, 2);
-		check_thing(blueprint.thingsets[2], 2, "exit", 32, 32, "resizable", 0, 0, 255, 0, 2);
+		check_thing(blueprint.thingsets[2], 1, "start", 32, 32, 0, 255, 0, 0, 2);
+		check_thing(blueprint.thingsets[2], 2, "exit", 32, 32, 0, 0, 255, 0, 4);
 
-		check_property<int>(blueprint.thingsets[2][1].properties, "id", 0, "Unique id for the start");
-		check_property<int>(blueprint.thingsets[2][1].properties, "bearing", 90, "Exit bearing, 0 points right, 90 up.");
+		check_property<int>(blueprint.thingsets[2][1].properties, "id", 0, "Unique id for the start", "nothing");
+		check_property<int>(blueprint.thingsets[2][1].properties, "bearing", 90, "Exit bearing, 0 points right, 90 up.", "nothing");
 
-		check_property<int>(blueprint.thingsets[2][2].properties, "map_id", 0, "Destination map id");
-		check_property<int>(blueprint.thingsets[2][2].properties, "start_id", 0, "Start id on the destination map");
+		check_property<int>(blueprint.thingsets[2][2].properties, "map_id", 0, "Destination map id", "nothing");
+		check_property<int>(blueprint.thingsets[2][2].properties, "start_id", 0, "Start id on the destination map", "nothing");
+		check_property<int>(blueprint.thingsets[2][2].properties, "w", 64, "Object width", "w");
+		check_property<int>(blueprint.thingsets[2][2].properties, "h", 64, "Object height", "h");
 
 		assert(1==blueprint.thingsets[3].size(), "failed to assert item count on thingset 3");
-		check_thing(blueprint.thingsets[3], 33, "Touch trigger", 64, 64, "resizable", 255, 0, 255, 0, 0);
+		check_thing(blueprint.thingsets[3], 33, "Touch trigger", 64, 64, 255, 0, 255, 0, 2);
+		check_property<int>(blueprint.thingsets[3][33].properties, "w", 64, "Object width", "w");
+		check_property<int>(blueprint.thingsets[3][33].properties, "h", 64, "Object height", "h");
 
 		//as do poly sets...
 		std::cout<<"testing polyset contents..."<<std::endl;
 		assert(2==blueprint.polysets.size(), "failed to assert that there are 2 polysets");
 		assert(1==blueprint.polysets.count(1), "failed to assert that polyset 1 exists");
 		assert(2==blueprint.polysets[1].size(), "failed to assert size of polyset 1");
-		check_poly(blueprint.polysets[1], 1, "collisionable", 255, 255, 0, 0, "fixed", 0);
-		check_poly(blueprint.polysets[1], 2, "touch_trigger", 255, 255, 255, 128, "fixed", 2);
-		check_property<int>(blueprint.polysets[1][2].properties, "trigger_id", 1, "Trigger id");
-		check_property<int>(blueprint.polysets[1][2].properties, "repeatable", -1, "-1 for infinite, a number for the exact number of times");
+		check_poly(blueprint.polysets[1], 1, "collisionable", 255, 255, 0, 0, 0);
+		check_poly(blueprint.polysets[1], 2, "touch_trigger", 255, 255, 255, 128, 6);
+		check_property<int>(blueprint.polysets[1][2].properties, "trigger_id", 1, "Trigger id", "nothing");
+		check_property<int>(blueprint.polysets[1][2].properties, "repeatable", -1, "-1 for infinite, a number for the exact number of times", "nothing");
+		check_property<int>(blueprint.polysets[1][2].properties, "colorred", 255, "Red channel", "color_red");
+		check_property<int>(blueprint.polysets[1][2].properties, "colorgreen", 255, "Green channel", "color_green");
+		check_property<int>(blueprint.polysets[1][2].properties, "colorblue", 255, "Blue channel", "color_blue");
+		check_property<int>(blueprint.polysets[1][2].properties, "coloralpha", 128, "Alpha channel", "color_alpha");
 
 		assert(1==blueprint.polysets.count(2), "failed to assert that polyset 2 exists");
 		assert(2==blueprint.polysets[2].size(), "failed to assert size of polyset 2");
-		check_poly(blueprint.polysets[2], 1, "background", 255, 0, 0, 0, "customizable", 0);
-		check_poly(blueprint.polysets[2], 2, "foreground", 0, 255, 0, 0, "customizable", 0);
+		check_poly(blueprint.polysets[2], 1, "background", 255, 0, 0, 0, 4);
+		check_property<int>(blueprint.polysets[2][1].properties, "colorred", 255, "Red channel", "color_red");
+		check_property<int>(blueprint.polysets[2][1].properties, "colorgreen", 255, "Green channel", "color_green");
+		check_property<int>(blueprint.polysets[2][1].properties, "colorblue", 255, "Blue channel", "color_blue");
+		check_property<int>(blueprint.polysets[2][1].properties, "coloralpha", 128, "Alpha channel", "color_alpha");
+
+		check_poly(blueprint.polysets[2], 2, "foreground", 0, 255, 0, 0, 4);
+		check_property<int>(blueprint.polysets[2][2].properties, "colorred", 128, "Red channel", "color_red");
+		check_property<int>(blueprint.polysets[2][2].properties, "colorgreen", 128, "Green channel", "color_green");
+		check_property<int>(blueprint.polysets[2][2].properties, "colorblue", 128, "Blue channel", "color_blue");
+		check_property<int>(blueprint.polysets[2][2].properties, "coloralpha", 0, "Alpha channel", "color_alpha");
 
 		//Same goes for map properties
 		std::cout<<"testing map property contents..."<<std::endl;
 		assert(3==blueprint.properties.size(), "failed to assert map property count");
-		check_property<std::string>(blueprint.properties, "name", "unnamed-map", "The name of the map");
-		check_property<int>(blueprint.properties, "map_id", 0, "An unique identifier for the map");
-		check_property<int>(blueprint.properties, "special_effect_flags", 0, "Special effects, 0 means none, 1 means darkened, 2 means underwater.");
+		check_property<std::string>(blueprint.properties, "name", "unnamed-map", "The name of the map", "nothing");
+		check_property<int>(blueprint.properties, "map_id", 0, "An unique identifier for the map", "nothing");
+		check_property<int>(blueprint.properties, "special_effect_flags", 0, "Special effects, 0 means none, 1 means darkened, 2 means underwater.", "nothing");
 
 		std::cout<<"testing session data..."<<std::endl;
 		assert(tile_editor::map_blueprint::thing_centers::top_right==blueprint.thing_center, "failed to assert center type");
@@ -216,6 +275,8 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 	//config parser with invalid map property definition
 	must_throw([&cfp](){cfp.read("data/bad-003.txt");}, "unrecognised 'nothing'", "config parser with invalid map property definition");
+
+	//TODO: Config parser with linked property.
 
 	//config parser with repeated property definition
 	must_throw([&cfp](){cfp.read("data/bad-004.txt");}, "repeated property 'default'", "config parser with repeated property definition");
@@ -381,7 +442,6 @@ void check_thing(
 	const std::string& _name, 
 	int _w, 
 	int _h, 
-	const std::string& _sizetype, 
 	int _r, 
 	int _g, 
 	int _b, 
@@ -396,19 +456,6 @@ void check_thing(
 	assert(_w==thing.w, std::to_string(_w)+" does not match thing width");
 	assert(_h==thing.h, std::to_string(_h)+" does not match thing height");
 
-	if(_sizetype=="fixed") {
-
-		assert(tile_editor::thing_definition::size_types::fixed==thing.size_type, "mismatched size type");
-	}
-	else if(_sizetype=="resizable") {
-
-		assert(tile_editor::thing_definition::size_types::resizable==thing.size_type, "mismatched size type");
-	}
-	else {
-
-		fail("invalid sizetype");
-	}
-	
 	assert(_r==thing.color.r, std::to_string(_r)+" does not match thing red");
 	assert(_g==thing.color.g, std::to_string(_g)+" does not match thing green");
 	assert(_b==thing.color.b, std::to_string(_b)+" does not match thing blue");
@@ -424,7 +471,6 @@ void check_poly(
 	int _g, 
 	int _b, 
 	int _a, 
-	const std::string& _colortype, 
 	std::size_t _propcount
 ) {
 
@@ -432,19 +478,6 @@ void check_poly(
 	
 	const auto& poly=_polys.at(_index);
 	assert(_name==poly.name, _name+"does not match poly name");
-
-	if(_colortype=="fixed") {
-
-		assert(tile_editor::poly_definition::color_types::fixed==poly.color_type, "mismatched color type");
-	}
-	else if(_colortype=="customizable") {
-
-		assert(tile_editor::poly_definition::color_types::customizable==poly.color_type, "mismatched color type");
-	}
-	else {
-
-		fail("invalid color type");
-	}
 
 	assert(_r==poly.color.r, std::to_string(_r)+" does not match poly red");
 	assert(_g==poly.color.g, std::to_string(_g)+" does not match poly green");

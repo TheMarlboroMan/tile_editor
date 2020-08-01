@@ -68,8 +68,7 @@ void poly_parser::parse_poly(
 	std::map<std::string, std::string> properties{
 		{"id", ""},
 		{"name", ""},
-		{"color", ""},
-		{"colortype", ""}
+		{"color", ""}
 	};
 
 	while(true) {
@@ -83,7 +82,7 @@ void poly_parser::parse_poly(
 
 		if(pair.name==propstart) {
 
-			property_parser pp;
+			property_parser pp(false);
 			pp.read(_reader, pt);
 			continue;
 		}
@@ -133,27 +132,12 @@ void poly_parser::parse_poly(
 		throw std::runtime_error("repeated poly definition id");
 	}
 
-	poly_definition::color_types colortype=poly_definition::color_types::fixed;
-	if(properties["colortype"]=="fixed") {
-
-		//Noop
-	}
-	else if(properties["colortype"]=="customizable") {
-
-		colortype=poly_definition::color_types::customizable;
-	}
-	else {
-
-		throw std::runtime_error("invalid color type, valid values are 'fixed' and 'customizable'");
-	}
-
 	auto color=parse_color(properties["color"]);
 
 	_result[id]={
 		id,
 		properties["name"],
 		color,
-		colortype,
 		pt
 	};
 }

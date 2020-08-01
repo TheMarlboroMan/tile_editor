@@ -3,6 +3,5 @@ beginobject
 	name extra_life
 	w 16
 	h 16
-	size fixed
 #	color 255 255 0 0
 endobject

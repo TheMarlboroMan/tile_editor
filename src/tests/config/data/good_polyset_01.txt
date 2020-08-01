@@ -2,24 +2,52 @@ beginpoly
 	id 1
 	name collisionable
 	color 255 255 0 0
-	colortype fixed
 endpoly
 
 beginpoly
 	id 2
 	name touch_trigger
 	color 255 255 255 128
-	colortype fixed
+	beginproperty
+		name colorred
+		type int
+		default 255
+		comment Red channel
+		linkedto colorred
+	endproperty
+	beginproperty
+		name colorgreen
+		type int
+		default 255
+		comment Green channel
+		linkedto colorgreen
+	endproperty
+	beginproperty
+		name colorblue
+		type int
+		default 255
+		comment Blue channel
+		linkedto colorblue
+	endproperty
+	beginproperty
+		name coloralpha
+		type int
+		default 128
+		comment Alpha channel
+		linkedto coloralpha
+	endproperty
 	beginproperty
 		name trigger_id
 		type int
 		default 1
 		comment Trigger id
+		linkedto nothing
 	endproperty
 	beginproperty
 		name repeatable
 		type int
 		default -1
 		comment -1 for infinite, a number for the exact number of times
+		linkedto nothing
 	endproperty
 endpoly

@@ -2,5 +2,3 @@ beginpoly
 	id 1
 	name collisionable
 	color 255 255 0 0
-	colortype fixed
-

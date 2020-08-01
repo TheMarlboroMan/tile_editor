@@ -2,12 +2,10 @@ beginpoly
 	id 3
 	name collisionable
 	color 255 0 0 0
-	colortype fixed
 endpoly
 
 beginpoly
 	id 3
 	name something-else
 	color 255 0 0 0
-	colortype fixed
 endpoly

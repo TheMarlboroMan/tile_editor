@@ -3,19 +3,20 @@ beginobject
 	name start
 	w 32
 	h 32
-	size fixed
 	color 0 255 0 0
 	beginproperty
 		name id
 		type int
 		default 0
 		comment Unique id for the start
+		linkedto nothing
 	endproperty
 	beginproperty
 		name bearing
 		type int
 		default 90
 		comment Exit bearing, 0 points right, 90 up.
+		linkedto nothing
 	endproperty
 endobject
 
@@ -24,18 +25,33 @@ beginobject
 	name exit
 	w 32
 	h 32
-	size resizable
 	color 0 0 255 0
 	beginproperty
 		name map_id
 		type int
 		default 0
 		comment Destination map id
+		linkedto nothing
 	endproperty
 	beginproperty
 		name start_id
 		type int
 		default 0
 		comment Start id on the destination map
+		linkedto nothing
+	endproperty
+	beginproperty
+		name w
+		type int
+		default 64
+		comment Object width
+		linkedto w
+	endproperty
+	beginproperty
+		name h
+		type int
+		default 64
+		comment Object height
+		linkedto h
 	endproperty
 endobject

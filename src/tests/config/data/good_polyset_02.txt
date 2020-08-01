@@ -2,12 +2,66 @@ beginpoly
 	id 1
 	name background
 	color 255 0 0 0
-	colortype customizable
+	beginproperty
+		name colorred
+		type int
+		default 128
+		comment Red channel
+		linkedto colorred
+	endproperty
+	beginproperty
+		name colorgreen
+		type int
+		default 128
+		comment Green channel
+		linkedto colorgreen
+	endproperty
+	beginproperty
+		name colorblue
+		type int
+		default 128
+		comment Blue channel
+		linkedto colorblue
+	endproperty
+	beginproperty
+		name coloralpha
+		type int
+		default 0
+		comment Alpha channel
+		linkedto coloralpha
+	endproperty
 endpoly
 
 beginpoly
 	id 2
 	name foreground
 	color 0 255 0 0
-	colortype customizable
+	beginproperty
+		name colorred
+		type int
+		default 255
+		comment Red channel
+		linkedto colorred
+	endproperty
+	beginproperty
+		name colorgreen
+		type int
+		default 255
+		comment Green channel
+		linkedto colorgreen
+	endproperty
+	beginproperty
+		name colorblue
+		type int
+		default 255
+		comment Blue channel
+		linkedto colorblue
+	endproperty
+	beginproperty
+		name coloralpha
+		type int
+		default 128
+		comment Alpha channel
+		linkedto coloralpha
+	endproperty
 endpoly

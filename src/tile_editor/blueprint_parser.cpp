@@ -97,7 +97,7 @@ void blueprint_parser::map_property_mode(
 
 	auto propmap=generic_first_level(_reader, "endmapproperties", {"file"});
 
-	property_parser pp;
+	property_parser pp(true);
 	_blueprint.properties=pp.read_file(propmap["file"]);
 }
 
