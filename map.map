@@ -94,7 +94,10 @@
 					]
 					"a": {
 						"trigger_id" : 12,
-						"color": [0, 0, 255, 128],
+						"colorred": 0,
+						"colorgreen": 0, 
+						"colorblue": 255, 
+						"coloralpha": 128
 					}
 				},
 				{
