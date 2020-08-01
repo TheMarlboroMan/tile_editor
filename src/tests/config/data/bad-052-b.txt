@@ -1,0 +1,12 @@
+beginpoly
+	id 1
+	name nothing
+	color 255 0 0 0
+	beginproperty
+		name failure
+		type int
+		default 1
+		comment Nothing
+		linkedto w
+	endproperty
+endpoly

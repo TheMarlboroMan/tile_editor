@@ -60,7 +60,7 @@ beginpoly
 	beginproperty
 		name coloralpha
 		type int
-		default 128
+		default 0
 		comment Alpha channel
 		linkedto coloralpha
 	endproperty

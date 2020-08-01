@@ -1,5 +1,5 @@
 beginpoly
 	id 1
-	name collisionable
+	name      
 	color 255 255 0 0
 endpoly

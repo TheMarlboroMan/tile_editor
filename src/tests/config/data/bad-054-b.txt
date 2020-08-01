@@ -5,9 +5,10 @@ beginobject
 	h 16
 	color 255 255 0 0
 	beginproperty
-		name prop
-		default 33
-		comment Lel
-		linkedto nothing
+		name meh
+		type double
+		default 12.2
+		comment meh
+		linkedto w
 	endproperty
 endobject

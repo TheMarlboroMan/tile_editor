@@ -2,6 +2,7 @@
 #include "parser/parse_tools.h"
 #include "parser/property_parser.h"
 #include "blueprint_types/property_table.h"
+#include "blueprint_types/property_definition.h"
 
 #include <tools/file_utils.h>
 
@@ -115,6 +116,15 @@ void poly_parser::parse_poly(
 		if(!pair.second.size()) {
 
 			throw std::runtime_error{std::string{"missing property '"}+pair.first+"'"};
+		}
+	}
+
+	//Now, any property linked to w or h must immediately fail.
+	for(const auto& prop : pt.int_properties) {
+
+		if(prop.second.linked_to==property_links::w || prop.second.linked_to==property_links::h) {
+
+			throw std::runtime_error{"polygon properties cannot be linked to width or height"};
 		}
 	}
 

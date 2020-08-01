@@ -48,7 +48,7 @@ void check_property_values(
 
 	assert(_property.name==_name, _name+" does not match property name");
 	assert(_property.description==_comment, _comment+" does not match property description");
-	assert(_property.default_value==_default, "property default value does not match");
+	assert(_property.default_value==_default, std::string{"property default value does not match for '"}+_name+"'");
 
 	tile_editor::property_links linktype{tile_editor::property_links::nothing};
 
@@ -218,15 +218,15 @@ int main(int /*argc*/, char ** /*argv*/) {
 		assert(1==blueprint.polysets.count(2), "failed to assert that polyset 2 exists");
 		assert(2==blueprint.polysets[2].size(), "failed to assert size of polyset 2");
 		check_poly(blueprint.polysets[2], 1, "background", 255, 0, 0, 0, 4);
-		check_property<int>(blueprint.polysets[2][1].properties, "colorred", 255, "Red channel", "color_red");
-		check_property<int>(blueprint.polysets[2][1].properties, "colorgreen", 255, "Green channel", "color_green");
-		check_property<int>(blueprint.polysets[2][1].properties, "colorblue", 255, "Blue channel", "color_blue");
-		check_property<int>(blueprint.polysets[2][1].properties, "coloralpha", 128, "Alpha channel", "color_alpha");
+		check_property<int>(blueprint.polysets[2][1].properties, "colorred", 128, "Red channel", "color_red");
+		check_property<int>(blueprint.polysets[2][1].properties, "colorgreen", 128, "Green channel", "color_green");
+		check_property<int>(blueprint.polysets[2][1].properties, "colorblue", 128, "Blue channel", "color_blue");
+		check_property<int>(blueprint.polysets[2][1].properties, "coloralpha", 0, "Alpha channel", "color_alpha");
 
 		check_poly(blueprint.polysets[2], 2, "foreground", 0, 255, 0, 0, 4);
-		check_property<int>(blueprint.polysets[2][2].properties, "colorred", 128, "Red channel", "color_red");
-		check_property<int>(blueprint.polysets[2][2].properties, "colorgreen", 128, "Green channel", "color_green");
-		check_property<int>(blueprint.polysets[2][2].properties, "colorblue", 128, "Blue channel", "color_blue");
+		check_property<int>(blueprint.polysets[2][2].properties, "colorred", 255, "Red channel", "color_red");
+		check_property<int>(blueprint.polysets[2][2].properties, "colorgreen", 255, "Green channel", "color_green");
+		check_property<int>(blueprint.polysets[2][2].properties, "colorblue", 255, "Blue channel", "color_blue");
 		check_property<int>(blueprint.polysets[2][2].properties, "coloralpha", 0, "Alpha channel", "color_alpha");
 
 		//Same goes for map properties
@@ -264,160 +264,113 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 	std::cout<<"testing invalid configuration files..."<<std::endl;
 
-	//config parser with non existing file.
 	must_throw([&cfp](){cfp.read("data/this-is-not-a-file");}, "cannot find file", "config parser with non existing file");
 
-	//config parser with invalid opening tag
 	must_throw([&cfp](){cfp.read("data/bad-001.txt");}, "expected beginmapproperties, begintileset or beginobjectset", "config parser with invalid opening tag");
 
-	//config parser without file value in property set
 	must_throw([&cfp](){cfp.read("data/bad-002.txt");}, "missing value for 'file'", "config parser without file value in property set");
 
-	//config parser with invalid map property definition
 	must_throw([&cfp](){cfp.read("data/bad-003.txt");}, "unrecognised 'nothing'", "config parser with invalid map property definition");
 
-	//TODO: Config parser with linked property.
+	must_throw([&cfp](){cfp.read("data/bad-051.txt");}, "unrecognised 'linkedto'", "Config parser with linked property.");
 
-	//config parser with repeated property definition
 	must_throw([&cfp](){cfp.read("data/bad-004.txt");}, "repeated property 'default'", "config parser with repeated property definition");
 
-	//config parser with two map property sets.
 	must_throw([&cfp](){cfp.read("data/bad-005.txt");}, "only one mapproperty node can be specified", "config parser with two map property sets");
 
-	//config parser with unclosed property set.
 	must_throw([&cfp](){cfp.read("data/bad-006.txt");}, "unexpected end of file before 'endmapproperties'", "config parser with unclosed property set");
 
-	//config parser with invalid map property file
 	must_throw([&cfp](){cfp.read("data/bad-007.txt");}, "cannot find properties file 'data/not-really-a-file'", "config parser with invalid map property file");
 
-	//config parser with invalid tileset definition
 	must_throw([&cfp](){cfp.read("data/bad-008.txt");}, "missing value for 'image'", "config parser with invalid tileset definition");
 
-	//config parser with unclosed tileset definition
 	must_throw([&cfp](){cfp.read("data/bad-009.txt");}, "unexpected end of file before 'endtileset'", "config parser with unclosed tileset definition");
 
-	//config parser with invalid tileset id
 	must_throw([&cfp](){cfp.read("data/bad-010.txt");}, "invalid id value", "config parser with invalid tileset id");
 
-	//config parser with repeated tileset id
 	must_throw([&cfp](){cfp.read("data/bad-011.txt");}, "repeated id value", "config parser with repeated tileset id");
 
-	//config parser with repeated tileset property definition
 	must_throw([&cfp](){cfp.read("data/bad-012.txt");}, "repeated property 'file'", "config parser with repeated tileset property definition");
 
-	//config parser with invalid thingset definition
 	must_throw([&cfp](){cfp.read("data/bad-013.txt");}, "missing value for 'id'", "config parser with invalid thingset definition");
 
-	//config parser with unclosed thingset definition
 	must_throw([&cfp](){cfp.read("data/bad-014.txt");}, "unexpected end of file before 'endobjectset'", "config parser with unclosed thingset definition");
 
-	//config parser with invalid thingset id
 	must_throw([&cfp](){cfp.read("data/bad-015.txt");}, "invalid id value", "config parser with invalid thingset id");
 
-	//config parser with repeated thingset id
 	must_throw([&cfp](){cfp.read("data/bad-016.txt");}, "repeated id value", "config parser with repeated thingset id");
 
-	//config parser with repeated thingset property definition
 	must_throw([&cfp](){cfp.read("data/bad-017.txt");}, "repeated property 'id'", "config parser with repeated thingset property definition");
 
-	//unclosed thing definition
 	must_throw([&cfp](){cfp.read("data/bad-018.txt");}, "unexpected file end before 'endobject'", "unclosed thing definition");
 
-	//malformed thing definition, missing parameters
-	must_throw([&cfp](){cfp.read("data/bad-019.txt");}, "missing property 'color'", "malformed thing definition, missing parameters");
+	must_throw([&cfp](){cfp.read("data/bad-019.txt");}, "missing property 'color'", "malformed thing definition, missing color parameter");
 
-	//malformed thing definition, missing values
-	must_throw([&cfp](){cfp.read("data/bad-020.txt");}, "missing property value for 'size'", "malformed thing definition, missing values");
+	must_throw([&cfp](){cfp.read("data/bad-020.txt");}, "missing property value for 'h'", "malformed thing definition, missing values");
 
-	//malformed thing definition, unknown property
 	must_throw([&cfp](){cfp.read("data/bad-021.txt");}, "unknown property name 'ouch'", "malformed thing definition, unknown property");
 
-	//malformed thing definition, malformed size
-	must_throw([&cfp](){cfp.read("data/bad-022.txt");}, "invalid size type, valid values are 'fixed' and 'resizable'", "malformed thing definition, malformed size");
-
-	//malformed thing definition, malformed color
 	must_throw([&cfp](){cfp.read("data/bad-023.txt");}, "invalid color schema, values are red, green, blue and alpha", "malformed thing definition, malformed color");
 
-	//malformed thing definition, repeated id
 	must_throw([&cfp](){cfp.read("data/bad-024.txt");}, "repeated thing definition id", "malformed thing definition, repeated id");
 
-	//malformed thing definition, repeated property
 	must_throw([&cfp](){cfp.read("data/bad-025.txt");}, "repeated property 'name'", "malformed thing definition, repeated property");
 
-	//unclosed property definition
 	must_throw([&cfp](){cfp.read("data/bad-026.txt");}, "unexpected end of file before 'endproperty'", "unclosed property definition");
 
-	//malformed property definition, missing parameters
 	must_throw([&cfp](){cfp.read("data/bad-027.txt");}, "missing value for 'type'", "malformed property definition, missing parameters");
 
-	//malformed property definition, missing values
 	must_throw([&cfp](){cfp.read("data/bad-028.txt");}, "syntax error: expected property value", "malformed property definition, missing values");
 
-	//malformed property definition, invalid types
 	must_throw([&cfp](){cfp.read("data/bad-029.txt");}, "invalid property type 'float', expected int, double or string", "malformed property definition, invalid types");
 
-	//repeated property name, even of different types
+	must_throw([&cfp](){cfp.read("data/bad-053.txt");}, "invalid link type 'meh'", "invalid linkedto property name");
+
+	must_throw([&cfp](){cfp.read("data/bad-054.txt");}, "double property 'meh' cannot be linked", "invalid linkedto property type (double)");
+
+	must_throw([&cfp](){cfp.read("data/bad-055.txt");}, "string property 'meh' cannot be linked", "invalid linkedto property type (string)");
+
 	must_throw([&cfp](){cfp.read("data/bad-030.txt");}, "property 'prop' already exists", "repeated property name, even of different types");
 
-	//unclosed beginsession
 	must_throw([&cfp](){cfp.read("data/bad-031.txt");}, "unexpected end of file before 'endsession'", "unclosed beginsession");
 
-	//unknown property in session data
 	must_throw([&cfp](){cfp.read("data/bad-032.txt");}, "unrecognised 'ouch'", "unknown property in session data");
 
-	//missing value for session data property
 	must_throw([&cfp](){cfp.read("data/bad-033.txt");}, "syntax error: expected property value", "missing value for session data property");
 
-	//bad bg color in session data
 	must_throw([&cfp](){cfp.read("data/bad-034.txt");}, "invalid color schema", "bad bg color in session data");
 
-	//bad grid color in session data
 	must_throw([&cfp](){cfp.read("data/bad-035.txt");}, "invalid color schema", "bad grid color in session data");
 
-	//bad ruler color in session data
 	must_throw([&cfp](){cfp.read("data/bad-036.txt");}, "invalid color schema", "bad ruler color in session data");
 
-	//bad thingcenter value
 	must_throw([&cfp](){cfp.read("data/bad-037.txt");}, "invalid value for thingcenter, valid values are", "bad thingcenter value");
 
-	//bad gridsize
 	must_throw([&cfp](){cfp.read("data/bad-038.txt");}, "invalid int value for 'gridsize'", "bad gridsize");
 
-	//config parser with invalid polyset definition
 	must_throw([&cfp](){cfp.read("data/bad-039.txt");}, "missing value for 'file'", "config parser with invalid polyset definition");
 
-	//config parser with repeated polyset id
 	must_throw([&cfp](){cfp.read("data/bad-040.txt");}, "repeated id value", "config parser with repeated polyset id");
 
-	//config parser with non existing polyset file
 	must_throw([&cfp](){cfp.read("data/bad-041.txt");}, "cannot find file 'not-a-file'", "config parser with non existing polyset file");
 
-	//config parser with unclosed polyset definition
 	must_throw([&cfp](){cfp.read("data/bad-042.txt");}, "unexpected end of file before 'endpolyset'", "config parser with unclosed polyset definition");
 
-	//poly parser with unclosed poly definition
 	must_throw([&cfp](){cfp.read("data/bad-043.txt");}, "unexpected file end before 'endpoly'", "poly parser with unclosed poly definition");
 
-	//poly parser with unexpected tag
 	must_throw([&cfp](){cfp.read("data/bad-044.txt");}, "unknown property name 'ouch'", "poly parser with unexpected tag");
 
-	//poly parser with missing property
-	must_throw([&cfp](){cfp.read("data/bad-045.txt");}, "missing property 'colortype'", "poly parser with missing property");
+	must_throw([&cfp](){cfp.read("data/bad-045.txt");}, "missing property 'name'", "poly parser with missing property");
 
-	//poly parser with missing values
-	must_throw([&cfp](){cfp.read("data/bad-046.txt");}, "missing property value for 'colortype'", "poly parser with missing values");
+	must_throw([&cfp](){cfp.read("data/bad-046.txt");}, "missing property value for 'name'", "poly parser with missing values");
 
-	//poly parser with bad colortype value
-	must_throw([&cfp](){cfp.read("data/bad-047.txt");}, "invalid color type, valid values are", "poly parser with bad colortype value");
-
-	//poly parser with bad color
 	must_throw([&cfp](){cfp.read("data/bad-048.txt");}, "invalid color schema", "poly parser with bad color");
 
-	//poly parser with bad id
 	must_throw([&cfp](){cfp.read("data/bad-049.txt");}, "invalid id value", "poly parser with bad id");
 
-	//poly parser with repeated id
 	must_throw([&cfp](){cfp.read("data/bad-050.txt");}, "repeated poly definition id", "poly parser with repeated id");
+
+	must_throw([&cfp](){cfp.read("data/bad-052.txt");}, "polygon properties cannot be linked to width or height", "invalid linkedto property for a polygon");
 
 	std::cout<<"done, all good"<<std::endl;
 

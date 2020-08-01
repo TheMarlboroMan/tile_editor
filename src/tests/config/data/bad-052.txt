@@ -1,4 +1,4 @@
 beginpolyset
-	file data/bad-047-b.txt
+	file data/bad-052-b.txt
 	id 1
 endpolyset

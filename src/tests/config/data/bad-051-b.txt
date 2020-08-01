@@ -1,0 +1,7 @@
+beginproperty
+	name invalid_property
+	type int
+	default 33
+	comment Nothing, really
+	linkedto nothing
+endproperty
