@@ -100,7 +100,151 @@ int main(int /*argc*/, char ** /*argv*/) {
 )str");
 	must_fail(mp.get_errors(), "'tiles' node must be an array, tiles will be skipped", "tiles node is not an array");
 
+	//tiles node whose member is not an object
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		"a", "b", "c"
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile layer node must be an object, skipping layer", "tiles node whose member is not an object");
+
+	//tiles node with no meta
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"no_meta": 6
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "missing meta node in layer, skipping layer meta", "tiles node with no meta");
+
+	//tiles node with invalid meta type
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": "hey"
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta node in layer must be an object, skipping layer meta", "tiles node with invalid meta type");
+
+	//tiles node with no alpha
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"no-alpha": "hehe"
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta node in layer has no 'alpha'", "tiles node with no alpha");
+
+	//tiles node with invalid alpha
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": "string"
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta:alpha node is not an integer", "tiles node with invalid alpha");
+
+	//tiles node with no set
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta node in layer has no 'set'", "tiles node with no set");
+
+	//tiles node with invalid set
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 12.44
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta:set node is not an integer", "tiles node with invalid set");
+
+	//tiles node with extraneous meta members.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 12.44,
+				"intruder": "yes"
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta node in layer has extraneous members which will be ignored", "tiles node with extraneous meta members.");
+
 	//TODO TODO
+	//tiles node with no data member
+
+	//tiles node with non-array data member
+
+	//tiles node item with no type
+
+	//tiles node item with non-int type
+
+	//tiles node item with no location
+
+	//tiles node item with non-array location
+
+	//tiles node item with bad length location
+
+	//tiles node item with non integer location value
+
+	//tiles node item extraneous members.
+
+	//tiles layer with extraneous members (non meta or data).
+	//"tile layer node has extraneous members that will be skipped"
+
 
 	//no things node
 	mp.parse_string(R"str(
