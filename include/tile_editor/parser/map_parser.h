@@ -28,9 +28,9 @@ class map_parser {
 	private:
 
 	struct meta {
-		std::size_t        set,
+		std::size_t        set;
 		int                alpha;
-	}
+	};
 
 	void                   parse_meta(const jsondoc&);
 	void                   parse_attributes(const jsondoc&, map&);
@@ -41,6 +41,7 @@ class map_parser {
 	void                   parse_polys(const jsondoc&, map&);
 	void                   parse_poly_layer(const jsondoc&, map&);
 	meta                   parse_meta_node(const jsonval&);
+	bool                   check_data_node(const jsonval&, const std::string&);
 
 	errvector              errors;
 	std::string            version;

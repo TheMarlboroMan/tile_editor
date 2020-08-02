@@ -159,68 +159,87 @@ void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
 		return;
 	}
 
-	auto meta=parse_meta_node(_node);
+	auto metadata=parse_meta_node(_node);
 
-	if(!_node.HasMember("data")) {
+	if(!check_data_node(_node, "tile")) {
 
-		//TODO:
+		return;
 	}
 
-	if(!_node.Size() > 2) {
+	//create the layer.
+	tile_layer layer{metadata.set, metadata.alpha, {}};
+
+	//iterate on its items.
+	for(const auto& item : _node["data"].GetArray()) {
+
+		if(!item.IsObject()) {
+			errors.push_back("tile item is not an object, skipping item");
+			continue;
+		}
+
+		if(!item.HasMember("t")) {
+
+			errors.push_back("tile item has no 't' property, skipping item");
+			continue;
+		}
+
+		if(!item["t"].IsInt()) {
+
+			errors.push_back("tile item 't' is not an integer, skipping item");
+			continue;
+		}
+
+		if(!item.HasMember("p")) {
+
+			errors.push_back("tile item has no 'p' property, skipping item");
+			continue;
+		}
+
+		if(!item["p"].IsArray()) {
+
+			errors.push_back("tile item 'p' is not an array, skipping item");
+			continue;
+		}
+
+		if(2!=item["p"].Size()) {
+
+			errors.push_back("tile item 'p' must have exactly two elements, skipping item");
+			continue;
+		}
+
+		if(!item["p"][0].IsInt()) {
+
+			errors.push_back("tile item 'p' must have an integer as its first value, skipping item");
+			continue;
+		}
+
+		if(!item["p"][1].IsInt()) {
+
+			errors.push_back("tile item 'p' must have an integer as its second value, skipping item");
+			continue;
+		}
+
+		tile_editor::tile tile{
+			item["p"][0].GetInt(),
+			item["p"][1].GetInt(),
+			item["t"].GetInt()
+		};
+
+		layer.data.push_back(tile);
+
+		if(item.Size() > 2) {
+
+			errors.push_back("tile layer item has extraneous members that will be skipped");
+		}
+	}
+
+	if(_node.Size() > 2) {
 
 		errors.push_back("tile layer node has extraneous members that will be skipped");
 	}
-}
 
-map_parser::meta map_parser::parse_meta_node(const jsonval& c) {
-
-	if(!_layer.HasMember("meta")) {
-
-		errors.push_back("missing meta node in layer, skipping layer meta");
-		return {0,0};
-	}
-
-	if(!_layer["meta"].IsObject()) {
-
-		errors.push_back("meta node in layer must be an object, skipping layer meta");
-		return {0,0};
-	}
-
-	meta result{0,0};
-
-	auto can_be_extracted=[_layer&, this](const std::string& _key) -> bool {
-
-		if(!_layer["meta"].HasMember(_key)) {
-
-			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default set will be used");
-			return false;
-		}
-
-		if(!_layer["meta"][_key].IsInt()) {
-
-			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default set will be used");
-			return false;
-		}
-
-		return true;
-	};
-
-	if(can_be_extracted("set")) {
-
-		result.set=_layer["meta"]["set"].GetInt();
-	}
-
-	if(can_be_extracted("alpha")) {
-
-		result.set=_layer["meta"]["alpha"].GetInt();
-	}
-
-	if(_layer.size > 2) {
-	
-		errors.push_back("meta node in layer has extraneous members which will be ignored");
-	}
-
-	return result;
+	//Add the layer to the map.
+	_map.tile_layers.push_back(std::move(layer));
 }
 
 void map_parser::parse_things(const jsondoc& _doc, map& _map) {
@@ -270,4 +289,72 @@ void map_parser::parse_polys(const jsondoc& _doc, map&_map) {
 
 void map_parser::parse_poly_layer(const jsondoc& _doc, map&_map) {
 
+}
+
+map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
+
+	if(!_layer.HasMember("meta")) {
+
+		errors.push_back("missing meta node in layer, skipping layer meta");
+		return {0,0};
+	}
+
+	if(!_layer["meta"].IsObject()) {
+
+		errors.push_back("meta node in layer must be an object, skipping layer meta");
+		return {0,0};
+	}
+
+	meta result{0,0};
+
+	auto can_be_extracted=[this, &_layer](const std::string& _key) -> bool {
+
+		if(!_layer["meta"].HasMember(_key.c_str())) {
+
+			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default set will be used");
+			return false;
+		}
+
+		if(!_layer["meta"][_key.c_str()].IsInt()) {
+
+			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default set will be used");
+			return false;
+		}
+
+		return true;
+	};
+
+	if(can_be_extracted("alpha")) {
+
+		result.set=_layer["meta"]["alpha"].GetInt();
+	}
+
+	if(can_be_extracted("set")) {
+
+		result.set=_layer["meta"]["set"].GetInt();
+	}
+
+	if(_layer.Size() > 2) {
+	
+		errors.push_back("meta node in layer has extraneous members which will be ignored");
+	}
+
+	return result;
+}
+
+bool map_parser::check_data_node(const jsonval& _node, const std::string& _type) {
+
+	if(!_node.HasMember("data")) {
+
+		errors.push_back(std::string{"missing data in "}+_type+" layer, skipping layer");
+		return false;
+	}
+
+	if(!_node["data"].IsArray()) {
+
+		errors.push_back(std::string{"data in "}+_type+" layer is not an array, skipping layer");
+		return false;
+	}
+
+	return true;
 }

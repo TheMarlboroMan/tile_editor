@@ -214,7 +214,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 		{
 			"meta": {
 				"alpha": 128,
-				"set" : 12.44,
+				"set" : 1,
 				"intruder": "yes"
 			}
 		}
@@ -223,28 +223,258 @@ int main(int /*argc*/, char ** /*argv*/) {
 )str");
 	must_fail(mp.get_errors(), "meta node in layer has extraneous members which will be ignored", "tiles node with extraneous meta members.");
 
-	//TODO TODO
 	//tiles node with no data member
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "missing data in layer, skipping layer", "tiles node with no data member");
 
 	//tiles node with non-array data member
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": 12
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "data in layer is not an array, skipping layer", "tiles node with non-array data member");
+
+	//tiles node not an object
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [1,2,3]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item is not an object, skipping item", "tiles node not an object");
 
 	//tiles node item with no type
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item has no 't' property, skipping item", "tiles node item with no type");
 
 	//tiles node item with non-int type
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{"t":1.234}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item 't' is not an integer, skipping item", "tiles node item with non-int type");
 
 	//tiles node item with no location
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{"t": 1}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item has no 'p' property, skipping item", "tiles node item with no location");
 
 	//tiles node item with non-array location
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": 12
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item 'p' is not an array, skipping item", "tiles node item with non-array location");
 
 	//tiles node item with bad length location
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [1,2,3]
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item 'p' must have exactly two elements, skipping item", "tiles node item with bad length location");
 
-	//tiles node item with non integer location value
+	//tiles node item with non integer location value (a)
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": ["a", 1]
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item 'p' must have an integer as its first value, skipping item", "tiles node item with non integer location value (a)");
+
+	//tiles node item with non integer location value (b)
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [1,"a"]
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile item 'p' must have an integer as its second value, skipping item", "tiles node item with non integer location value (b)");
 
 	//tiles node item extraneous members.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [2,3],
+					"what":"now"
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile layer item has extraneous members that will be skipped", "tiles node item extraneous members.");
 
 	//tiles layer with extraneous members (non meta or data).
-	//"tile layer node has extraneous members that will be skipped"
-
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles": [
+		{
+			"meta": {
+				"alpha": 128,
+				"set" : 1
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [2,3]
+				}
+			],
+			"what":"now"
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "tile layer node has extraneous members that will be skipped", "tiles layer with extraneous members (non meta or data)");
 
 	//no things node
 	mp.parse_string(R"str(
@@ -319,6 +549,27 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 		test(1==map.properties.double_properties.count("gravity_factor"), "no 'gravity_factor' attribute");
 		test(1.2==map.properties.double_properties["gravity_factor"], "invalid value for 'gravity_factor' attribute");
+
+		test(2==map.tile_layers.size(), "invalid parsing of tile layers");
+
+		test(1==map.tile_layers[0].set, "invalid set value for first tile layer");
+		test(0==map.tile_layers[0].alpha, "invalid alpha value for first tile layer");
+		test(2==map.tile_layers[0].data.size(), "invalid item count for first tile layer");
+
+		test(1==map.tile_layers[0].data[0].type, "invalid type for first tile layer item 0");
+		test(2==map.tile_layers[0].data[0].x, "invalid x for first tile layer item 0");
+		test(3==map.tile_layers[0].data[0].y, "invalid t for first tile layer item 0");
+		test(2==map.tile_layers[0].data[1].type, "invalid type for first tile layer item 1");
+		test(4==map.tile_layers[0].data[1].x, "invalid x for first tile layer item 1");
+		test(5==map.tile_layers[0].data[1].y, "invalid t for first tile layer item 1");
+
+		test(2==map.tile_layers[1].set, "invalid set value for second tile layer");
+		test(128==map.tile_layers[1].alpha, "invalid alpha value for second tile layer");
+		test(1==map.tile_layers[1].data.size(), "invalid item count for second tile layer");
+
+		test(3==map.tile_layers[1].data[0].type, "invalid type for first tile layer item 1");
+		test(10==map.tile_layers[1].data[0].x, "invalid x for second tile layer item 0");
+		test(11==map.tile_layers[1].data[0].y, "invalid t for second tile layer item 0");
 	}
 	catch(std::exception& e) {
 
