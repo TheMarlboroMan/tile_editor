@@ -11,6 +11,15 @@ This file tests the map file parsers.
 void fail(const std::string& _msg);
 void test(bool _thing, const std::string& _msg);
 void must_fail(std::vector<std::string> _errors, const std::string& _errmsg, const std::string& _type);
+void check_tile(const tile_editor::tile&, std::size_t, int, int, int);
+
+template <typename T>
+void check_layer(const T& _layer, std::size_t _set, int _alpha, std::size_t _count, int _line) {
+
+	test(_set==_layer.set, std::string{"invalid set value in line "}+std::to_string(_line)+" got "+std::to_string(_layer.set)+" expected "+std::to_string(_set));
+	test(_alpha==_layer.alpha, std::string{"invalid alpha value in line "}+std::to_string(_line)+" got "+std::to_string(_layer.alpha)+" expected "+std::to_string(_alpha));
+	test(_count==_layer.data.size(), std::string{"invalid item count in line "}+std::to_string(_line)+" got "+std::to_string(_layer.data.size())+" expected "+std::to_string(_count));
+}
 
 int main(int /*argc*/, char ** /*argv*/) {
 
@@ -70,7 +79,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":[1,2,3]}
 }
 )str");
-	must_fail(mp.get_errors(), "invalid data type in 'attributes', skipping property 'hello'", "invalid data type in attributes");
+	must_fail(mp.get_errors(), "invalid data type in attribute, skipping property 'hello'", "invalid data type in attributes");
 
 	//repeated property in attributes
 	mp.parse_string(R"str(
@@ -238,7 +247,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "missing data in layer, skipping layer", "tiles node with no data member");
+	must_fail(mp.get_errors(), "missing data in tile layer, skipping layer", "tiles node with no data member");
 
 	//tiles node with non-array data member
 	mp.parse_string(R"str(
@@ -256,7 +265,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "data in layer is not an array, skipping layer", "tiles node with non-array data member");
+	must_fail(mp.get_errors(), "data in tile layer is not an array, skipping layer", "tiles node with non-array data member");
 
 	//tiles node not an object
 	mp.parse_string(R"str(
@@ -497,7 +506,282 @@ int main(int /*argc*/, char ** /*argv*/) {
 )str");
 	must_fail(mp.get_errors(), "'things' node must be an array, things will be skipped", "things node is not an array");
 
-	//TODO: TODO: 
+	//non-object thing layer
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [33]
+}
+)str");
+	must_fail(mp.get_errors(), "thing layer node must be an object, skipping layer", "non-object thing layer");
+
+	//the meta node does not need to be tested, it has been tested with the tiles.
+	//the data node does not need to be tested either, it has been tested before too.
+
+	//non-object thing item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[1]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item is not an object, skipping item", "non-object thing layer");
+
+	//not t member in thing item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"meh":1}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item has no 't' property, skipping item", "not t member in thing item");
+
+	//non-int t member in thing item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":"a string"}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 't' is not an integer, skipping item", "non-int t member in thing item");
+
+	//not p member in thing item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":1}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item has no 'p' property, skipping item", "not p member in thing item");
+
+	//non-array p member in thing item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":1, "p":2}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 'p' is not an array, skipping item", "non-array p member in thing item");
+
+	//invalid p member size
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":1, "p":[1,2,3]}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 'p' must have exactly two elements, skipping item", "invalid p member size");
+
+	//invalid p member value (a)
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":1, "p":[1.2, 3]}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 'p' must have an integer as its first value, skipping item", "invalid p member value (a)");
+
+	//invalid p member value (b)
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[{"t":1, "p":[1, 2.3]}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 'p' must have an integer as its second value, skipping item", "invalid p member value (b)");
+
+	//not a property in thing item.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[
+				{
+					"t":1,
+					"p":[1, 2]
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item has no 'a' property, skipping item", "not a property in thing item");
+
+	//non-object a property in thing item.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[
+				{
+					"t":1,
+					"p":[1, 2],
+					"a":"hello"
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing item 'a' is not an object, skipping item", "non-object a property in thing item");
+
+	//the property parser has been already tested with the map, so we can skip that.
+
+	//thing layer item with extraneous member...
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[
+				{
+					"t":1,
+					"p":[1,2],
+					"a":{
+						"a": 1,
+						"b": "c",
+						"d": 1.2
+					},
+					"c":"hello"
+				}
+			]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing layer item has extraneous members that will be skipped", "thing layer with extraneous members");
+
+	//thing layer with extraneous members
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [
+		{
+			"meta":{
+				"set":1,
+				"alpha":0
+			},
+			"data":[
+				{
+					"t":1,
+					"p":[1,2],
+					"a":{
+						"a": 1,
+						"b": "c",
+						"d": 1.2
+					}
+				}
+			],
+			"extraneous":"member"
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "thing layer node has extraneous members that will be skipped", "thing layer with extraneous members");
 
 	//no polys node
 	mp.parse_string(R"str(
@@ -524,12 +808,16 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 	//TODO TODO
 
-	//Testing good map...
-
 	try {
-		std::cout<<"testing valid map file"<<std::endl;
-		auto map=mp.parse_file("data/good.map");
-		test(mp.get_errors().size()==0, "there were errors parsing the good map");
+		std::cout<<"testing mostly valid map file"<<std::endl;
+		auto map=mp.parse_file("data/almost_good.map");
+		const auto& errors=mp.get_errors();
+		test(errors.size()==3, "there were unexpected errors parsing the mostly good map");
+
+		test("tile item has no 'p' property, skipping item"==errors[0], "invalid error");
+		test("missing meta node in layer, skipping layer meta"==errors[1], "invalid error");
+		test("missing data in tile layer, skipping layer"==errors[2], "invalid error");
+
 		test(mp.get_version()=="1.0.0", "could not assert the map version");
 
 		test(1==map.properties.string_properties.count("apropos"), "no 'apropos' attribute");
@@ -552,31 +840,58 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 		test(2==map.tile_layers.size(), "invalid parsing of tile layers");
 
-		test(1==map.tile_layers[0].set, "invalid set value for first tile layer");
-		test(0==map.tile_layers[0].alpha, "invalid alpha value for first tile layer");
-		test(2==map.tile_layers[0].data.size(), "invalid item count for first tile layer");
+		check_layer(map.tile_layers[0], 1, 0, 2, __LINE__);
+		check_tile(map.tile_layers[0].data[0], 1, 2, 3, __LINE__);
+		check_tile(map.tile_layers[0].data[1], 2, 4, 5, __LINE__);
 
-		test(1==map.tile_layers[0].data[0].type, "invalid type for first tile layer item 0");
-		test(2==map.tile_layers[0].data[0].x, "invalid x for first tile layer item 0");
-		test(3==map.tile_layers[0].data[0].y, "invalid t for first tile layer item 0");
-		test(2==map.tile_layers[0].data[1].type, "invalid type for first tile layer item 1");
-		test(4==map.tile_layers[0].data[1].x, "invalid x for first tile layer item 1");
-		test(5==map.tile_layers[0].data[1].y, "invalid t for first tile layer item 1");
-
-		test(2==map.tile_layers[1].set, "invalid set value for second tile layer");
-		test(128==map.tile_layers[1].alpha, "invalid alpha value for second tile layer");
-		test(1==map.tile_layers[1].data.size(), "invalid item count for second tile layer");
-
-		test(3==map.tile_layers[1].data[0].type, "invalid type for first tile layer item 1");
-		test(10==map.tile_layers[1].data[0].x, "invalid x for second tile layer item 0");
-		test(11==map.tile_layers[1].data[0].y, "invalid t for second tile layer item 0");
+		check_layer(map.tile_layers[1], 2, 128, 1, __LINE__);
+		check_tile(map.tile_layers[1].data[0], 3, 10, 11, __LINE__);
 	}
 	catch(std::exception& e) {
 
 		std::cerr<<"failed: "<<e.what()<<std::endl;
-		for(const auto& err : mp.get_errors()) {
-			std::cerr<<">"<<err<<std::endl;
-		}
+		std::exit(1);
+	}
+
+	try {
+	/*
+		std::cout<<"testing fully valid map file"<<std::endl;
+		auto map=mp.parse_file("data/good.map");
+		const auto& errors=mp.get_errors();
+		test(errors.size()==0, "there were unexpected errors parsing the good map");
+		test(mp.get_version()=="1.0.0", "could not assert the map version");
+
+		test(1==map.properties.string_properties.count("apropos"), "no 'apropos' attribute");
+		test("custom attributes go here"==map.properties.string_properties["apropos"], "invalid value for 'apropos' attribute");
+
+		test(1==map.properties.string_properties.count("name"), "no 'name' attribute");
+		test("Test map"==map.properties.string_properties["name"], "invalid value for 'name' attribute");
+
+		test(1==map.properties.int_properties.count("overworld_position_x"), "no 'overworld_position_x' attribute");
+		test(0==map.properties.int_properties["overworld_position_x"], "invalid value for 'overworld_position_x' attribute");
+
+		test(1==map.properties.int_properties.count("overworld_position_y"), "no 'overworld_position_y' attribute");
+		test(0==map.properties.int_properties["overworld_position_y"], "invalid value for 'overworld_position_y' attribute");
+
+		test(1==map.properties.int_properties.count("special_effects"), "no 'special_effects' attribute");
+		test(12==map.properties.int_properties["special_effects"], "invalid value for 'special_effects' attribute");
+
+		test(1==map.properties.double_properties.count("gravity_factor"), "no 'gravity_factor' attribute");
+		test(1.2==map.properties.double_properties["gravity_factor"], "invalid value for 'gravity_factor' attribute");
+
+		test(2==map.tile_layers.size(), "invalid parsing of tile layers");
+
+		check_layer(map.tile_layers[0], 1, 0, 2, __LINE__);
+		check_tile(map.tile_layers[0].data[0], 1, 2, 3, __LINE__);
+		check_tile(map.tile_layers[0].data[1], 2, 4, 5, __LINE__);
+
+		check_layer(map.tile_layers[1], 2, 128, 1, __LINE__);
+		check_tile(map.tile_layers[1].data[0], 3, 10, 11, __LINE__);
+	*/
+	}
+	catch(std::exception& e) {
+
+		std::cerr<<"failed: "<<e.what()<<std::endl;
 		std::exit(1);
 	}
 
@@ -618,3 +933,9 @@ void must_fail(
 	std::cout<<"caught: "<<_type<<std::endl;
 }
 
+void check_tile(const tile_editor::tile& _tile, std::size_t _type, int _x, int _y, int _line) {
+
+	test(_type==_tile.type, std::string{"invalid type for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.type)+" expected "+std::to_string(_type));
+	test(_x==_tile.x, std::string{"invalid x for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.x)+" expected "+std::to_string(_x));
+	test(_y==_tile.y, std::string{"invalid t for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.y)+" expected "+std::to_string(_y));
+}

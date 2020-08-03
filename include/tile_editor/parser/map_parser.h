@@ -9,7 +9,7 @@ namespace tile_editor {
 
 //!Map parser. Unlike its blueprint counterpart, it will always try to go on
 //!and parse whatever we throw at it, even if its syntax is botched. It, however
-//!will try to emit error messages for everything that it did not expect 
+//!will try to emit error messages for everything that it did not expect
 //!(missing nodes, bad types, extraneous entries...).
 
 class map_parser {
@@ -37,11 +37,12 @@ class map_parser {
 	void                   parse_tiles(const jsondoc&, map&);
 	void                   parse_tile_layer(const jsonval&, map&);
 	void                   parse_things(const jsondoc&, map&);
-	void                   parse_thing_layer(const jsondoc&, map&);
+	void                   parse_thing_layer(const jsonval&, map&);
 	void                   parse_polys(const jsondoc&, map&);
-	void                   parse_poly_layer(const jsondoc&, map&);
+	void                   parse_poly_layer(const jsonval&, map&);
 	meta                   parse_meta_node(const jsonval&);
 	bool                   check_data_node(const jsonval&, const std::string&);
+	void                   parse_attributes(const jsonval&, tile_editor::property_manager&);
 
 	errvector              errors;
 	std::string            version;
