@@ -327,12 +327,13 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 			1,
 			1,
 			item["t"].GetInt(),
+			{128,128,128,128}, //default color too.
 			pm
 		};
 
 		layer.data.push_back(thing);
 
-		if(item.Size() > 3 {
+		if(item.Size() > 3) {
 
 			errors.push_back("thing layer item has extraneous members that will be skipped");
 		}

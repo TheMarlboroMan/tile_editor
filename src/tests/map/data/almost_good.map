@@ -46,7 +46,48 @@
 		{"skip":"me"}
 	],
 	"things":[
-
+		{
+			"meta": {
+				"set": 3,
+				"alpha": 32
+			},
+			"data": [
+				{
+					"t": 1,
+					"p": [10,11],
+					"a": {
+						"some_attribute": 1,
+						"some_other_attribute": 2.2,
+						"and_another_one": "yes"
+					}
+				},
+				{
+					"t": 2,
+					"p": [14,15],
+					"a": {
+						"an_attribute": 2
+					}
+				}
+			]
+		},
+		{
+			"meta": {
+				"set":4,
+				"alpha": 64
+			},
+			"data": [
+				{
+					"t":3,
+					"p":[16, 17],
+					"a": {}
+				},
+				{
+					"t":4,
+					"skip":"me"
+				}
+			]
+		},
+		{"skip":"me"}
 	],
 	"polys":[
 

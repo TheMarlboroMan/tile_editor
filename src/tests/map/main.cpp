@@ -846,6 +846,19 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 		check_layer(map.tile_layers[1], 2, 128, 1, __LINE__);
 		check_tile(map.tile_layers[1].data[0], 3, 10, 11, __LINE__);
+
+		test(2==map.thing_layers.size(), "invalid parsing of thing layers");
+		check_layer(map.thing_layers[0], 3, 32, 2, __LINE__);
+		//TODO: Check thing will check the default color, w and h!!!!
+		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3);
+		//TODO: check attributes  Do it simple.
+		check_thing(map.thing_layers[0].data[1], 2, 14, 15, 1);
+		//TODO: check attributes
+
+		check_layer(map.thing_layers[1], 4, 64, 1, __LINE__);
+		check_thing(map.thing_layers[1].data[0], 3, 16, 17, 0);
+
+		
 	}
 	catch(std::exception& e) {
 

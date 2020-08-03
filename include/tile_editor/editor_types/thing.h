@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../editor_types/property_manager.h"
+#include "../blueprint_types/color.h"
 
 namespace tile_editor {
 
@@ -16,6 +17,7 @@ struct thing {
 	                                    w,
 	                                    h;
 	std::size_t                         type;
+	tile_editor::color                  color;
 
 	property_manager                    properties;
 };
