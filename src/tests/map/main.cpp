@@ -12,6 +12,10 @@ void fail(const std::string& _msg);
 void test(bool _thing, const std::string& _msg);
 void must_fail(std::vector<std::string> _errors, const std::string& _errmsg, const std::string& _type);
 void check_tile(const tile_editor::tile&, std::size_t, int, int, int);
+void check_thing(const tile_editor::thing&, std::size_t, int, int, std::size_t, int);
+void check_thing_attribute(const tile_editor::thing&, const std::string&, int, int);
+void check_thing_attribute(const tile_editor::thing&, const std::string&, double, int);
+void check_thing_attribute(const tile_editor::thing&, const std::string&, const std::string&, int);
 
 template <typename T>
 void check_layer(const T& _layer, std::size_t _set, int _alpha, std::size_t _count, int _line) {
@@ -805,8 +809,41 @@ int main(int /*argc*/, char ** /*argv*/) {
 }
 )str");
 	must_fail(mp.get_errors(), "'polys' node must be an array, polys will be skipped", "polys node is not an array");
-
+	
 	//TODO TODO
+
+	//Non object property for poly layer
+
+	//the meta node does not need to be tested, it has been tested with the tiles.
+	//the data node does not need to be tested either, it has been tested before too.
+
+	//Non object poly item
+
+	//missing t node in poly item
+	
+	//non-numeric t node in poly item
+
+	//missing p node in poly item
+
+	//non array p node in poly item
+
+	//less than 3 items in poly item
+
+	//invalid poly item point: not an array
+
+	//invalid poly item point: not exactly two items
+
+	//invalid poly item point: item is not an integer
+
+	//not a property in poly item.
+
+	//non-object a property in poly item.
+
+	//the property parser has been already tested with the map, so we can skip that.
+
+	//poly item with extraneous member...
+
+	//poly layer with extraneous member...
 
 	try {
 		std::cout<<"testing mostly valid map file"<<std::endl;
@@ -849,14 +886,21 @@ int main(int /*argc*/, char ** /*argv*/) {
 
 		test(2==map.thing_layers.size(), "invalid parsing of thing layers");
 		check_layer(map.thing_layers[0], 3, 32, 2, __LINE__);
-		//TODO: Check thing will check the default color, w and h!!!!
-		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3);
-		//TODO: check attributes  Do it simple.
-		check_thing(map.thing_layers[0].data[1], 2, 14, 15, 1);
-		//TODO: check attributes
+
+		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3, __LINE__);
+		//TODO: check attributes  Do it simple, 3 overloads.
+		check_thing_attribute(map.thing_layers[0].data[0], "some_attribute", 1, __LINE__);
+		check_thing_attribute(map.thing_layers[0].data[0], "some_other_attribute", 2.2, __LINE__);
+		check_thing_attribute(map.thing_layers[0].data[0], "and_another_one", "yes", __LINE__);
+
+
+		check_thing(map.thing_layers[0].data[1], 2, 14, 15, 1, __LINE__);
+		check_thing_attribute(map.thing_layers[1].data[0], "an_attribute", 2, __LINE__);
 
 		check_layer(map.thing_layers[1], 4, 64, 1, __LINE__);
-		check_thing(map.thing_layers[1].data[0], 3, 16, 17, 0);
+		check_thing(map.thing_layers[1].data[0], 3, 16, 17, 0, __LINE__);
+
+		//TODO: Check poly layers
 
 		
 	}
@@ -951,4 +995,61 @@ void check_tile(const tile_editor::tile& _tile, std::size_t _type, int _x, int _
 	test(_type==_tile.type, std::string{"invalid type for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.type)+" expected "+std::to_string(_type));
 	test(_x==_tile.x, std::string{"invalid x for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.x)+" expected "+std::to_string(_x));
 	test(_y==_tile.y, std::string{"invalid t for tile "}+std::to_string(_line)+" got "+std::to_string(_tile.y)+" expected "+std::to_string(_y));
+}
+
+void check_thing(
+	const tile_editor::thing& _thing, 
+	std::size_t _type, 
+	int _x,
+	int _y,
+	std::size_t _propcount,
+	int _line
+) {
+
+	const int default_w=1,
+	          default_h=1,
+	          default_r=128,
+	          default_g=128,
+	          default_b=128,
+	          default_a=128;
+
+	test(_type==_thing.type, std::string{"invalid type for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.type)+" expected "+std::to_string(_type));
+	test(_x==_thing.x, std::string{"invalid x for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.x)+" expected "+std::to_string(_x));
+	test(_y==_thing.y, std::string{"invalid t for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.y)+" expected "+std::to_string(_y));
+	test(_propcount==_thing.properties.size(), std::string{"invalid property size for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.properties.size())+" expected "+std::to_string(_propcount));
+	test(default_w==_thing.w, std::string{"invalid default w for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.w)+" expected "+std::to_string(default_w));
+	test(default_h==_thing.h, std::string{"invalid default h for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.h)+" expected "+std::to_string(default_h));
+	test(default_r==_thing.color.r, std::string{"invalid default color r for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.color.r)+" expected "+std::to_string(default_r));
+	test(default_g==_thing.color.g, std::string{"invalid default color g for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.color.g)+" expected "+std::to_string(default_g));
+	test(default_b==_thing.color.b, std::string{"invalid default color b for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.color.b)+" expected "+std::to_string(default_b));
+	test(default_a==_thing.color.a, std::string{"invalid default color a for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.color.a)+" expected "+std::to_string(default_a));
+}
+
+void check_thing_attribute(
+	const tile_editor::thing& _thing, 
+	const std::string& _key, 
+	int _value
+	int _line
+) {
+
+	test(1==2, "unimplemented");
+}
+void check_thing_attribute(
+	const tile_editor::thing& _thing, 
+	const std::string& _key, 
+	double _value,
+	int _line
+) {
+
+	test(1==2, "unimplemented");
+}
+
+void check_thing_attribute(
+	const tile_editor::thing& _thing, 
+	const std::string& _key, 
+	const std::string& _value,
+	int _line
+) {
+
+	test(1==2, "unimplemented");
 }

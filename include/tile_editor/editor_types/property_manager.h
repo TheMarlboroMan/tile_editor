@@ -9,6 +9,7 @@ namespace tile_editor {
 struct property_manager {
 
 	bool                                has_property(const std::string&) const;
+	std::size_t                         size() const;
 
 	std::map<std::string, int>          int_properties;
 	std::map<std::string, double>       double_properties;
