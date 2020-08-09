@@ -1197,7 +1197,6 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_layer(map.thing_layers[0], 3, 32, 2, __LINE__);
 
 		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3, __LINE__);
-
 		check_component_attribute(map.thing_layers[0].data[0], "some_attribute", 1, __LINE__);
 		check_component_attribute(map.thing_layers[0].data[0], "some_other_attribute", 2.2, __LINE__);
 		check_component_attribute(map.thing_layers[0].data[0], "and_another_one", "yes", __LINE__);
@@ -1231,40 +1230,56 @@ int main(int /*argc*/, char ** /*argv*/) {
 	}
 
 	try {
-	/*
+
 		std::cout<<"testing fully valid map file"<<std::endl;
 		auto map=mp.parse_file("data/good.map");
 		const auto& errors=mp.get_errors();
+
 		test(errors.size()==0, "there were unexpected errors parsing the good map");
 		test(mp.get_version()=="1.0.0", "could not assert the map version");
 
-		test(1==map.properties.string_properties.count("apropos"), "no 'apropos' attribute");
-		test("custom attributes go here"==map.properties.string_properties["apropos"], "invalid value for 'apropos' attribute");
-
-		test(1==map.properties.string_properties.count("name"), "no 'name' attribute");
-		test("Test map"==map.properties.string_properties["name"], "invalid value for 'name' attribute");
-
-		test(1==map.properties.int_properties.count("overworld_position_x"), "no 'overworld_position_x' attribute");
-		test(0==map.properties.int_properties["overworld_position_x"], "invalid value for 'overworld_position_x' attribute");
-
-		test(1==map.properties.int_properties.count("overworld_position_y"), "no 'overworld_position_y' attribute");
-		test(0==map.properties.int_properties["overworld_position_y"], "invalid value for 'overworld_position_y' attribute");
-
-		test(1==map.properties.int_properties.count("special_effects"), "no 'special_effects' attribute");
-		test(12==map.properties.int_properties["special_effects"], "invalid value for 'special_effects' attribute");
-
-		test(1==map.properties.double_properties.count("gravity_factor"), "no 'gravity_factor' attribute");
-		test(1.2==map.properties.double_properties["gravity_factor"], "invalid value for 'gravity_factor' attribute");
+		test("entryway"==map.properties.string_properties["name"], "invalid name property");
+		test(1==map.properties.int_properties["episode"], "invalid episode property");
+		test(1==map.properties.int_properties["map"], "invalid map property");
 
 		test(2==map.tile_layers.size(), "invalid parsing of tile layers");
 
-		check_layer(map.tile_layers[0], 1, 0, 2, __LINE__);
-		check_tile(map.tile_layers[0].data[0], 1, 2, 3, __LINE__);
-		check_tile(map.tile_layers[0].data[1], 2, 4, 5, __LINE__);
+		check_layer(map.tile_layers[0], 1, 0, 4, __LINE__);
+		check_tile(map.tile_layers[0].data[0], 1, 0, 0, __LINE__);
+		check_tile(map.tile_layers[0].data[1], 1, 0, 1, __LINE__);
+		check_tile(map.tile_layers[0].data[2], 1, 0, 2, __LINE__);
+		check_tile(map.tile_layers[0].data[3], 2, 1, 1, __LINE__);
 
-		check_layer(map.tile_layers[1], 2, 128, 1, __LINE__);
-		check_tile(map.tile_layers[1].data[0], 3, 10, 11, __LINE__);
-	*/
+		check_layer(map.tile_layers[1], 2, 128, 3, __LINE__);
+		check_tile(map.tile_layers[1].data[0], 1, 1, 0, __LINE__);
+		check_tile(map.tile_layers[1].data[1], 1, 1, 1, __LINE__);
+		check_tile(map.tile_layers[1].data[2], 1, 1, 2, __LINE__);
+
+		test(1==map.thing_layers.size(), "invalid parsing of thing layers");
+
+		check_layer(map.thing_layers[0], 1, 128, 3, __LINE__);
+
+		check_thing(map.thing_layers[0].data[0], 1, 32, 32, 2, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[0], "entry_id", 1, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[0], "bearing", 90, __LINE__);
+
+		check_thing(map.thing_layers[0].data[1], 2, 128, 32, 4, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[1], "w", 16, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[1], "h", 32, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[1], "map_id", 2, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[1], "entry_id", 1, __LINE__);
+
+		check_thing(map.thing_layers[0].data[2], 2, 32, 128, 4, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[2], "w", 32, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[2], "h", 16, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[2], "map_id", 3, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[2], "entry_id", 1, __LINE__);
+
+		check_layer(map.poly_layers[0], 1, 128, 1, __LINE__);
+
+		check_poly(map.poly_layers[0].data[0], 1, {{32,32}, {64,32}, {64,128}, {32,128}}, 1, __LINE__);
+		check_component_attribute(map.poly_layers[0].data[0], "path_speed", 2.1, __LINE__);
+
 	}
 	catch(std::exception& e) {
 
