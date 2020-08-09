@@ -13,9 +13,51 @@ void test(bool _thing, const std::string& _msg);
 void must_fail(std::vector<std::string> _errors, const std::string& _errmsg, const std::string& _type);
 void check_tile(const tile_editor::tile&, std::size_t, int, int, int);
 void check_thing(const tile_editor::thing&, std::size_t, int, int, std::size_t, int);
-void check_thing_attribute(const tile_editor::thing&, const std::string&, int, int);
-void check_thing_attribute(const tile_editor::thing&, const std::string&, double, int);
-void check_thing_attribute(const tile_editor::thing&, const std::string&, const std::string&, int);
+void check_poly(tile_editor::poly&, std::size_t, const std::vector<tile_editor::poly_point>&, std::size_t, int);
+
+template<typename T>
+void check_component_attribute(
+	const T& _subject,
+	const std::string& _key,
+	int _value,
+	int _line
+) {
+	test(_subject.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_subject.properties.int_properties.count(_key), std::string{"property is not an int on line "}+std::to_string(_line));
+
+	auto val=_subject.properties.int_properties.at(_key);
+	test(val==_value, std::string{"invalid integer property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
+}
+
+template<typename T>
+void check_component_attribute(
+	const T& _subject,
+	const std::string& _key,
+	double _value,
+	int _line
+) {
+
+	test(_subject.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_subject.properties.double_properties.count(_key), std::string{"property is not a double on line "}+std::to_string(_line));
+
+	auto val=_subject.properties.double_properties.at(_key);
+	test(val==_value, std::string{"invalid double property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
+}
+
+template<typename T>
+void check_component_attribute(
+	const T& _subject,
+	const std::string& _key,
+	const std::string& _value,
+	int _line
+) {
+
+	test(_subject.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_subject.properties.string_properties.count(_key), std::string{"property is not a string on line "}+std::to_string(_line));
+
+	auto val=_subject.properties.string_properties.at(_key);
+	test(val==_value, std::string{"invalid string property value, got "}+val+", expected "+_value+" on line "+std::to_string(_line));
+}
 
 template <typename T>
 void check_layer(const T& _layer, std::size_t _set, int _alpha, std::size_t _count, int _line) {
@@ -1108,14 +1150,18 @@ int main(int /*argc*/, char ** /*argv*/) {
 		std::cout<<"testing mostly valid map file"<<std::endl;
 		auto map=mp.parse_file("data/almost_good.map");
 		const auto& errors=mp.get_errors();
-		test(errors.size()==6, "there were unexpected errors parsing the mostly good map");
 
-		test("tile item has no 'p' property, skipping item"==errors[0], "invalid error");
-		test("missing meta node in layer, skipping layer meta"==errors[1], "invalid error");
-		test("missing data in tile layer, skipping layer"==errors[2], "invalid error");
-		test("thing item has no 'p' property, skipping item"==errors[3], "invalid error");
-		test("missing meta node in layer, skipping layer meta"==errors[4], "invalid error");
-		test("missing data in thing layer, skipping layer"==errors[5], "invalid error");
+		test(errors.size()==9, "there were unexpected errors parsing the mostly good map");
+
+		test("tile item has no 'p' property, skipping item"==errors[0], "invalid error 0");
+		test("missing meta node in layer, skipping layer meta"==errors[1], "invalid error 1");
+		test("missing data in tile layer, skipping layer"==errors[2], "invalid error 2");
+		test("thing item has no 'p' property, skipping item"==errors[3], "invalid error 3");
+		test("missing meta node in layer, skipping layer meta"==errors[4], "invalid error 4");
+		test("missing data in thing layer, skipping layer"==errors[5], "invalid error 5");
+		test("poly item has no 'p' property, skipping poly"==errors[6], "invalid error 6");
+		test("missing meta node in layer, skipping layer meta"==errors[7], "invalid error 7");
+		test("missing data in poly layer, skipping layer"==errors[8], "invalid error 8");
 
 		test(mp.get_version()=="1.0.0", "could not assert the map version");
 
@@ -1147,23 +1193,36 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_tile(map.tile_layers[1].data[0], 3, 10, 11, __LINE__);
 
 		test(2==map.thing_layers.size(), "invalid parsing of thing layers");
+
 		check_layer(map.thing_layers[0], 3, 32, 2, __LINE__);
 
 		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3, __LINE__);
 
-		check_thing_attribute(map.thing_layers[0].data[0], "some_attribute", 1, __LINE__);
-		check_thing_attribute(map.thing_layers[0].data[0], "some_other_attribute", 2.2, __LINE__);
-		check_thing_attribute(map.thing_layers[0].data[0], "and_another_one", "yes", __LINE__);
+		check_component_attribute(map.thing_layers[0].data[0], "some_attribute", 1, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[0], "some_other_attribute", 2.2, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[0], "and_another_one", "yes", __LINE__);
 
 		check_thing(map.thing_layers[0].data[1], 2, 14, 15, 1, __LINE__);
-		check_thing_attribute(map.thing_layers[0].data[1], "an_attribute", 2, __LINE__);
+		check_component_attribute(map.thing_layers[0].data[1], "an_attribute", 2, __LINE__);
 
 		check_layer(map.thing_layers[1], 4, 64, 1, __LINE__);
 		check_thing(map.thing_layers[1].data[0], 3, 16, 17, 0, __LINE__);
 
-		//TODO: Check poly layers
+		test(2==map.poly_layers.size(), "invalid parsing of poly layers");
+		check_layer(map.poly_layers[0], 4, 64, 3, __LINE__);
 
+		check_poly(map.poly_layers[0].data[0], 1, {{10,11}, {12,13}, {14,15}, {16,17}}, 3, __LINE__);
+		check_component_attribute(map.poly_layers[0].data[0], "some_attribute", 2, __LINE__);
+		check_component_attribute(map.poly_layers[0].data[0], "some_other_attribute", 3.2, __LINE__);
+		check_component_attribute(map.poly_layers[0].data[0], "and_another_one", "no", __LINE__);
 
+		check_poly(map.poly_layers[0].data[1], 2, {{18,19}, {20,21}, {22,23}, {24,25}}, 1, __LINE__);
+		check_component_attribute(map.poly_layers[0].data[1], "an_attribute", 3, __LINE__);
+
+		check_poly(map.poly_layers[0].data[2], 2, {{118,119}, {120,121}, {122,123}, {124,125}}, 0, __LINE__);
+
+		check_layer(map.poly_layers[1], 5, 128, 1, __LINE__);
+		check_poly(map.poly_layers[1].data[0], 3, {{16,17}, {18,19}, {20,21}}, 0, __LINE__);
 	}
 	catch(std::exception& e) {
 
@@ -1286,42 +1345,15 @@ void check_thing(
 	test(default_a==_thing.color.a, std::string{"invalid default color a for thing "}+std::to_string(_line)+" got "+std::to_string(_thing.color.a)+" expected "+std::to_string(default_a));
 }
 
-void check_thing_attribute(
-	const tile_editor::thing& _thing,
-	const std::string& _key,
-	int _value,
-	int _line
-) {
-	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
-	test(_thing.properties.int_properties.count(_key), std::string{"property is not an int on line "}+std::to_string(_line));
-
-	auto val=_thing.properties.int_properties.at(_key);
-	test(val==_value, std::string{"invalid integer property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
-}
-void check_thing_attribute(
-	const tile_editor::thing& _thing,
-	const std::string& _key,
-	double _value,
+void check_poly(
+	tile_editor::poly& _poly,
+	std::size_t _type,
+	const std::vector<tile_editor::poly_point>& _points,
+	std::size_t _propcount,
 	int _line
 ) {
 
-	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
-	test(_thing.properties.double_properties.count(_key), std::string{"property is not a double on line "}+std::to_string(_line));
-
-	auto val=_thing.properties.double_properties.at(_key);
-	test(val==_value, std::string{"invalid double property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
-}
-
-void check_thing_attribute(
-	const tile_editor::thing& _thing,
-	const std::string& _key,
-	const std::string& _value,
-	int _line
-) {
-
-	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
-	test(_thing.properties.string_properties.count(_key), std::string{"property is not a string on line "}+std::to_string(_line));
-
-	auto val=_thing.properties.string_properties.at(_key);
-	test(val==_value, std::string{"invalid string property value, got "}+val+", expected "+_value+" on line "+std::to_string(_line));
+	test(_type==_poly.type, std::string{"invalid type for poly in line "}+std::to_string(_line)+" got "+std::to_string(_poly.type)+" expected "+std::to_string(_type));
+	test(_propcount==_poly.properties.size(), std::string{"invalid property size for poly "}+std::to_string(_line)+" got "+std::to_string(_poly.properties.size())+" expected "+std::to_string(_propcount));
+	test(_points == _poly.points, std::string{"invalid points for poly in line "}+std::to_string(_line));
 }
