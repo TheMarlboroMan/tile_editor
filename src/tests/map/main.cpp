@@ -809,51 +809,313 @@ int main(int /*argc*/, char ** /*argv*/) {
 }
 )str");
 	must_fail(mp.get_errors(), "'polys' node must be an array, polys will be skipped", "polys node is not an array");
-	
-	//TODO TODO
 
 	//Non object property for poly layer
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [1,2,3]
+}
+)str");
+	must_fail(mp.get_errors(), "poly layer node must be an object, skipping layer", "non object property for poly layer");
 
 	//the meta node does not need to be tested, it has been tested with the tiles.
 	//the data node does not need to be tested either, it has been tested before too.
 
 	//Non object poly item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[1,2,3]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item is not an object, skipping poly", "non object poly item");
 
 	//missing t node in poly item
-	
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item has no 't' property, skipping poly", "missing t node in poly item");
+
 	//non-numeric t node in poly item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":"lala"
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item 't' is not an integer, skipping poly", "non-numeric t node in poly item");
 
 	//missing p node in poly item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item has no 'p' property, skipping poly", "missing p node in poly item");
 
 	//non array p node in poly item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p":1
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item 'p' is not an array, skipping poly", "non array p node in poly item");
 
 	//less than 3 items in poly item
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p":[1,2]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item 'p' must have at least 3 vertices represented by three arrays, skipping poly", "less than 3 items in poly item");
 
 	//invalid poly item point: not an array
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [1,2,3]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item point must be an array, skipping poly", "invalid poly item point: not an array");
 
 	//invalid poly item point: not exactly two items
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [1,2,3], 2, 3 ]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item point must have exactly two items, skipping poly", "invalid poly item point: not exactly two items");
 
-	//invalid poly item point: item is not an integer
+	//invalid poly item point: first component is not an integer
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ ["a",2], 2, 3 ]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item point first component must be an integer, skipping poly", "invalid poly item point: first component is not an integer");
+
+	//invalid poly item point: second component is not an integer
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [2, "b"], 2, 3]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item point second component must be an integer, skipping poly", "invalid poly item point: second component is not an integer");
 
 	//not a property in poly item.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [1,2], [3,4], [5, 6] ]
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item has no 'a' property, skipping poly", "not a property in poly item");
 
 	//non-object a property in poly item.
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [1,2], [3,4], [5,6] ],
+				"a": "string"
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly item 'a' is not an object, skipping poly", "non-object a property in poly item");
 
 	//the property parser has been already tested with the map, so we can skip that.
 
 	//poly item with extraneous member...
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [1,2], [3,4], [5,6] ],
+				"a": {},
+				"lol":33
+			}]
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly layer item has extraneous members that will be skipped", "poly item with extraneous member");
 
 	//poly layer with extraneous member...
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"tiles":[],
+	"things": [],
+	"polys": [
+		{
+			"meta":{"set":1, "alpha":0},
+			"data":[{
+				"t":1,
+				"p": [ [1,2], [3,4], [5,6] ],
+				"a": {}
+			}],
+			"lol":"useless"
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "poly layer node has extraneous members that will be skipped", "poly layer with extraneous member");
 
 	try {
 		std::cout<<"testing mostly valid map file"<<std::endl;
 		auto map=mp.parse_file("data/almost_good.map");
 		const auto& errors=mp.get_errors();
-		test(errors.size()==3, "there were unexpected errors parsing the mostly good map");
+		test(errors.size()==6, "there were unexpected errors parsing the mostly good map");
 
 		test("tile item has no 'p' property, skipping item"==errors[0], "invalid error");
 		test("missing meta node in layer, skipping layer meta"==errors[1], "invalid error");
 		test("missing data in tile layer, skipping layer"==errors[2], "invalid error");
+		test("thing item has no 'p' property, skipping item"==errors[3], "invalid error");
+		test("missing meta node in layer, skipping layer meta"==errors[4], "invalid error");
+		test("missing data in thing layer, skipping layer"==errors[5], "invalid error");
 
 		test(mp.get_version()=="1.0.0", "could not assert the map version");
 
@@ -888,21 +1150,20 @@ int main(int /*argc*/, char ** /*argv*/) {
 		check_layer(map.thing_layers[0], 3, 32, 2, __LINE__);
 
 		check_thing(map.thing_layers[0].data[0], 1, 10, 11, 3, __LINE__);
-		//TODO: check attributes  Do it simple, 3 overloads.
+
 		check_thing_attribute(map.thing_layers[0].data[0], "some_attribute", 1, __LINE__);
 		check_thing_attribute(map.thing_layers[0].data[0], "some_other_attribute", 2.2, __LINE__);
 		check_thing_attribute(map.thing_layers[0].data[0], "and_another_one", "yes", __LINE__);
 
-
 		check_thing(map.thing_layers[0].data[1], 2, 14, 15, 1, __LINE__);
-		check_thing_attribute(map.thing_layers[1].data[0], "an_attribute", 2, __LINE__);
+		check_thing_attribute(map.thing_layers[0].data[1], "an_attribute", 2, __LINE__);
 
 		check_layer(map.thing_layers[1], 4, 64, 1, __LINE__);
 		check_thing(map.thing_layers[1].data[0], 3, 16, 17, 0, __LINE__);
 
 		//TODO: Check poly layers
 
-		
+
 	}
 	catch(std::exception& e) {
 
@@ -998,8 +1259,8 @@ void check_tile(const tile_editor::tile& _tile, std::size_t _type, int _x, int _
 }
 
 void check_thing(
-	const tile_editor::thing& _thing, 
-	std::size_t _type, 
+	const tile_editor::thing& _thing,
+	std::size_t _type,
 	int _x,
 	int _y,
 	std::size_t _propcount,
@@ -1026,30 +1287,41 @@ void check_thing(
 }
 
 void check_thing_attribute(
-	const tile_editor::thing& _thing, 
-	const std::string& _key, 
-	int _value
+	const tile_editor::thing& _thing,
+	const std::string& _key,
+	int _value,
 	int _line
 ) {
+	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_thing.properties.int_properties.count(_key), std::string{"property is not an int on line "}+std::to_string(_line));
 
-	test(1==2, "unimplemented");
+	auto val=_thing.properties.int_properties.at(_key);
+	test(val==_value, std::string{"invalid integer property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
 }
 void check_thing_attribute(
-	const tile_editor::thing& _thing, 
-	const std::string& _key, 
+	const tile_editor::thing& _thing,
+	const std::string& _key,
 	double _value,
 	int _line
 ) {
 
-	test(1==2, "unimplemented");
+	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_thing.properties.double_properties.count(_key), std::string{"property is not a double on line "}+std::to_string(_line));
+
+	auto val=_thing.properties.double_properties.at(_key);
+	test(val==_value, std::string{"invalid double property value, got "}+std::to_string(val)+", expected "+std::to_string(_value)+" on line "+std::to_string(_line));
 }
 
 void check_thing_attribute(
-	const tile_editor::thing& _thing, 
-	const std::string& _key, 
+	const tile_editor::thing& _thing,
+	const std::string& _key,
 	const std::string& _value,
 	int _line
 ) {
 
-	test(1==2, "unimplemented");
+	test(_thing.properties.has_property(_key), std::string{"property does not exist on line "}+std::to_string(_line));
+	test(_thing.properties.string_properties.count(_key), std::string{"property is not a string on line "}+std::to_string(_line));
+
+	auto val=_thing.properties.string_properties.at(_key);
+	test(val==_value, std::string{"invalid string property value, got "}+val+", expected "+_value+" on line "+std::to_string(_line));
 }

@@ -369,8 +369,136 @@ void map_parser::parse_polys(const jsondoc& _doc, map& _map) {
 
 }
 
-void map_parser::parse_poly_layer(const jsonval& _item, map& _map) {
+void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 
+	if(!_node.IsObject()) {
+
+		errors.push_back("poly layer node must be an object, skipping layer");
+		return;
+	}
+
+	auto metadata=parse_meta_node(_node);
+
+	if(!check_data_node(_node, "poly")) {
+
+		return;
+	}
+
+	poly_layer layer{metadata.set, metadata.alpha, {}};
+
+	for(const auto& item : _node["data"].GetArray()) {
+
+		if(!item.IsObject()) {
+			errors.push_back("poly item is not an object, skipping poly");
+			continue;
+		}
+
+		if(!item.HasMember("t")) {
+
+			errors.push_back("poly item has no 't' property, skipping poly");
+			continue;
+		}
+
+		if(!item["t"].IsInt()) {
+
+			errors.push_back("poly item 't' is not an integer, skipping poly");
+			continue;
+		}
+
+		if(!item.HasMember("p")) {
+
+			errors.push_back("poly item has no 'p' property, skipping poly");
+			continue;
+		}
+
+		if(!item["p"].IsArray()) {
+
+			errors.push_back("poly item 'p' is not an array, skipping poly");
+			continue;
+		}
+
+		if(3 > item["p"].Size()) {
+
+			errors.push_back("poly item 'p' must have at least 3 vertices represented by three arrays, skipping poly");
+			continue;
+		}
+
+		//BEGIN TODO.
+		std::vector<tile_editor::poly_point> points;
+		bool must_skip=false;
+		for(const auto& point : item["p"].GetArray()) {
+
+			if(!point.IsArray()) {
+
+				errors.push_back("poly item point must be an array, skipping poly");
+				must_skip=true;
+				break;
+			}
+
+			if(2 != point.Size()) {
+
+				errors.push_back("poly item point must have exactly two items, skipping poly");
+				must_skip=true;
+				break;
+			}
+
+			if(!point[0].IsInt()) {
+
+				errors.push_back("poly item point first component must be an integer, skipping poly");
+				must_skip=true;
+				break;
+			}
+
+			if(!point[1].IsInt()) {
+
+				errors.push_back("poly item point second component must be an integer, skipping poly");
+				must_skip=true;
+				break;
+			}
+
+			points.push_back({point[0].GetInt(), point[1].GetInt()});
+		}
+
+		if(must_skip) {
+			continue;
+		}
+
+		if(!item.HasMember("a")) {
+
+			errors.push_back("poly item has no 'a' property, skipping poly");
+			continue;
+		}
+
+		if(!item["a"].IsObject()) {
+
+			errors.push_back("poly item 'a' is not an object, skipping poly");
+			continue;
+		}
+
+		tile_editor::property_manager pm;
+		parse_attributes(item["a"], pm);
+
+		tile_editor::poly poly{
+			points,
+			item["t"].GetInt(),
+			pm
+		};
+
+		layer.data.push_back(poly);
+
+		if(item.Size() > 3) {
+
+			errors.push_back("poly layer item has extraneous members that will be skipped");
+		}
+	}
+
+	if(_node.Size() > 2) {
+
+		errors.push_back("poly layer node has extraneous members that will be skipped");
+	}
+
+	//Add the layer to the map.
+	_map.poly_layers.push_back(std::move(layer));
 }
 
 map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
