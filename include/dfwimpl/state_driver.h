@@ -7,10 +7,12 @@
 #include <memory>
 
 //Controllers.
+#include "../../include/controller/editor.h"
 //[new-controller-header-mark]
 
 //Specific app_config
-//#include "../app/placeholder.h"
+#include "../tile_editor/blueprint_types/map_blueprint.h"
+#include "../tile_editor/editor_types/map.h"
 
 namespace dfwimpl {
 
@@ -35,13 +37,18 @@ class state_driver:
 	void						prepare_resources(dfw::kernel&);
 	void						register_controllers(dfw::kernel&);
 	void 						virtualize_input(dfw::input& input);
+	void                        read_app_data(tools::arg_manager&);
 
 	//references
 	dfwimpl::config&				config;
 	lm::logger&					log;
 
 	typedef std::unique_ptr<dfw::controller_interface>	ptr_controller;
+	ptr_controller					c_editor;
 	//[new-controller-property-mark]
+
+	tile_editor::map_blueprint      session;
+	tile_editor::map                map;
 };
 
 }

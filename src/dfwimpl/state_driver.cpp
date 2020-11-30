@@ -1,6 +1,8 @@
 #include "../../include/dfwimpl/state_driver.h"
 #include "../../include/input/input.h"
 #include "../../include/controller/states.h"
+#include "../../include/tile_editor/parser/blueprint_parser.h"
+#include "../../include/tile_editor/parser/map_parser.h"
 
 #include <lm/sentry.h>
 #include <tools/string_utils.h>
@@ -10,7 +12,7 @@
 using namespace dfwimpl;
 
 state_driver::state_driver(dfw::kernel& kernel, dfwimpl::config& c)
-	:state_driver_interface(controller::t_states::state_min),
+	:state_driver_interface(controller::t_states::state_editor),
 	config(c), log(kernel.get_log()) {
 
 	lm::log(log, lm::lvl::info)<<"setting state check function..."<<std::endl;
@@ -36,6 +38,9 @@ state_driver::state_driver(dfw::kernel& kernel, dfwimpl::config& c)
 
 	lm::log(log, lm::lvl::info)<<"virtualizing input..."<<std::endl;
 	virtualize_input(kernel.get_input());
+
+	lm::log(log, lm::lvl::info)<<"reading application data..."<<std::endl;
+	read_app_data(kernel.get_arg_manager());
 
 	lm::log(log, lm::lvl::info)<<"state driver fully constructed"<<std::endl;
 }
@@ -101,6 +106,7 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 		register_controller(_i, *_ptr);
 	};
 
+	reg(c_editor, controller::t_states::state_editor, new controller::editor(log));
 	//[new-controller-mark]
 }
 
@@ -144,5 +150,26 @@ void state_driver::virtualize_input(dfw::input& input) {
 		input().virtualize_joystick_hats(i);
 		input().virtualize_joystick_axis(i, 15000);
 		lm::log(log, lm::lvl::info)<<"Joystick virtualized "<<i<<std::endl;
+	}
+}
+
+void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
+
+	//TODO: Should this shit be read outside and fed to the state driver
+	//from main????
+	tile_editor::blueprint_parser cfp;
+	session=cfp.read(_arg_manager.get_following("-c"));
+
+	if(_arg_manager.exists("-f") && _arg_manager.arg_follows("-f")) {
+
+		tile_editor::map_parser mp;
+		map=mp.parse_file(_arg_manager.get_following("-f"));
+
+		auto& editor=static_cast<controller::editor&>(*c_editor);
+
+		for(const auto& msg : mp.get_errors()) {
+
+			editor.add_message(msg);
+		}
 	}
 }

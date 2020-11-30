@@ -1,5 +1,5 @@
-#include "include/dfwimpl/config.h"
-#include "include/dfwimpl/state_driver.h"
+#include "../include/dfwimpl/config.h"
+#include "../include/dfwimpl/state_driver.h"
 
 #include <lm/file_logger.h>
 #include <lm/sentry.h>
@@ -20,6 +20,12 @@ int main(int argc, char ** argv)
 	//Argument controller.
 	tools::arg_manager carg(argc, argv);
 
+	if(!carg.exists("-c") || !carg.arg_follows("-c")) {
+
+		std::cerr<<"./tile_editor -c #config_file#"<<std::endl;
+		return 1;
+	}
+
 	//Init application log.
 	lm::file_logger log_app("logs/app.log");
 	lm::log(log_app, lm::lvl::info)<<"starting main process..."<<std::endl;
@@ -30,7 +36,7 @@ int main(int argc, char ** argv)
 		if(!ldt::sdl_init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK)) {
 			throw std::runtime_error("unable to init sdl2");
 		}
-		
+
 		lm::log(log_app, lm::lvl::info)<<"creating kernel..."<<std::endl;
 		dfw::kernel kernel(log_app, carg);
 
