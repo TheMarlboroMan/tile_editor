@@ -20,6 +20,7 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/include/tile_editor")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/dfw_impl")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/input")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/controller")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")
 

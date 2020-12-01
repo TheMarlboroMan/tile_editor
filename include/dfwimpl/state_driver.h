@@ -12,8 +12,9 @@
 //[new-controller-header-mark]
 
 //Specific app_config
-#include "../tile_editor/blueprint_types/map_blueprint.h"
-#include "../tile_editor/editor_types/map.h"
+#include "blueprint_types/map_blueprint.h"
+#include "editor_types/map.h"
+#include "tools/message_manager.h"
 
 namespace dfwimpl {
 
@@ -49,6 +50,7 @@ class state_driver:
 	//[new-controller-property-mark]
 
 	ldtools::ttf_manager            ttf_manager;
+	tools::message_manager          message_manager;
 	tile_editor::map_blueprint      session;
 	tile_editor::map                map;
 };

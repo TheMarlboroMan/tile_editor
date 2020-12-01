@@ -13,7 +13,10 @@ using namespace dfwimpl;
 
 state_driver::state_driver(dfw::kernel& kernel, dfwimpl::config& c)
 	:state_driver_interface(controller::t_states::state_editor),
-	config(c), log(kernel.get_log()) {
+	config(c),
+	log(kernel.get_log()),
+	message_manager(30)
+{
 
 	lm::log(log, lm::lvl::info)<<"setting state check function..."<<std::endl;
 
@@ -115,7 +118,7 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 	unsigned int    screen_w=config.int_from_path("video:window_w_logical"),
 					screen_h=config.int_from_path("video:window_h_logical");
 
-	reg(c_editor, controller::t_states::state_editor, new controller::editor(log, ttf_manager, screen_w, screen_h));
+	reg(c_editor, controller::t_states::state_editor, new controller::editor(log, ttf_manager, message_manager, screen_w, screen_h));
 	//[new-controller-mark]
 }
 
@@ -131,12 +134,14 @@ void state_driver::prepare_state(int /*next*/, int /*current*/) {
 */
 }
 
-void state_driver::common_pre_loop_input(dfw::input& input, float /*delta*/) {
+void state_driver::common_pre_loop_input(dfw::input& input, float _delta) {
 
 	if(input().is_event_joystick_connected()) {
 		lm::log(log, lm::lvl::info)<<"New joystick detected..."<<std::endl;
 		virtualize_input(input);
 	}
+
+	message_manager.tick(_delta);
 }
 
 void state_driver::common_loop_input(dfw::input& /*input*/, float /*delta*/) {
@@ -171,18 +176,30 @@ void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 
 	if(_arg_manager.exists("-f") && _arg_manager.arg_follows("-f")) {
 
+		//TODO: This could be a map loader class so we can invoke it here
+		//and from the outside too.
 		tile_editor::map_parser mp;
 		map=mp.parse_file(_arg_manager.get_following("-f"));
 
-		auto& editor=static_cast<controller::editor&>(*c_editor);
 		for(const auto& msg : mp.get_errors()) {
 
 			lm::log(log, lm::lvl::notice)<<msg<<std::endl;
+			message_manager.add(msg);
 		}
 
 		if(mp.get_errors().size()) {
 
-			editor.add_message("there were errors loading the map, please check the log file");
+			message_manager.add("there were errors loading the map, please check the log file");
+		}
+		else {
+
+			std::string msg=std::string{"loaded map with "}
+				+std::to_string(map.tile_layers.size())+" tile layers,"
+				+std::to_string(map.thing_layers.size())+" thing layers,"
+				+std::to_string(map.poly_layers.size())+" polygon layers and "
+				+std::to_string(map.properties.size())+" properties";
+
+			message_manager.add(msg);
 		}
 	}
 }

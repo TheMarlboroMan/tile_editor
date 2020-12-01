@@ -1,5 +1,11 @@
 # Tile editor
 
+## TODO
+
+- Setup "load" controller.
+- Setup "save" controller. This is going to hurt... quite a lot.
+- Setup "grid", draw stuff...
+
 ## Building
 
 TODO:

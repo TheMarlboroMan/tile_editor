@@ -8,11 +8,13 @@ using namespace controller;
 editor::editor(
 	lm::logger& _log,
 	ldtools::ttf_manager& _ttf_manager,
+	tools::message_manager& _message_manager,
 	unsigned int _screen_w,
 	unsigned int _screen_h
 )
 	:log(_log),
 	ttf_manager(_ttf_manager),
+	message_manager{_message_manager},
 	screen_rect{0, 0, _screen_w, _screen_h},
 	camera{
 		screen_rect, //pointing at world 0,0.
@@ -27,7 +29,7 @@ editor::editor(
 
 }
 
-void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& lid) {
+void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) {
 
 	if(_input().is_exit_signal() || _input.is_input_down(input::escape)) {
 		set_leave(true);
@@ -35,11 +37,6 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& lid) {
 	}
 
 	mouse_pos=get_mouse_position(_input);
-
-	if(last_message.time > 0.f) {
-
-		last_message.time-=lid.delta;
-	}
 
 	if(_input.is_input_down(input::zoom_in)) {
 
@@ -67,10 +64,22 @@ void editor::draw(ldv::screen& _screen, int /*fps*/) {
 
 void editor::draw_messages(ldv::screen& _screen) {
 
-	if(last_message.time > 0.f) {
+	if(message_manager.size()) {
 
-		last_message_rep.draw(_screen);
+//TODO: There should be some system of "register me for when a message is added"
+//so we can do callbacks an not this crap at every tick.
+		last_message_rep.set_text(message_manager.last());
+
+		last_message_rep.align(
+			screen_rect,
+			ldv::representation_alignment{
+				ldv::representation_alignment::h::center,
+				ldv::representation_alignment::v::inner_bottom
+			}
+		);
 	}
+
+	last_message_rep.draw(_screen);
 }
 
 void editor::draw_hud(ldv::screen& _screen) {
@@ -85,21 +94,6 @@ void editor::draw_hud(ldv::screen& _screen) {
 	txt_hud.go_to({0,0});
 	txt_hud.set_text(txt);
 	txt_hud.draw(_screen);
-}
-
-void editor::add_message(const std::string& _msg) {
-
-	last_message.message=_msg;
-	last_message.time=30.0f;
-	last_message_rep.set_text(last_message.message);
-
-	last_message_rep.align(
-		screen_rect,
-		ldv::representation_alignment{
-			ldv::representation_alignment::h::center,
-			ldv::representation_alignment::v::inner_bottom
-		}
-	);
 }
 
 ldt::point_2d<int> editor::get_mouse_position(dfw::input& _input) const {
