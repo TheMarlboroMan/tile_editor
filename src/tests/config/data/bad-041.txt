@@ -1,4 +1,0 @@
-beginpolyset
-	file not-a-file
-	id 1
-endpolyset

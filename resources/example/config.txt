@@ -1,0 +1,39 @@
+beginmapproperties
+	file example/map_properties.txt
+endmapproperties
+
+begintileset
+	file example/set_0.dat
+	id 1
+	image example/set_0.png
+	name Foreground tiles
+endtileset
+
+begintileset
+	file example/set_1.dat
+	id 2
+	image example/set_1.png
+	name Background tiles
+endtileset
+
+beginobjectset
+	file example/things_01.txt
+	id 1
+	name Things
+endobjectset
+
+beginpolyset
+	file example/polyset_01.txt
+	id 1
+	name Polygons
+endpolyset
+
+beginsession
+	thingcenter center
+	bgcolor 0 0 0 0
+	gridsize 32
+	gridvruler 8
+	gridhruler 8
+	gridcolor 128 128 128 0
+	gridrulercolor 32 32 32 0
+endsession

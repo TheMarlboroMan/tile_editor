@@ -1,3 +1,0 @@
-beginmapproperties
-file data/good_map_properties.txt
-#ouch

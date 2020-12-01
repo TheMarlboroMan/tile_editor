@@ -10,7 +10,7 @@
 
 using namespace tile_editor;
 
-thing_definition_table thing_parser::read_file(const std::string& _filename) {
+thing_definition_table::table_type thing_parser::read_file(const std::string& _filename) {
 
 	if(!tools::file_exists(_filename)) {
 
@@ -19,7 +19,7 @@ thing_definition_table thing_parser::read_file(const std::string& _filename) {
 
 	const std::string   begin{"beginobject"};
 
-	thing_definition_table result;
+	thing_definition_table::table_type result;
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
 	tools::text_reader reader{_filename, '#', flags};
 
@@ -30,7 +30,7 @@ thing_definition_table thing_parser::read_file(const std::string& _filename) {
 			if(reader.is_eof()) {
 				break;
 			}
-			
+
 			std::string tag;
 			ss>>std::skipws>>tag;
 
@@ -55,8 +55,8 @@ thing_definition_table thing_parser::read_file(const std::string& _filename) {
 }
 
 void thing_parser::parse_object(
-	tools::text_reader& _reader, 
-	thing_definition_table& _result
+	tools::text_reader& _reader,
+	thing_definition_table::table_type& _result
 ) {
 
 	//Given the nested structure of this file, we cannot use exactly the same
@@ -134,7 +134,7 @@ void thing_parser::parse_object(
 
 	_result[id]={
 		id,
-		w, 
+		w,
 		h,
 		properties["name"],
 		color,

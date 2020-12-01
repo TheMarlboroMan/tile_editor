@@ -1,3 +1,0 @@
-beginsession
-	thingcenter nowhere
-endsession

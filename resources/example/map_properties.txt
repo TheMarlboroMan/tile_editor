@@ -1,0 +1,13 @@
+beginproperty
+	name name
+	type string
+	default unnamed
+	comment Map name
+endproperty
+
+beginproperty
+	name map_id
+	type int
+	default 0
+	comment An unique identifier for the map
+endproperty

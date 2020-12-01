@@ -1,3 +1,0 @@
-beginmapproperties
-#there should be a file property here.
-endmapproperties

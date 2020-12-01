@@ -8,7 +8,10 @@ escape=0,
 up,
 down,
 left,
-right
+right,
+zoom_in,
+zoom_out,
+left_click
 };
 
 }

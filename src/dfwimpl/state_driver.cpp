@@ -59,6 +59,8 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 
 	auto& screen=kernel.get_screen();
 	screen.set_fullscreen(config.bool_from_path("video:fullscreen"));
+
+	ttf_manager.insert("main", 12, "assets/ttf/BebasNeue-Regular.ttf");
 }
 
 void state_driver::prepare_audio(dfw::kernel& kernel) {
@@ -82,7 +84,10 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:left")), input::left},
 		{input_description_from_config_token(config.token_from_path("input:right")), input::right},
 		{input_description_from_config_token(config.token_from_path("input:up")), input::up},
-		{input_description_from_config_token(config.token_from_path("input:down")), input::down}
+		{input_description_from_config_token(config.token_from_path("input:down")), input::down},
+		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
+		{input_description_from_config_token(config.token_from_path("input:zoom_out")), input::zoom_out},
+		{input_description_from_config_token(config.token_from_path("input:left_click")), input::left_click}
 	};
 
 	kernel.init_input_system(pairs);
@@ -106,7 +111,11 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 		register_controller(_i, *_ptr);
 	};
 
-	reg(c_editor, controller::t_states::state_editor, new controller::editor(log));
+
+	unsigned int    screen_w=config.int_from_path("video:window_w_logical"),
+					screen_h=config.int_from_path("video:window_h_logical");
+
+	reg(c_editor, controller::t_states::state_editor, new controller::editor(log, ttf_manager, screen_w, screen_h));
 	//[new-controller-mark]
 }
 
@@ -158,7 +167,7 @@ void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 	//TODO: Should this shit be read outside and fed to the state driver
 	//from main????
 	tile_editor::blueprint_parser cfp;
-	session=cfp.read(_arg_manager.get_following("-c"));
+	session=cfp.parse_file(_arg_manager.get_following("-c"));
 
 	if(_arg_manager.exists("-f") && _arg_manager.arg_follows("-f")) {
 
@@ -166,10 +175,14 @@ void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 		map=mp.parse_file(_arg_manager.get_following("-f"));
 
 		auto& editor=static_cast<controller::editor&>(*c_editor);
-
 		for(const auto& msg : mp.get_errors()) {
 
-			editor.add_message(msg);
+			lm::log(log, lm::lvl::notice)<<msg<<std::endl;
+		}
+
+		if(mp.get_errors().size()) {
+
+			editor.add_message("there were errors loading the map, please check the log file");
 		}
 	}
 }

@@ -11,7 +11,7 @@
 
 using namespace tile_editor;
 
-poly_definition_table poly_parser::read_file(const std::string& _filename) {
+poly_definition_table::table_type poly_parser::read_file(const std::string& _filename) {
 
 	if(!tools::file_exists(_filename)) {
 
@@ -20,7 +20,7 @@ poly_definition_table poly_parser::read_file(const std::string& _filename) {
 
 	const std::string   begin{"beginpoly"};
 
-	poly_definition_table result;
+	poly_definition_table::table_type result;
 	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
 	tools::text_reader reader{_filename, '#', flags};
 
@@ -31,7 +31,7 @@ poly_definition_table poly_parser::read_file(const std::string& _filename) {
 			if(reader.is_eof()) {
 				break;
 			}
-			
+
 			std::string tag;
 			ss>>std::skipws>>tag;
 
@@ -56,8 +56,8 @@ poly_definition_table poly_parser::read_file(const std::string& _filename) {
 }
 
 void poly_parser::parse_poly(
-	tools::text_reader& _reader, 
-	poly_definition_table& _result
+	tools::text_reader& _reader,
+	poly_definition_table::table_type& _result
 ) {
 
 	//This works mostly the same as a thing definition.

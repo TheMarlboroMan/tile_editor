@@ -1,3 +1,0 @@
-beginpolyset
-	id 1
-endpolyset

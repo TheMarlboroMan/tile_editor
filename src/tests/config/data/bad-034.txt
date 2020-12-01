@@ -1,4 +1,0 @@
-beginsession
-	thingcenter center
-	bgcolor 1 2 a 0
-endsession

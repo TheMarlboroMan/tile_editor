@@ -15,12 +15,28 @@
 
 using namespace tile_editor;
 
-map_blueprint blueprint_parser::read(const std::string& _filename) {
+map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 
 	if(!tools::file_exists(_filename)) {
 
 		throw std::runtime_error(std::string{"cannot find file '"}+_filename+"'");
 	}
+
+	try {
+		return parse_string(tools::dump_file(_filename));
+	}
+	catch(std::exception& e) {
+
+		throw std::runtime_error(
+			std::string{
+				e.what()
+			}
+			+" on file "+_filename
+		);
+	}
+}
+
+map_blueprint blueprint_parser::parse_string(const std::string& _contents) {
 
 	const std::string   beginprop{"beginmapproperties"},
 	                    begintile{"begintileset"},
@@ -29,8 +45,8 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 	                    beginsession{"beginsession"};
 
 	map_blueprint mb;
-	int flags=tools::text_reader::ltrim | tools::text_reader::rtrim | tools::text_reader::ignorewscomment;
-	tools::text_reader reader{_filename, '#', flags};
+	int flags=tools::string_reader::ltrim | tools::string_reader::rtrim | tools::string_reader::ignorewscomment;
+	tools::string_reader reader{_contents, '#', flags};
 	bool properties_set=false;
 
 	try {
@@ -40,7 +56,7 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 			if(reader.is_eof()) {
 				break;
 			}
-			
+
 			//We can only expect beginmapproperties, begintileset, beginobjectset...
 			//Skip all whitespace in the extraction operations that will follow.
 			std::string tag;
@@ -82,7 +98,6 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 
 		throw std::runtime_error(
 			std::string{e.what()}
-			+" on file "+_filename
 			+" line "+std::to_string(reader.get_line_number())
 		);
 	}
@@ -91,7 +106,7 @@ map_blueprint blueprint_parser::read(const std::string& _filename) {
 }
 
 void blueprint_parser::map_property_mode(
-	tools::text_reader& _reader,
+	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
 
@@ -102,15 +117,15 @@ void blueprint_parser::map_property_mode(
 }
 
 void blueprint_parser::tile_mode(
-	tools::text_reader& _reader,
+	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
 
-	auto propmap=generic_first_level(_reader, "endtileset", {"file", "id", "image"});
+	auto propmap=generic_first_level(_reader, "endtileset", {"file", "id", "image", "name"});
 
 	std::stringstream ss{propmap["id"]};
 	std::size_t index{};
-	
+
 	ss>>index;
 
 	if(ss.fail()) {
@@ -125,20 +140,21 @@ void blueprint_parser::tile_mode(
 
 	_blueprint.tilesets[index]={
 		ldtools::sprite_table{propmap["file"]},
-		propmap["image"]
+		propmap["image"],
+		propmap["name"]
 	};
 }
 
 void blueprint_parser::thing_mode(
-	tools::text_reader& _reader,
+	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
 
-	auto propmap=generic_first_level(_reader, "endobjectset", {"file", "id"});
-	
+	auto propmap=generic_first_level(_reader, "endobjectset", {"file", "id", "name"});
+
 	std::stringstream ss{propmap["id"]};
 	std::size_t index{};
-	
+
 	ss>>index;
 
 	if(ss.fail()) {
@@ -152,19 +168,22 @@ void blueprint_parser::thing_mode(
 	}
 
 	thing_parser tp;
-	_blueprint.thingsets[index]=tp.read_file(propmap["file"]);
+	_blueprint.thingsets.emplace(
+		index,
+		thing_definition_table{propmap["name"], tp.read_file(propmap["file"])}
+	);
 }
 
 void blueprint_parser::poly_mode(
-	tools::text_reader& _reader, 
+	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
 
-	auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id"});
-	
+	auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id", "name"});
+
 	std::stringstream ss{propmap["id"]};
 	std::size_t index{};
-	
+
 	ss>>index;
 
 	if(ss.fail()) {
@@ -178,16 +197,20 @@ void blueprint_parser::poly_mode(
 	}
 
 	poly_parser pp;
-	_blueprint.polysets[index]=pp.read_file(propmap["file"]);
+
+	_blueprint.polysets.emplace(
+		index,
+		poly_definition_table{propmap["name"], pp.read_file(propmap["file"])}
+	);
 }
 
 void blueprint_parser::session_mode(
-	tools::text_reader& _reader, 
+	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
 
 	auto propmap=generic_first_level(_reader, "endsession", {
-		"thingcenter", 
+		"thingcenter",
 		"bgcolor",
 		"gridsize",
 		"gridvruler",

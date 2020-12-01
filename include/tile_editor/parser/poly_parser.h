@@ -10,11 +10,11 @@ class poly_parser {
 
 	public:
 
-	poly_definition_table     read_file(const std::string&);
+	poly_definition_table::table_type     read_file(const std::string&);
 
 	private:
 
-	void                      parse_poly(tools::text_reader&, poly_definition_table&);
+	void                      parse_poly(tools::text_reader&, poly_definition_table::table_type&);
 };
 
 }

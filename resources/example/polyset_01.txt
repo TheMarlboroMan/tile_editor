@@ -1,0 +1,19 @@
+beginpoly
+	id 1
+	name touch_trigger
+	color 255 255 255 128
+	beginproperty
+		name trigger_id
+		type int
+		default 1
+		comment Trigger id
+		linkedto nothing
+	endproperty
+	beginproperty
+		name repeatable
+		type int
+		default -1
+		comment -1 for infinite, a number for the exact number of times
+		linkedto nothing
+	endproperty
+endpoly

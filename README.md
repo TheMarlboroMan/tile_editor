@@ -73,3 +73,9 @@ TODO
 	- Hacked the life away to support png alpha.
 - 7-8-2017: Changes.
 	- Added the possibility to change the size of logic objects... This actually has consequences in many places (loaders, exporters, logic editor...).
+
+## Credits
+
+Bebas Neue font by Dharma Type.
+Example tileset 1 by Paulina Riva
+Example tileset 2 by mfburn

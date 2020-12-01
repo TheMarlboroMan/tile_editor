@@ -1,6 +1,0 @@
-beginobjectset
-	file data/good_objectset_01.txt
-	id 1
-	id 1
-endobjectset
-

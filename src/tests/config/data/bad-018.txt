@@ -1,5 +1,0 @@
-beginobjectset
-	file data/bad-018-b.txt
-	id 1
-endobjectset
-

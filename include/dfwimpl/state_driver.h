@@ -3,6 +3,7 @@
 #include "config.h"
 
 #include <dfw/state_driver_interface.h>
+#include <ldtools/ttf_manager.h>
 
 #include <memory>
 
@@ -20,7 +21,7 @@ class state_driver:
 	public dfw::state_driver_interface {
 
 	public:
-							state_driver(dfw::kernel& kernel, dfwimpl::config& config);
+									state_driver(dfw::kernel& kernel, dfwimpl::config& config);
 
 	virtual void					common_pre_loop_input(dfw::input& input, float delta);
 	virtual void					common_pre_loop_step(float delta);
@@ -47,6 +48,7 @@ class state_driver:
 	ptr_controller					c_editor;
 	//[new-controller-property-mark]
 
+	ldtools::ttf_manager            ttf_manager;
 	tile_editor::map_blueprint      session;
 	tile_editor::map                map;
 };

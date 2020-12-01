@@ -1,4 +1,0 @@
-beginpolyset
-	file data/bad-045-b.txt
-	id 1
-endpolyset
