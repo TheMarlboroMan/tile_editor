@@ -27,6 +27,10 @@ editor::editor(
 	mouse_pos{0,0}
 {
 
+	message_manager.subscribe("editor", [this](tools::message_manager::notify_event_type _type) {
+
+		receive_message(_type);
+	});
 }
 
 void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) {
@@ -50,7 +54,43 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	}
 
 	/*
-	TODO: Add input movement.
+	typedef  bool (dfw::input::*input_fn)(int) const;
+	input_fn movement_fn=_input.is_input_pressed(input::left_control)
+		? &dfw::input::is_input_down
+		: &dfw::input::is_input_pressed;
+
+	const int factor=_input.is_input_pressed(input::left_control) ? 1 : movement_factor;
+	int movement_x=0,
+		movement_y=0;
+
+	if(std::invoke(movement_fn, _input, input::up)) {
+
+		movement_y=-1*factor;
+	}
+	if(std::invoke(movement_fn, _input, input::down)) {
+
+		movement_y=1*factor;
+	}
+
+	if(std::invoke(movement_fn, _input, input::left)) {
+
+		movement_x=-1*factor;
+	}
+	if(std::invoke(movement_fn, _input, input::right)) {
+
+		movement_x=1*factor;
+	}
+
+	if(movement_x || movement_y) {
+
+		perform_movement(
+			movement_x,
+			movement_y,
+			_input.is_input_pressed(input::resize),
+			_input.is_input_pressed(input::align)
+		);
+		return;
+	}
 	*/
 }
 
@@ -63,21 +103,6 @@ void editor::draw(ldv::screen& _screen, int /*fps*/) {
 }
 
 void editor::draw_messages(ldv::screen& _screen) {
-
-	if(message_manager.size()) {
-
-//TODO: There should be some system of "register me for when a message is added"
-//so we can do callbacks an not this crap at every tick.
-		last_message_rep.set_text(message_manager.last());
-
-		last_message_rep.align(
-			screen_rect,
-			ldv::representation_alignment{
-				ldv::representation_alignment::h::center,
-				ldv::representation_alignment::v::inner_bottom
-			}
-		);
-	}
 
 	last_message_rep.draw(_screen);
 }
@@ -129,42 +154,21 @@ void editor::zoom_out() {
 	}
 }
 
-/*
-	typedef  bool (dfw::input::*input_fn)(int) const;
-	input_fn movement_fn=_input.is_input_pressed(input::left_control)
-		? &dfw::input::is_input_down
-		: &dfw::input::is_input_pressed;
+void editor::receive_message(tools::message_manager::notify_event_type /*_type*/) {
 
-	const int factor=_input.is_input_pressed(input::left_control) ? 1 : movement_factor;
-	int movement_x=0,
-		movement_y=0;
+	if(message_manager.size()) {
 
-	if(std::invoke(movement_fn, _input, input::up)) {
+		last_message_rep.set_text(message_manager.last());
 
-		movement_y=-1*factor;
-	}
-	if(std::invoke(movement_fn, _input, input::down)) {
-
-		movement_y=1*factor;
-	}
-
-	if(std::invoke(movement_fn, _input, input::left)) {
-
-		movement_x=-1*factor;
-	}
-	if(std::invoke(movement_fn, _input, input::right)) {
-
-		movement_x=1*factor;
-	}
-
-	if(movement_x || movement_y) {
-
-		perform_movement(
-			movement_x,
-			movement_y,
-			_input.is_input_pressed(input::resize),
-			_input.is_input_pressed(input::align)
+		last_message_rep.align(
+			screen_rect,
+			ldv::representation_alignment{
+				ldv::representation_alignment::h::center,
+				ldv::representation_alignment::v::inner_bottom
+			}
 		);
-		return;
 	}
-	*/
+	else {
+		last_message_rep.set_text("");
+	}
+}

@@ -32,6 +32,7 @@ class editor:
 	void                        draw_hud(ldv::screen&);
 	void                        zoom_in();
 	void                        zoom_out();
+	void                        receive_message(tools::message_manager::notify_event_type);
 
 	//references...
 	lm::logger&                 log;
