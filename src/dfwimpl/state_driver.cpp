@@ -149,16 +149,28 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 	//[new-controller-mark]
 }
 
-void state_driver::prepare_state(int /*next*/, int /*current*/) {
+void state_driver::prepare_state(int _next, int /*_current*/) {
 
-/*
+	controller::file_browser& fb{* c_file_browser};
+
 	switch(next) {
-		case t_states::state_placeholder:
+		case t_states::state_file_browser:
+
+			//TODO: set the ability to new or not new.
+
 		break;
 		default:
 		break;
 	}
-*/
+
+	switch(_current) {
+
+		case t_states::state_file_browser:
+
+			//TODO: Perform whatever is needed...
+
+		break;
+	}
 }
 
 void state_driver::common_pre_loop_input(dfw::input& input, float _delta) {
