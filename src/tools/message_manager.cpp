@@ -1,11 +1,12 @@
 #include "tools/message_manager.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 using namespace tools;
 
 message_manager::message_manager(
-	int _max_time
+	float _max_time
 ):max_time{_max_time}
 {
 
@@ -14,9 +15,12 @@ message_manager::message_manager(
 void message_manager::add(const std::string& _msg) {
 
 	messages.push_back({_msg, 0.f});
+	notify(notify_event_type::add);
 }
 
 void message_manager::tick(float _delta) {
+
+	auto count=messages.size();
 
 	for(auto& m : messages) {
 
@@ -33,16 +37,22 @@ void message_manager::tick(float _delta) {
 	);
 
 	messages.erase(it, std::end(messages));
+
+	if(count != messages.size()) {
+
+		notify(notify_event_type::expire);
+	}
 }
 
 void message_manager::clear() {
 
 	messages.clear();
+	notify(notify_event_type::clear);
 }
 
 std::vector<std::string> message_manager::get() const {
 
-	std::vector<std::string> result;
+	std::vector<std::string> result(messages.size());
 	std::transform(
 		std::begin(messages),
 		std::end(messages),
@@ -52,6 +62,8 @@ std::vector<std::string> message_manager::get() const {
 			return _msg.message;
 		}
 	);
+
+	std::reverse(std::begin(result), std::end(result));
 
 	return result;
 }
@@ -71,5 +83,36 @@ std::vector<std::string> message_manager::get(std::size_t _count) const {
 
 std::string message_manager::last() const {
 
-	return messages.at(0).message;
+	return messages.back().message;
+}
+
+void message_manager::subscribe(
+	const std::string& _key,
+	message_manager::notify_callback _fn
+) {
+	if(subscribers.count(_key)) {
+
+		throw message_manager_exception(std::string{"subscriber key "}+_key+" already exists");
+	}
+
+	subscribers.emplace(_key, _fn);
+}
+
+void message_manager::unsubscribe(
+	const std::string& _key
+) {
+	if(!subscribers.count(_key)) {
+
+		throw message_manager_exception(std::string{"subscriber key "}+_key+" does not exist");
+	}
+
+	subscribers.erase(_key);
+}
+
+void message_manager::notify(message_manager::notify_event_type _type) {
+
+	for(const auto& ref : subscribers) {
+
+		ref.second(_type);
+	}
 }

@@ -46,6 +46,9 @@ if(${BUILD_TESTS})
 	add_executable(map src/tests/map/main.cpp ${SOURCE})
 	target_link_libraries(map tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
 	add_custom_command(TARGET map POST_BUILD COMMAND cp -r ../src/tests/map/data ./)
+
+	add_executable(message_manager src/tests/tools/message_manager.cpp ${SOURCE})
+	target_link_libraries(message_manager tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
 endif()
 
 #Configure the executable, we want it into the "build directory" and we want all resources copied

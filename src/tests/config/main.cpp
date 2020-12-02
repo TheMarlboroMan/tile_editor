@@ -3,38 +3,14 @@ This file test the configuration file parsers.
 */
 
 #include "parser/blueprint_parser.h"
+#include "../tests.h"
 
 #include <iostream>
 #include <stdexcept>
 #include <map>
 
-void fail(const std::string& _msg);
-void assert(bool _thing, const std::string& _msg);
 void check_thing(const tile_editor::thing_definition_table&, std::size_t, const std::string&, int, int, int, int, int, int, std::size_t);
 void check_poly(const tile_editor::poly_definition_table&, std::size_t, const std::string&, int, int, int, int, std::size_t);
-
-template<typename T> void must_throw(
-	T _whatever,
-	const std::string& _errmsg,
-	const std::string& _type
-) {
-
-	try {
-		_whatever();
-		std::cerr<<"'"<<_type<<"' should have failed..."<<std::endl;
-		std::exit(1);
-	}
-	catch(std::exception &e) {
-
-		if(std::string{e.what()}.find(_errmsg)==std::string::npos) {
-
-			std::cerr<<"expected '"<<_errmsg<<"', got '"<<e.what()<<"'"<<std::endl;
-			std::exit(1);
-		}
-	}
-
-	std::cout<<"caught: "<<_type<<std::endl;
-}
 
 //Generic property content checks.
 template<typename T, typename V>
@@ -857,18 +833,6 @@ endpolyset
 	std::cout<<"done, all good"<<std::endl;
 
 	return 0;
-}
-
-void fail(const std::string& _msg) {
-
-	throw std::runtime_error(_msg);
-}
-
-void assert(bool _thing, const std::string& _msg) {
-
-	if(!_thing) {
-		fail(_msg);
-	}
 }
 
 void check_thing(
