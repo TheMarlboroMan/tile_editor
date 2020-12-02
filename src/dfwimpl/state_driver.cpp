@@ -1,8 +1,8 @@
-#include "../../include/dfwimpl/state_driver.h"
-#include "../../include/input/input.h"
-#include "../../include/controller/states.h"
-#include "../../include/tile_editor/parser/blueprint_parser.h"
-#include "../../include/tile_editor/parser/map_parser.h"
+#include "dfwimpl/state_driver.h"
+#include "input/input.h"
+#include "controller/states.h"
+#include "tile_editor/parser/blueprint_parser.h"
+#include "tile_editor/parser/map_parser.h"
 
 #include <lm/sentry.h>
 #include <tools/string_utils.h>
@@ -63,7 +63,7 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	auto& screen=kernel.get_screen();
 	screen.set_fullscreen(config.bool_from_path("video:fullscreen"));
 
-	ttf_manager.insert("main", 12, "assets/ttf/BebasNeue-Regular.ttf");
+	ttf_manager.insert("main", 14, "assets/ttf/BebasNeue-Regular.ttf");
 }
 
 void state_driver::prepare_audio(dfw::kernel& kernel) {
@@ -88,6 +88,13 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:right")), input::right},
 		{input_description_from_config_token(config.token_from_path("input:up")), input::up},
 		{input_description_from_config_token(config.token_from_path("input:down")), input::down},
+		{input_description_from_config_token(config.token_from_path("input:enter")), input::enter},
+		{input_description_from_config_token(config.token_from_path("input:space")), input::space},
+		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
+		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
+		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
+		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
+		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
 		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
 		{input_description_from_config_token(config.token_from_path("input:zoom_out")), input::zoom_out},
 		{input_description_from_config_token(config.token_from_path("input:left_click")), input::left_click}
@@ -118,7 +125,27 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 	unsigned int    screen_w=config.int_from_path("video:window_w_logical"),
 					screen_h=config.int_from_path("video:window_h_logical");
 
-	reg(c_editor, controller::t_states::state_editor, new controller::editor(log, ttf_manager, message_manager, screen_w, screen_h));
+	reg(
+		c_editor,
+		controller::t_states::state_editor,
+		new controller::editor(
+			log,
+			ttf_manager,
+			message_manager,
+			screen_w,
+			screen_h
+		)
+	);
+
+	reg(
+		c_file_browser,
+		controller::t_states::state_file_browser,
+		new controller::file_browser(
+			log,
+			ttf_manager,
+			screen_h
+		)
+	);
 	//[new-controller-mark]
 }
 

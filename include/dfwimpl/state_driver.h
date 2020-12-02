@@ -8,7 +8,8 @@
 #include <memory>
 
 //Controllers.
-#include "../../include/controller/editor.h"
+#include "controller/editor.h"
+#include "controller/file_browser.h"
 //[new-controller-header-mark]
 
 //Specific app_config
@@ -46,7 +47,8 @@ class state_driver:
 	lm::logger&					log;
 
 	typedef std::unique_ptr<dfw::controller_interface>	ptr_controller;
-	ptr_controller					c_editor;
+	ptr_controller                  c_editor;
+	ptr_controller                  c_file_browser;
 	//[new-controller-property-mark]
 
 	ldtools::ttf_manager            ttf_manager;

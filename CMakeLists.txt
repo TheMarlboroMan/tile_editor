@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(tile_editor)
 
 option(BUILD_TESTS "Build test code" ON)
-option(BUILD_DEBUG "Build a debug release" OFF)
+option(BUILD_DEBUG "Build a debug release" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

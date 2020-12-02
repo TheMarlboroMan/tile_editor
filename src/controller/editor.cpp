@@ -1,7 +1,7 @@
-#include "../../include/controller/editor.h"
+#include "controller/editor.h"
 
 //local
-#include "../../include/input/input.h"
+#include "input/input.h"
 
 using namespace controller;
 
@@ -21,7 +21,7 @@ editor::editor(
 		{0,0}           //at 0.0 in the screen...
 	},
 	last_message_rep{
-		ttf_manager.get("main", 12),
+		ttf_manager.get("main", 14),
 		ldv::rgba8(255, 255, 255, 255),
 	},
 	mouse_pos{0,0}
@@ -37,6 +37,12 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input().is_exit_signal() || _input.is_input_down(input::escape)) {
 		set_leave(true);
+		return;
+	}
+
+	if(_input.is_input_down(input::load)) {
+
+		push_state(state_file_browser);
 		return;
 	}
 
@@ -110,7 +116,7 @@ void editor::draw_messages(ldv::screen& _screen) {
 void editor::draw_hud(ldv::screen& _screen) {
 
 	ldv::ttf_representation txt_hud{
-		ttf_manager.get("main", 12),
+		ttf_manager.get("main", 14),
 		ldv::rgba8(255, 255, 255, 192),
 		""
 	};
