@@ -2,6 +2,15 @@
 
 ## TODO
 
+- Think about the HUD for a bit.
+	- The map contains absolutely NO information on what order the layers
+	are stacked on, which creates interesting display conundrums.
+		- We could change the format for that
+			- Makes sense, actually: all layers are just stacked in a "layers" 	node... We can mostly keep the structure (add type in layer) and the code (just read the type first) but the data structure makes no allowances for this. We would have to make the layers be a vector of pointers to layers so the data structure makes sense.
+		- We could add metadata for that...
+			- Makes sense too: something like "display_order": ["T1", "T2", "P1", "T1"] or just in the meta part: "display_order", 0, maybe "display": true so it can be toggled. It would be a part of the map data structure and should be updated when the data changes. Drawing would be a matter of reading a vector which references the order.
+			- IDEA: I like this one... seems easier to implement in the end than to change what a layer is.
+
 - Setup "grid", draw stuff...
 
 ## Building
