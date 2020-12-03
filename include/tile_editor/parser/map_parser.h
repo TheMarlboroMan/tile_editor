@@ -17,8 +17,6 @@ class map_parser {
 	public:
 
 	using errvector=std::vector<std::string>;
-	using jsondoc=rapidjson::Document;
-	using jsonval=rapidjson::Value;
 
 	map                    parse_file(const std::string&);
 	map                    parse_string(const std::string&);
@@ -26,6 +24,9 @@ class map_parser {
 	const std::string      get_version() const {return version;}
 
 	private:
+
+	using jsondoc=rapidjson::Document;
+	using jsonval=rapidjson::Value;
 
 	struct meta {
 		std::size_t        set;

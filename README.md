@@ -2,10 +2,6 @@
 
 ## TODO
 
-- Setup "save". This is going to hurt... quite a lot:
-	- decide where does VERSION go...
-	- reverse the "map_parser" with to_string(map, version) and to_file(map, version). That's gonna hurt.
-	- do all the motherfucking tests. Which is gonna hurt even more.
 - Setup "grid", draw stuff...
 
 ## Building

@@ -1,4 +1,5 @@
 #include "app/map_saver.h"
+#include "serializer/map_serializer.h"
 
 #include <lm/sentry.h>
 #include <iostream>
@@ -16,12 +17,17 @@ map_saver::map_saver(
 }
 
 void map_saver::save(
-	const tile_editor::map&,
+	const tile_editor::map& _map,
 	const std::string& _filename
 ) {
 
 	lm::log(log, lm::lvl::info)<<"saving map into "<<_filename<<std::endl;
 
+	tile_editor::map_serializer serializer;
+	//TODO: Where does the version reside????
+	serializer.to_file(_map, "1.0,0", _filename);
 
-	//TODO: do your shit, do not forget to log crap!
+	//TODO: Errors and shit, log dem?
+	message_manager.add("map saved");
+	lm::log(log, lm::lvl::info)<<"map saved into "<<_filename<<std::endl;
 }

@@ -8,6 +8,10 @@ set(SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/poly_parser.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/map_parser.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/property_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/exchange_data.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/map_loader.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/map_saver.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/map_serializer.cpp
 	PARENT_SCOPE
 )
 

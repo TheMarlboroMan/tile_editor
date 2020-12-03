@@ -324,6 +324,7 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 			item["p"][0].GetInt(),
 			item["p"][1].GetInt(),
 			//Width and height values are set by default and will be reviewed later when the blueprints are loaded.
+			//TODO: Is this ever done???
 			1,
 			1,
 			(std::size_t)item["t"].GetInt(),

@@ -61,9 +61,7 @@ void editor::awake(dfw::input& /*_input*/) {
 			//Load requested...
 			else {
 
-				tile_editor::map_loader ml{log, message_manager};
-				//TODO: sure, where's the map???
-				ml.load_from_file(exchange_data.file_browser_choice);
+				load_map(exchange_data.file_browser_choice);
 			}
 		}
 	}
@@ -250,7 +248,7 @@ void editor::save_current() {
 void editor::load_map(const std::string& _path) {
 
 	tile_editor::map_loader ml{log, message_manager};
-	ml.load_from_file(_path);
+	map=ml.load_from_file(_path);
 	current_filename=_path;
 }
 
