@@ -2,8 +2,10 @@
 
 ## TODO
 
-- Setup "load" controller.
-- Setup "save" controller. This is going to hurt... quite a lot.
+- Setup "save". This is going to hurt... quite a lot:
+	- decide where does VERSION go...
+	- reverse the "map_parser" with to_string(map, version) and to_file(map, version). That's gonna hurt.
+	- do all the motherfucking tests. Which is gonna hurt even more.
 - Setup "grid", draw stuff...
 
 ## Building
@@ -12,12 +14,10 @@ TODO:
 
 ## How to use
 
-TODO:
 ./editor.out -c #configfile# [-f #mapfile#]
 
 ## Input files
-
-### Session file
+### configfile
 
 Contains:
 
@@ -29,7 +29,7 @@ Contains:
 
 Can be reused along many map files thast share the same building blocks.
 
-### Map file
+### mapfile
 
 Contains
 
@@ -40,14 +40,21 @@ Contains
 - Polygons
 
 ## What are...
-
 ### Templates for map properties
+
+TODO
 
 ### Tilesets
 
+TODO
+
 ### Object sets
 
+TODO
+
 ### Polygon sets
+
+TODO
 
 ## Output file format
 

@@ -24,7 +24,7 @@ class file_browser:
 
 	public:
 
-	                            file_browser(lm::logger&, ldtools::ttf_manager&, app::exchange_data&, int);
+	                            file_browser(lm::logger&, ldtools::ttf_manager&, tile_editor::exchange_data&, int);
 	virtual void                loop(dfw::input&, const dfw::loop_iteration_data&);
 	virtual void                draw(ldv::screen&, int);
 	virtual void                awake(dfw::input& /*input*/);
@@ -83,7 +83,7 @@ class file_browser:
 	//references...
 	lm::logger&                 log;
 	ldtools::ttf_manager&       ttf_manager;
-	app::exchange_data&         exchange_data;
+	tile_editor::exchange_data& exchange_data;
 
 	//properties
 	working_modes				mode;

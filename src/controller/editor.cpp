@@ -2,6 +2,13 @@
 
 //local
 #include "input/input.h"
+#include "app/map_loader.h"
+#include "app/map_saver.h"
+#include "app/map_loader.h"
+#include "tile_editor/parser/blueprint_parser.h"
+
+
+#include <lm/sentry.h>
 
 using namespace controller;
 
@@ -9,7 +16,7 @@ editor::editor(
 	lm::logger& _log,
 	ldtools::ttf_manager& _ttf_manager,
 	tools::message_manager& _message_manager,
-	app::exchange_data& _exchange_data,
+	tile_editor::exchange_data& _exchange_data,
 	unsigned int _screen_w,
 	unsigned int _screen_h
 )
@@ -37,9 +44,28 @@ editor::editor(
 
 void editor::awake(dfw::input& /*_input*/) {
 
+	lm::log(log, lm::lvl::info)<<"map editor controller awakens"<<std::endl;
+
 	if(exchange_data.has(state_editor)) {
 
-		//TODO: Who sent me a message???
+		exchange_data.recover(state_editor);
+		if(exchange_data.file_browser_success) {
+
+			//Save as requested...
+			if(exchange_data.file_browser_allow_create) {
+
+				current_filename=exchange_data.file_browser_choice;
+				lm::log(log, lm::lvl::info)<<"map editor changes current filename to "<<current_filename<<std::endl;
+				save_current();
+			}
+			//Load requested...
+			else {
+
+				tile_editor::map_loader ml{log, message_manager};
+				//TODO: sure, where's the map???
+				ml.load_from_file(exchange_data.file_browser_choice);
+			}
+		}
 	}
 }
 
@@ -54,8 +80,32 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		exchange_data.file_browser_allow_create=false;
 		exchange_data.file_browser_title="Load map file";
+		exchange_data.file_browser_invoker_id=state_editor;
+		exchange_data.put(state_file_browser);
 		push_state(state_file_browser);
 		return;
+	}
+
+	if(_input.is_input_down(input::save)) {
+
+		if(_input.is_input_pressed(input::left_control)) {
+
+			exchange_data.file_browser_allow_create=true;
+			exchange_data.file_browser_title="Save map file as";
+			exchange_data.file_browser_invoker_id=state_editor;
+			exchange_data.put(state_file_browser);
+			push_state(state_file_browser);
+			return;
+		}
+		else {
+
+			if(!current_filename.size()) {
+
+				message_manager.add("cannot save without current filename, use ctrl+s");
+				return;
+			}
+			save_current();
+		}
 	}
 
 	mouse_pos=get_mouse_position(_input);
@@ -189,4 +239,23 @@ void editor::receive_message(tools::message_manager::notify_event_type /*_type*/
 	else {
 		last_message_rep.set_text("");
 	}
+}
+
+void editor::save_current() {
+
+	tile_editor::map_saver ms{log, message_manager};
+	ms.save(map, current_filename);
+}
+
+void editor::load_map(const std::string& _path) {
+
+	tile_editor::map_loader ml{log, message_manager};
+	ml.load_from_file(_path);
+	current_filename=_path;
+}
+
+void editor::load_session(const std::string& _path) {
+
+	tile_editor::blueprint_parser cfp;
+	session=cfp.parse_file(_path);
 }

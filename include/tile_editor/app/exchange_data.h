@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-namespace app {
+namespace tile_editor {
 
 class exchange_data {
 
@@ -30,7 +30,7 @@ class exchange_data {
 
 	private:
 
-	std::map<int, bool>     controller_marks;
+	std::map<int, int>      controller_marks;
 };
 
 }

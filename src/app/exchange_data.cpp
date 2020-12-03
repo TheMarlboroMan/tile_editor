@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-using namespace app;
+using namespace tile_editor;
 
 exchange_data::exchange_data() {
 

@@ -9,6 +9,8 @@
 //local
 #include "input/input.h"
 
+#include <lm/sentry.h>
+
 #include <algorithm>
 
 using namespace controller;
@@ -16,7 +18,7 @@ using namespace controller;
 file_browser::file_browser(
 	lm::logger& plog,
 	ldtools::ttf_manager& _ttfman,
-	app::exchange_data& _exchange_data,
+	tile_editor::exchange_data& _exchange_data,
 	int _window_height
 ):
 log(plog),
@@ -53,21 +55,41 @@ pager{0, 0} {
 
 void file_browser::awake(dfw::input& /*_input*/) {
 
+	lm::log(log, lm::lvl::info)<<"file browser controller awakens from invoker "<<exchange_data.file_browser_invoker_id<<"..."<<std::endl;
+
 	//On awake there must always be something for this controller.
 	exchange_data.recover(state_file_browser);
 
 	if(exchange_data.file_browser_allow_create != allow_create) {
 
 		allow_create=exchange_data.file_browser_allow_create;
+		lm::log(log, lm::lvl::info)<<"file browser changes allow_create to "<<allow_create<<std::endl;
+
 		extract_entries();
 		refresh_list_view();
 		position_selector();
-		compose_title();
 	}
 
 	title=exchange_data.file_browser_title;
 	invoker_id=exchange_data.file_browser_invoker_id;
+
+	compose_title();
 }
+
+void file_browser::solve(bool _result, const std::string& _choice) {
+
+	exchange_data.put(invoker_id);
+	exchange_data.file_browser_success=_result;
+	exchange_data.file_browser_choice=_choice;
+
+	lm::log(log, lm::lvl::info)<<"file browser solves to ["
+		<<exchange_data.file_browser_success
+		<<", "<<exchange_data.file_browser_choice
+		<<"] back to "<<invoker_id<<std::endl;
+
+	pop_state();
+}
+
 
 void file_browser::loop(dfw::input& _input, const dfw::loop_iteration_data& /*lid*/) {
 
@@ -312,12 +334,4 @@ void file_browser::input_create(dfw::input& _input) {
 
 		return solve(true, path.string());
 	}
-}
-
-void file_browser::solve(bool _result, const std::string& _choice) {
-
-	exchange_data.put(invoker_id);
-	exchange_data.file_browser_success=_result;
-	exchange_data.file_browser_choice=_choice;
-	pop_state();
 }

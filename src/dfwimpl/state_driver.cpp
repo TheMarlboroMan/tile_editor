@@ -1,9 +1,6 @@
 #include "dfwimpl/state_driver.h"
 #include "input/input.h"
 #include "controller/states.h"
-#include "tile_editor/parser/blueprint_parser.h"
-#include "tile_editor/parser/map_parser.h"
-
 #include <lm/sentry.h>
 #include <tools/string_utils.h>
 
@@ -92,6 +89,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:space")), input::space},
 		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
 		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
+		{input_description_from_config_token(config.token_from_path("input:left_control")), input::left_control},
 		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
 		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
 		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
@@ -153,26 +151,6 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 
 void state_driver::prepare_state(int /*_next*/, int /*_current*/) {
 
-/*
-	controller::file_browser& fb{* c_file_browser};
-
-	switch(next) {
-		case t_states::state_file_browser:
-
-
-		break;
-		default:
-		break;
-	}
-
-	switch(_current) {
-
-		case t_states::state_file_browser:
-
-
-		break;
-	}
-*/
 }
 
 void state_driver::common_pre_loop_input(dfw::input& input, float _delta) {
@@ -210,39 +188,11 @@ void state_driver::virtualize_input(dfw::input& input) {
 
 void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 
-	//TODO: Should this shit be read outside and fed to the state driver
-	//from main????
-	tile_editor::blueprint_parser cfp;
-	session=cfp.parse_file(_arg_manager.get_following("-c"));
+	auto& editor=static_cast<controller::editor&>(*c_editor);
 
+	editor.load_session(_arg_manager.get_following("-c"));
 	if(_arg_manager.exists("-f") && _arg_manager.arg_follows("-f")) {
 
-		//TODO: This could be a map loader class so we can invoke it here
-		//and from a controller too...
-		
-
-		tile_editor::map_parser mp;
-		map=mp.parse_file(_arg_manager.get_following("-f"));
-
-		for(const auto& msg : mp.get_errors()) {
-
-			lm::log(log, lm::lvl::notice)<<msg<<std::endl;
-			message_manager.add(msg);
-		}
-
-		if(mp.get_errors().size()) {
-
-			message_manager.add("there were errors loading the map, please check the log file");
-		}
-		else {
-
-			std::string msg=std::string{"loaded map with "}
-				+std::to_string(map.tile_layers.size())+" tile layers,"
-				+std::to_string(map.thing_layers.size())+" thing layers,"
-				+std::to_string(map.poly_layers.size())+" polygon layers and "
-				+std::to_string(map.properties.size())+" properties";
-
-			message_manager.add(msg);
-		}
+		editor.load_map(_arg_manager.get_following("-f"));
 	}
 }

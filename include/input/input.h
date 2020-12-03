@@ -16,6 +16,7 @@ load,
 pageup,
 pagedown,
 help,
+left_control,
 zoom_in,
 zoom_out,
 left_click

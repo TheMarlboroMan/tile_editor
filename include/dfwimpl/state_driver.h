@@ -13,8 +13,6 @@
 //[new-controller-header-mark]
 
 //Specific app_config
-#include "blueprint_types/map_blueprint.h"
-#include "editor_types/map.h"
 #include "tools/message_manager.h"
 #include "app/exchange_data.h"
 
@@ -44,8 +42,8 @@ class state_driver:
 	void                        read_app_data(tools::arg_manager&);
 
 	//references
-	dfwimpl::config&				config;
-	lm::logger&					log;
+	dfwimpl::config&                config;
+	lm::logger&                     log;
 
 	typedef std::unique_ptr<dfw::controller_interface>	ptr_controller;
 	ptr_controller                  c_editor;
@@ -54,9 +52,8 @@ class state_driver:
 
 	ldtools::ttf_manager            ttf_manager;
 	tools::message_manager          message_manager;
-	tile_editor::map_blueprint      session;
-	tile_editor::map                map;
-	app::exchange_data              exchange_data;
+	tile_editor::exchange_data      exchange_data;
+
 };
 
 }
