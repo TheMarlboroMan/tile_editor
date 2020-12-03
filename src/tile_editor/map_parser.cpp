@@ -203,13 +203,13 @@ void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
 
 		layer.data.push_back(tile);
 
-		if(item.Size() > 2) {
+		if(item.MemberCount() > 2) {
 
 			errors.push_back("tile layer item has extraneous members that will be skipped");
 		}
 	}
 
-	if(_node.Size() > 2) {
+	if(_node.MemberCount() > 2) {
 
 		errors.push_back("tile layer node has extraneous members that will be skipped");
 	}
@@ -334,13 +334,13 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 
 		layer.data.push_back(thing);
 
-		if(item.Size() > 3) {
+		if(item.MemberCount() > 3) {
 
 			errors.push_back("thing layer item has extraneous members that will be skipped");
 		}
 	}
 
-	if(_node.Size() > 2) {
+	if(_node.MemberCount() > 2) {
 
 		errors.push_back("thing layer node has extraneous members that will be skipped");
 	}
@@ -487,13 +487,13 @@ void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 
 		layer.data.push_back(poly);
 
-		if(item.Size() > 3) {
+		if(item.MemberCount() > 3) {
 
 			errors.push_back("poly layer item has extraneous members that will be skipped");
 		}
 	}
 
-	if(_node.Size() > 2) {
+	if(_node.MemberCount() > 2) {
 
 		errors.push_back("poly layer node has extraneous members that will be skipped");
 	}
@@ -545,7 +545,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 		result.set=_layer["meta"]["set"].GetInt();
 	}
 
-	if(_layer["meta"].Size() > 2) {
+	if(_layer["meta"].MemberCount() > 2) {
 
 		errors.push_back("meta node in layer has extraneous members which will be ignored");
 	}
