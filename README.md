@@ -11,6 +11,15 @@
 			- Makes sense too: something like "display_order": ["T1", "T2", "P1", "T1"] or just in the meta part: "display_order", 0, maybe "display": true so it can be toggled. It would be a part of the map data structure and should be updated when the data changes. Drawing would be a matter of reading a vector which references the order.
 			- IDEA: I like this one... seems easier to implement in the end than to change what a layer is.
 
+	- The HUD should have:
+		- info on the current layer
+		- info on the number of layer we are in
+		- the set selector
+	- Each layer is separate, there's no poly+tile+thing layer, but rather three separate layers.
+	- adding a new layer should either prompt for the type or maybe we could just have shortcuts to add a thing, poly or tile layers.
+	- layers should be able to be rearranged for display.
+	- TODO: A problem, the order of the layers for display might just fuck up different maps between the same application (one goes Thing, Tile, Poly, Tile and the other goes Tile, Tile, Poly, Thing... perhaps layers could have an alias on their meta?, this would do the whole ordering thing easier by having a meta order with just their aliases, it would also make easy to add a new layer with a controller: just add the alias, type, set and shit.
+
 - Setup "grid", draw stuff...
 
 ## Building
