@@ -132,6 +132,7 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 			log,
 			ttf_manager,
 			message_manager,
+			exchange_data,
 			screen_w,
 			screen_h
 		)
@@ -143,20 +144,21 @@ void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
 		new controller::file_browser(
 			log,
 			ttf_manager,
+			exchange_data,
 			screen_h
 		)
 	);
 	//[new-controller-mark]
 }
 
-void state_driver::prepare_state(int _next, int /*_current*/) {
+void state_driver::prepare_state(int /*_next*/, int /*_current*/) {
 
+/*
 	controller::file_browser& fb{* c_file_browser};
 
 	switch(next) {
 		case t_states::state_file_browser:
 
-			//TODO: set the ability to new or not new.
 
 		break;
 		default:
@@ -167,10 +169,10 @@ void state_driver::prepare_state(int _next, int /*_current*/) {
 
 		case t_states::state_file_browser:
 
-			//TODO: Perform whatever is needed...
 
 		break;
 	}
+*/
 }
 
 void state_driver::common_pre_loop_input(dfw::input& input, float _delta) {
@@ -216,7 +218,9 @@ void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 	if(_arg_manager.exists("-f") && _arg_manager.arg_follows("-f")) {
 
 		//TODO: This could be a map loader class so we can invoke it here
-		//and from the outside too.
+		//and from a controller too...
+		
+
 		tile_editor::map_parser mp;
 		map=mp.parse_file(_arg_manager.get_following("-f"));
 

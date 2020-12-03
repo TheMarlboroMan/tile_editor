@@ -198,7 +198,7 @@ void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
 		tile_editor::tile tile{
 			item["p"][0].GetInt(),
 			item["p"][1].GetInt(),
-			item["t"].GetInt()
+			(std::size_t)item["t"].GetInt()
 		};
 
 		layer.data.push_back(tile);
@@ -326,7 +326,7 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 			//Width and height values are set by default and will be reviewed later when the blueprints are loaded.
 			1,
 			1,
-			item["t"].GetInt(),
+			(std::size_t)item["t"].GetInt(),
 			{128,128,128,128}, //default color too.
 			pm
 		};
@@ -480,7 +480,7 @@ void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 
 		tile_editor::poly poly{
 			points,
-			item["t"].GetInt(),
+			(std::size_t)item["t"].GetInt(),
 			pm
 		};
 

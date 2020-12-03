@@ -16,6 +16,7 @@
 #include "blueprint_types/map_blueprint.h"
 #include "editor_types/map.h"
 #include "tools/message_manager.h"
+#include "app/exchange_data.h"
 
 namespace dfwimpl {
 
@@ -55,6 +56,7 @@ class state_driver:
 	tools::message_manager          message_manager;
 	tile_editor::map_blueprint      session;
 	tile_editor::map                map;
+	app::exchange_data              exchange_data;
 };
 
 }

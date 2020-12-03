@@ -3,13 +3,12 @@ This file tests the map file parsers.
 */
 
 #include "parser/map_parser.h"
+#include "../tests.h"
 
 #include <iostream>
 #include <stdexcept>
 #include <map>
 
-void fail(const std::string& _msg);
-void test(bool _thing, const std::string& _msg);
 void must_fail(std::vector<std::string> _errors, const std::string& _errmsg, const std::string& _type);
 void check_tile(const tile_editor::tile&, std::size_t, int, int, int);
 void check_thing(const tile_editor::thing&, std::size_t, int, int, std::size_t, int);
@@ -1290,18 +1289,6 @@ int main(int /*argc*/, char ** /*argv*/) {
 	std::cout<<"all good"<<std::endl;
 
 	return 0;
-}
-
-void fail(const std::string& _msg) {
-
-	throw std::runtime_error(_msg);
-}
-
-void test(bool _thing, const std::string& _msg) {
-
-	if(!_thing) {
-		fail(_msg);
-	}
 }
 
 void must_fail(

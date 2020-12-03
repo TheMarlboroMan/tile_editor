@@ -2,6 +2,7 @@
 
 //local
 #include "states.h"
+#include "app/exchange_data.h"
 
 //framework
 #include <dfw/controller_interface.h>
@@ -23,22 +24,12 @@ class file_browser:
 
 	public:
 
-	                            file_browser(lm::logger&, ldtools::ttf_manager&, int);
+	                            file_browser(lm::logger&, ldtools::ttf_manager&, app::exchange_data&, int);
 	virtual void                loop(dfw::input&, const dfw::loop_iteration_data&);
 	virtual void                draw(ldv::screen&, int);
-	virtual void                awake(dfw::input& /*input*/) {}
+	virtual void                awake(dfw::input& /*input*/);
 	virtual void                slumber(dfw::input& /*input*/) {}
 	virtual bool                can_leave_state() const {return true;}
-
-	//!Sets the allow creation flag, which displays the "create" entry
-	//!Reloads the data.
-	void                        set_allow_create(bool _v);
-	//!Sets the title that appears before the current directory.
-	void                        set_title(const std::string& _title) {title=_title;}
-	//!Returns if this controller exited with a chosen file.
-	bool                        get_result() const {return result;}
-	//!Returns the file that was chosen.
-	std::string                 get_choice() const {return choice;}
 
 	private:
 
@@ -85,10 +76,14 @@ class file_browser:
 	void                        position_selector();
 	//!Void composes the title
 	void                        compose_title();
+	//!Void sets the exchange data...
+	void                        solve(bool, const std::string&);
+
 
 	//references...
 	lm::logger&                 log;
 	ldtools::ttf_manager&       ttf_manager;
+	app::exchange_data&         exchange_data;
 
 	//properties
 	working_modes				mode;
@@ -98,9 +93,7 @@ class file_browser:
 	int                         first_selection_y{0},
 	                            y_selection_factor{0};
 	bool                        allow_create{true}; //!< True if it allows the [new] entry.
-
-	bool                        result{false};
-	std::string                 choice;
+	int                         invoker_id{0}; //!< Stores the id of the invoking controller so packages can be left for it.
 
 	tools::pager                pager;
 

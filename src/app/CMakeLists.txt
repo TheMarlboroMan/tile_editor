@@ -1,0 +1,6 @@
+set(SOURCE
+	${SOURCE}
+	${CMAKE_CURRENT_SOURCE_DIR}/exchange_data.cpp
+	PARENT_SCOPE
+)
+

@@ -9,12 +9,14 @@ editor::editor(
 	lm::logger& _log,
 	ldtools::ttf_manager& _ttf_manager,
 	tools::message_manager& _message_manager,
+	app::exchange_data& _exchange_data,
 	unsigned int _screen_w,
 	unsigned int _screen_h
 )
 	:log(_log),
 	ttf_manager(_ttf_manager),
 	message_manager{_message_manager},
+	exchange_data{_exchange_data},
 	screen_rect{0, 0, _screen_w, _screen_h},
 	camera{
 		screen_rect, //pointing at world 0,0.
@@ -33,6 +35,14 @@ editor::editor(
 	});
 }
 
+void editor::awake(dfw::input& /*_input*/) {
+
+	if(exchange_data.has(state_editor)) {
+
+		//TODO: Who sent me a message???
+	}
+}
+
 void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) {
 
 	if(_input().is_exit_signal() || _input.is_input_down(input::escape)) {
@@ -42,6 +52,8 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::load)) {
 
+		exchange_data.file_browser_allow_create=false;
+		exchange_data.file_browser_title="Load map file";
 		push_state(state_file_browser);
 		return;
 	}

@@ -16,10 +16,12 @@ using namespace controller;
 file_browser::file_browser(
 	lm::logger& plog,
 	ldtools::ttf_manager& _ttfman,
+	app::exchange_data& _exchange_data,
 	int _window_height
 ):
 log(plog),
 ttf_manager{_ttfman},
+exchange_data{_exchange_data},
 mode{working_modes::navigate},
 current_directory{std::filesystem::current_path()},
 pager{0, 0} {
@@ -42,11 +44,29 @@ pager{0, 0} {
 	pager.set_items_per_page(excess_height / y_selection_factor);
 
 	//Setup data...
-	set_title("file browser");
+	title="file browser";
 	extract_entries();
 	refresh_list_view();
 	position_selector();
 	compose_title();
+}
+
+void file_browser::awake(dfw::input& /*_input*/) {
+
+	//On awake there must always be something for this controller.
+	exchange_data.recover(state_file_browser);
+
+	if(exchange_data.file_browser_allow_create != allow_create) {
+
+		allow_create=exchange_data.file_browser_allow_create;
+		extract_entries();
+		refresh_list_view();
+		position_selector();
+		compose_title();
+	}
+
+	title=exchange_data.file_browser_title;
+	invoker_id=exchange_data.file_browser_invoker_id;
 }
 
 void file_browser::loop(dfw::input& _input, const dfw::loop_iteration_data& /*lid*/) {
@@ -186,10 +206,7 @@ void file_browser::input_navigation(dfw::input& _input) {
 	//Cancelling...
 	if(_input.is_input_down(input::escape)) {
 
-		result=false;
-		choice={};
-		pop_state();
-		return;
+		return solve(false, "");
 	}
 
 	//Movement...
@@ -255,11 +272,8 @@ void file_browser::input_navigation(dfw::input& _input) {
 		}
 		else {
 
-			result=true;
 			auto final_path=current_directory/item.path_name;
-			choice=final_path.string();
-			pop_state();
-			return;
+			return solve(true, final_path.string());
 		}
 	}
 }
@@ -290,24 +304,20 @@ void file_browser::input_create(dfw::input& _input) {
 			return;
 		}
 
-		result=true;
-		auto path=current_directory;
-
-		path/=tools::str_trim({_input().get_text_input()});
-		choice=path.string();
-
 		_input().stop_text_input();
 		_input().clear_text_input();
-		pop_state();
-		return;
+
+		auto path=current_directory;
+		path/=tools::str_trim({_input().get_text_input()});
+
+		return solve(true, path.string());
 	}
 }
 
-void file_browser::set_allow_create(bool _v) {
+void file_browser::solve(bool _result, const std::string& _choice) {
 
-	allow_create=_v;
-	extract_entries();
-	refresh_list_view();
-	position_selector();
-	compose_title();
+	exchange_data.put(invoker_id);
+	exchange_data.file_browser_success=_result;
+	exchange_data.file_browser_choice=_choice;
+	pop_state();
 }

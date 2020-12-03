@@ -14,7 +14,7 @@ else()
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_compile_options(-Wall -Wextra -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -Wno-deprecated -ansi -pedantic -fno-rtti)
+add_compile_options(-Wall -Werror -Wextra -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -Wno-deprecated -ansi -pedantic -fno-rtti)
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/tile_editor")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/dfw_impl")
@@ -39,6 +39,7 @@ set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldt
 set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
 
 if(${BUILD_TESTS})
+
 	add_executable(config src/tests/config/main.cpp ${SOURCE})
 	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
 	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
