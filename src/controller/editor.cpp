@@ -7,8 +7,8 @@
 #include "app/map_loader.h"
 #include "tile_editor/parser/blueprint_parser.h"
 
-
 #include <lm/sentry.h>
+#include <ldv/line_representation.h>
 
 using namespace controller;
 
@@ -74,6 +74,11 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	if(_input.is_input_down(input::help)) {
+
+		push_state(state_help);
+	}
+
 	if(_input.is_input_down(input::load)) {
 
 		exchange_data.file_browser_allow_create=false;
@@ -119,13 +124,15 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
-	/*
 	typedef  bool (dfw::input::*input_fn)(int) const;
 	input_fn movement_fn=_input.is_input_pressed(input::left_control)
 		? &dfw::input::is_input_down
 		: &dfw::input::is_input_pressed;
 
-	const int factor=_input.is_input_pressed(input::left_control) ? 1 : movement_factor;
+	const int factor=_input.is_input_pressed(input::left_control) 
+		? 1 
+		: session.grid_data.size;
+
 	int movement_x=0,
 		movement_y=0;
 
@@ -149,15 +156,15 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(movement_x || movement_y) {
 
-		perform_movement(
-			movement_x,
-			movement_y,
-			_input.is_input_pressed(input::resize),
-			_input.is_input_pressed(input::align)
-		);
+		camera.move_by(movement_x, movement_y);
+//		perform_movement(
+//			movement_x,
+//			movement_y,
+//			_input.is_input_pressed(input::resize),
+//			_input.is_input_pressed(input::align)
+//		);
 		return;
 	}
-	*/
 }
 
 void editor::draw(ldv::screen& _screen, int /*fps*/) {
@@ -176,9 +183,66 @@ void editor::draw_messages(ldv::screen& _screen) {
 }
 
 void editor::draw_grid(
-	ldv::screen&
+	ldv::screen& _screen
 ) {
-	//TODO:
+	auto euclidean_module=[](int a, int b) -> int {
+
+		int m=a%b;
+		if(m < 0) {
+			return b < 0 ? m-b : m+b;
+		}
+		return m;
+	};
+
+	auto to_color=[](const tile_editor::color _c) -> ldv::rgba_color {
+
+		return ldv::rgba8(_c.r, _c.g, _c.b, _c.a);
+	};
+
+	const auto& focus=camera.get_focus_box();
+
+	int x_max=focus.origin.x + focus.w;
+	int y_max=focus.origin.y + focus.h;
+
+	//Horizontal lines...
+	int module=euclidean_module(focus.origin.x, session.grid_data.size);
+	int x=focus.origin.x-module;
+	int index=0;
+	while(x < x_max) {
+
+		ldv::line_representation line(
+			{x, focus.origin.y}, 
+			{x, y_max},
+			index % session.grid_data.horizontal_ruler 
+				? to_color(session.grid_data.color)
+				: to_color(session.grid_data.ruler_color)
+		);
+
+		line.draw(_screen, camera);
+
+		x+=session.grid_data.size;
+		++index;
+	}
+
+	//Horizontal lines...
+	module=euclidean_module(focus.origin.y, session.grid_data.size);
+	int y=focus.origin.y-module;
+	index=0;
+	while(y < y_max) {
+
+		ldv::line_representation line(
+			{focus.origin.x, y}, 
+			{x_max, y},
+			index % session.grid_data.vertical_ruler 
+				? to_color(session.grid_data.color)
+				: to_color(session.grid_data.ruler_color)
+		);
+
+		line.draw(_screen, camera);
+
+		y+=session.grid_data.size;
+		++index;
+	}
 }
 
 void editor::draw_layers(ldv::screen& _screen) {
@@ -236,11 +300,10 @@ void editor::draw_layer(
 void editor::draw_hud(ldv::screen& _screen) {
 
 	std::stringstream ss;
-	ss<<mouse_pos.x<<","<<mouse_pos.y;
 
 	if(!map.layers.size()) {
 
-		ss<<" no layers";
+		ss<<"no layers";
 	}
 	else {
 
@@ -265,11 +328,13 @@ void editor::draw_hud(ldv::screen& _screen) {
 		visitor.session=&session;
 		map.layers[current_layer]->accept(visitor);
 
-		ss<<" layer "
+		ss<<"layer "
 			<<" '"<<map.layers[current_layer]->id<<"'"
 			<<visitor.contents
 			<<" "<<(current_layer+1)<<" / "<<map.layers.size();
 	}
+
+	ss<<" "<<mouse_pos.x<<","<<mouse_pos.y<<" zoom:"<<camera.get_zoom();
 
 	ldv::ttf_representation txt_hud{
 		ttf_manager.get("main", 14),

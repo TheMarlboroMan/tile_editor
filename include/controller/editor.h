@@ -12,8 +12,6 @@
 #include <lm/logger.h>
 #include <ldtools/ttf_manager.h>
 
-#include <cmath>
-
 namespace controller {
 
 class editor:
@@ -51,8 +49,6 @@ class editor:
 	tools::message_manager&     message_manager;
 	tile_editor::exchange_data& exchange_data;
 
-	//The editor controller owns both the map and the session. Data input for
-	//specific components can be referenced somewhere else.
 	tile_editor::map_blueprint  session;
 	tile_editor::map            map;
 	ldv::rect                   screen_rect;

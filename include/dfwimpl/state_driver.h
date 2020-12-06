@@ -10,6 +10,7 @@
 //Controllers.
 #include "controller/editor.h"
 #include "controller/file_browser.h"
+#include "../../include/controller/help.h"
 //[new-controller-header-mark]
 
 //Specific app_config
@@ -48,6 +49,7 @@ class state_driver:
 	typedef std::unique_ptr<dfw::controller_interface>	ptr_controller;
 	ptr_controller                  c_editor;
 	ptr_controller                  c_file_browser;
+	ptr_controller					c_help;
 	//[new-controller-property-mark]
 
 	ldtools::ttf_manager            ttf_manager;

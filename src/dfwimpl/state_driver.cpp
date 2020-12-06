@@ -167,6 +167,17 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			screen_h
 		)
 	);
+
+	reg(
+		c_help, 
+		controller::t_states::state_help, 
+		new controller::help{
+			log,
+			ttf_manager,
+			screen_w,
+			screen_h
+		}
+	);
 	//[new-controller-mark]
 }
 

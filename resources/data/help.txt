@@ -1,0 +1,12 @@
+= HELP =
+
+== EDITOR MODE ==
+
+f1 - Help.
+s - save current file
+l - load new file
++ - zoom in
+- - zoom out
+ctrl+s - save to new file
+
+
