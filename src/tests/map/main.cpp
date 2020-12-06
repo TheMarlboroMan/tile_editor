@@ -1132,16 +1132,16 @@ OK missing meta node in layer, skipping layer meta
 
 		check_layer(*map.layers[2], 3, 32, 2, "third", __LINE__);
 
-		check_thing(*map.layers[3], 0, 1, 10, 11, 3, __LINE__);
-		check_component_attribute(*map.layers[4], 0, "some_attribute", 1, __LINE__);
-		check_component_attribute(*map.layers[4], 0, "some_other_attribute", 2.2, __LINE__);
-		check_component_attribute(*map.layers[4], 0, "and_another_one", "yes", __LINE__);
+		check_thing(*map.layers[2], 0, 1, 10, 11, 3, __LINE__);
+		check_component_attribute(*map.layers[2], 0, "some_attribute", 1, __LINE__);
+		check_component_attribute(*map.layers[2], 0, "some_other_attribute", 2.2, __LINE__);
+		check_component_attribute(*map.layers[2], 0, "and_another_one", "yes", __LINE__);
 
-		check_thing(*map.layers[3], 0, 2, 14, 15, 1, __LINE__);
-		check_component_attribute(*map.layers[3], 1, "an_attribute", 2, __LINE__);
+		check_thing(*map.layers[2], 1, 2, 14, 15, 1, __LINE__);
+		check_component_attribute(*map.layers[2], 1, "an_attribute", 2, __LINE__);
 
 		check_layer(*map.layers[3], 4, 64, 1, "fourth", __LINE__);
-		check_thing(*map.layers[4], 0, 3, 16, 17, 0, __LINE__);
+		check_thing(*map.layers[3], 0, 3, 16, 17, 0, __LINE__);
 
 		check_layer(*map.layers[4], 4, 64, 3, "fifth", __LINE__);
 
@@ -1177,18 +1177,18 @@ OK missing meta node in layer, skipping layer meta
 		test(1==map.properties.int_properties["episode"], "invalid episode property");
 		test(1==map.properties.int_properties["map"], "invalid map property");
 
-		check_layer(*map.layers[0], 1, 0, 4, "first", __LINE__);
+		check_layer(*map.layers[0], 1, 0, 4, "background", __LINE__);
 		check_tile(*map.layers[0], 0, 1, 0, 0, __LINE__);
 		check_tile(*map.layers[0], 1, 1, 0, 1, __LINE__);
 		check_tile(*map.layers[0], 2, 1, 0, 2, __LINE__);
 		check_tile(*map.layers[0], 3, 2, 1, 1, __LINE__);
 
-		check_layer(*map.layers[1], 2, 128, 3, "second", __LINE__);
+		check_layer(*map.layers[1], 2, 128, 3, "foreground", __LINE__);
 		check_tile(*map.layers[1], 0, 1, 1, 0, __LINE__);
 		check_tile(*map.layers[1], 1, 1, 1, 1, __LINE__);
 		check_tile(*map.layers[1], 2, 1, 1, 2, __LINE__);
 
-		check_layer(*map.layers[2], 1, 128, 3, "third", __LINE__);
+		check_layer(*map.layers[2], 1, 128, 3, "objects", __LINE__);
 
 		check_thing(*map.layers[2], 0, 1, 32, 32, 2, __LINE__);
 		check_component_attribute(*map.layers[2], 0, "entry_id", 1, __LINE__);
@@ -1200,13 +1200,13 @@ OK missing meta node in layer, skipping layer meta
 		check_component_attribute(*map.layers[2], 1, "map_id", 2, __LINE__);
 		check_component_attribute(*map.layers[2], 1, "entry_id", 1, __LINE__);
 
-		check_thing(*map.layers[3], 2, 2, 32, 128, 4, __LINE__);
-		check_component_attribute(*map.layers[3], 2, "w", 32, __LINE__);
-		check_component_attribute(*map.layers[3], 2, "h", 16, __LINE__);
-		check_component_attribute(*map.layers[3], 2, "map_id", 3, __LINE__);
-		check_component_attribute(*map.layers[3], 2, "entry_id", 1, __LINE__);
+		check_thing(*map.layers[2], 2, 2, 32, 128, 4, __LINE__);
+		check_component_attribute(*map.layers[2], 2, "w", 32, __LINE__);
+		check_component_attribute(*map.layers[2], 2, "h", 16, __LINE__);
+		check_component_attribute(*map.layers[2], 2, "map_id", 3, __LINE__);
+		check_component_attribute(*map.layers[2], 2, "entry_id", 1, __LINE__);
 
-		check_layer(*map.layers[3], 1, 128, 1, "fourth", __LINE__);
+		check_layer(*map.layers[3], 1, 128, 1, "polygons", __LINE__);
 
 		check_poly(*map.layers[3], 0, 1, {{32,32}, {64,32}, {64,128}, {32,128}}, 1, __LINE__);
 		check_component_attribute(*map.layers[3], 0, "path_speed", 2.1, __LINE__);
