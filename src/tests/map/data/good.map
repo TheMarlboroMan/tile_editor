@@ -7,9 +7,11 @@
 		"episode":1,
 		"map":1
 	},
-	"tiles":[
+	"layers":[
 		{
 			"meta": {
+				"id":"background",
+				"type":"tiles",
 				"set": 1,
 				"alpha": 0
 			},
@@ -34,6 +36,8 @@
 		},
 		{
 			"meta": {
+				"id":"foreground",
+				"type":"tiles",
 				"set":2,
 				"alpha": 128
 			},
@@ -51,11 +55,11 @@
 					"p":[1, 2]
 				}
 			]
-		}
-	],
-	"things":[
+		},
 		{
 			"meta": {
+				"id":"objects",
+				"type":"things",
 				"set": 1,
 				"alpha": 128
 			},
@@ -89,11 +93,11 @@
 					}
 				}
 			]
-		}
-	],
-	"polys":[
+		},
 		{
 			"meta": {
+				"id":"polygons",
+				"type":"polys",
 				"set": 1,
 				"alpha": 128
 			},

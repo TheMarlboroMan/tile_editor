@@ -26,9 +26,7 @@ std::string map_serializer::to_string(
 
 	put_meta(doc, _version);
 	put_attributes(doc, _map);
-	put_tiles(doc, _map);
-	put_things(doc, _map);
-	put_polys(doc, _map);
+	put_layers(doc, _map);
 
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -36,11 +34,38 @@ std::string map_serializer::to_string(
 	return buffer.GetString();
 }
 
+void map_serializer::put_layers(
+	jsondoc& _doc, 
+	const tile_editor::map& _map
+) {
+
+	struct serializer_visitor:
+		public layer_visitor {
+
+		map_serializer *   serializer{nullptr};
+		jsonval *          layers{nullptr};
+		jsondoc *          doc{nullptr}; 
+		virtual void       visit(tile_layer& _layer) {serializer->put_tile_layer(*doc, *layers, _layer);}
+		virtual void       visit(thing_layer& _layer) {serializer->put_thing_layer(*doc, *layers, _layer);}
+		virtual void       visit(poly_layer& _layer) {serializer->put_poly_layer(*doc, *layers, _layer);}
+	};
+
+	jsonval layers{rapidjson::kArrayType};
+	serializer_visitor sv;
+	sv.serializer=this;
+	sv.layers=&layers;
+	sv.doc=&_doc;
+
+	for(const auto& layer : _map.layers) {
+
+		layer->accept(sv);
+	}
+}
+
 void map_serializer::put_meta(
 	jsondoc& _doc,
 	const std::string& _version
 ) {
-
 	jsondoc meta{rapidjson::kObjectType};
 
 	auto& allocator=_doc.GetAllocator();
@@ -91,19 +116,6 @@ void map_serializer::put_attributes(
 	_doc.AddMember("attributes", attributes, allocator);
 }
 
-void map_serializer::put_tiles(
-	jsondoc& _doc,
-	const tile_editor::map& _map
-) {
-	jsonval tiles{rapidjson::kArrayType};
-	for(const auto& layer : _map.tile_layers) {
-
-		put_tile_layer(_doc, tiles, layer);
-	}
-
-	_doc.AddMember("tiles", tiles, _doc.GetAllocator());
-}
-
 void map_serializer::put_tile_layer(
 	jsondoc& _doc,
 	jsonval& _container,
@@ -116,6 +128,8 @@ void map_serializer::put_tile_layer(
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
+	meta.AddMember("type", "tiles", allocator);
+	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
 
 	//Add data...
 	jsonval data{rapidjson::kArrayType};
@@ -139,19 +153,6 @@ void map_serializer::put_tile_layer(
 }
 
 
-void map_serializer::put_things(
-	jsondoc& _doc,
-	const tile_editor::map& _map
-) {
-	jsonval things{rapidjson::kArrayType};
-	for(const auto& layer : _map.thing_layers) {
-
-		put_thing_layer(_doc, things, layer);
-	}
-
-	_doc.AddMember("things", things, _doc.GetAllocator());
-}
-
 void map_serializer::put_thing_layer(
 	jsondoc& _doc,
 	jsonval& _container,
@@ -164,6 +165,8 @@ void map_serializer::put_thing_layer(
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
+	meta.AddMember("type", "things", allocator);
+	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
 
 	//Add data...
 	jsonval data{rapidjson::kArrayType};
@@ -218,20 +221,6 @@ void map_serializer::put_thing_layer(
 	_container.GetArray().PushBack(layer, allocator);
 }
 
-
-void map_serializer::put_polys(
-	jsondoc& _doc,
-	const tile_editor::map& _map
-) {
-	jsonval polys{rapidjson::kArrayType};
-	for(const auto& layer : _map.poly_layers) {
-
-		put_poly_layer(_doc, polys, layer);
-	}
-
-	_doc.AddMember("polys", polys, _doc.GetAllocator());
-}
-
 void map_serializer::put_poly_layer(
 	jsondoc& _doc,
 	jsonval& _container,
@@ -244,6 +233,9 @@ void map_serializer::put_poly_layer(
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
+	meta.AddMember("type", "polys", allocator);
+	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
+
 	//Add data...
 	jsonval data{rapidjson::kArrayType};
 	for(const auto& entry : _layer.data) {

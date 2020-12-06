@@ -14,7 +14,8 @@ else()
 	set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_compile_options(-Wall -Werror -Wextra -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -Wno-deprecated -ansi -pedantic -fno-rtti)
+#-Werror
+add_compile_options(-Wall -Wextra -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -Wno-deprecated -ansi -pedantic -fno-rtti)
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/tile_editor")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/dfw_impl")
@@ -41,15 +42,15 @@ set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
 if(${BUILD_TESTS})
 
 	add_executable(config src/tests/config/main.cpp ${SOURCE})
-	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
+	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
 
 	add_executable(map src/tests/map/main.cpp ${SOURCE})
-	target_link_libraries(map tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
+	target_link_libraries(map tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 	add_custom_command(TARGET map POST_BUILD COMMAND cp -r ../src/tests/map/data ./)
 
 	add_executable(message_manager src/tests/tools/message_manager.cpp ${SOURCE})
-	target_link_libraries(message_manager tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL)
+	target_link_libraries(message_manager tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 endif()
 
 #Configure the executable, we want it into the "build directory" and we want all resources copied

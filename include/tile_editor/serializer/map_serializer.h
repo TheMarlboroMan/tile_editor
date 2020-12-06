@@ -27,11 +27,9 @@ class map_serializer {
 
 	void                    put_meta(jsondoc&, const std::string&);
 	void                    put_attributes(jsondoc&, const tile_editor::map&);
-	void                    put_tiles(jsondoc&, const tile_editor::map&);
+	void                    put_layers(jsondoc&, const tile_editor::map&);
 	void                    put_tile_layer(jsondoc&, jsonval&, const tile_editor::tile_layer&);
-	void                    put_things(jsondoc&, const tile_editor::map&);
 	void                    put_thing_layer(jsondoc&, jsonval&, const tile_editor::thing_layer&);
-	void                    put_polys(jsondoc&, const tile_editor::map&);
 	void                    put_poly_layer(jsondoc&, jsonval&, const tile_editor::poly_layer&);
 
 	errvector               errors;

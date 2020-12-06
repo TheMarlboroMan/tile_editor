@@ -4,9 +4,6 @@
 #include <tools/file_utils.h>
 #include <stdexcept>
 
-//TODO: Erase...
-#include <iostream>
-
 using namespace tile_editor;
 
 map map_parser::parse_file(const std::string& _filename) {
@@ -41,9 +38,7 @@ map map_parser::parse_string(const std::string& _contents) {
 
 		parse_meta(doc);
 		parse_attributes(doc, result);
-		parse_tiles(doc, result);
-		parse_things(doc, result);
-		parse_polys(doc, result);
+		parse_layers(doc, result);
 	}
 	//Can only be thrown in parse_json_string.
 	catch(tools::parse_json_string_exception& e) {
@@ -107,27 +102,56 @@ void map_parser::parse_attributes(const jsondoc& _doc, map& _map) {
 	parse_attributes(_doc["attributes"], _map.properties);
 }
 
-void map_parser::parse_tiles(const jsondoc& _doc, map& _map) {
+void map_parser::parse_layers(
+	const jsondoc& _doc, 
+	map& _map
+) {
 
-	if(!_doc.HasMember("tiles")) {
+	if(!_doc.HasMember("layers")) {
 
-		errors.push_back("no 'tiles' node found, tiles will be skipped");
+		errors.push_back("no 'layers' node found, layers will be skipped");
 		return;
 	}
 
-	if(!_doc["tiles"].IsArray()) {
+	if(!_doc["layers"].IsArray()) {
 
-		errors.push_back("'tiles' node must be an array, tiles will be skipped");
+		errors.push_back("'layers' node must be an array, layers will be skipped");
 		return;
 	}
 
-	for(const auto& item : _doc["tiles"].GetArray()) {
+	for(const auto& node : _doc["layers"].GetArray()) {
 
-		parse_tile_layer(item, _map);
+		if(!node.IsObject()) {
+
+			errors.push_back("layer must be an object, cannot locate meta, skipping layer meta");
+			continue;
+		}
+
+		auto metadata=parse_meta_node(node);
+
+		switch(metadata.type) {
+			case meta::types::bad:
+				continue;
+			case meta::types::tiles:
+				parse_tile_layer(node, metadata, _map);
+			break;
+
+			case meta::types::things:
+				parse_thing_layer(node, metadata, _map);
+			break;
+
+			case meta::types::polys:
+				parse_poly_layer(node, metadata, _map);
+			break;
+		}
 	}
 }
 
-void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
+void map_parser::parse_tile_layer(
+	const jsonval& _node, 
+	const meta& _meta, 
+	map& _map
+) {
 
 	if(!_node.IsObject()) {
 
@@ -135,15 +159,13 @@ void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
 		return;
 	}
 
-	auto metadata=parse_meta_node(_node);
-
 	if(!check_data_node(_node, "tile")) {
 
 		return;
 	}
 
 	//create the layer.
-	tile_layer layer{metadata.set, metadata.alpha, {}};
+	tile_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
 
 	//iterate on its items.
 	for(const auto& item : _node["data"].GetArray()) {
@@ -215,30 +237,16 @@ void map_parser::parse_tile_layer(const jsonval& _node, map& _map) {
 	}
 
 	//Add the layer to the map.
-	_map.tile_layers.push_back(std::move(layer));
+	_map.layers.emplace_back(
+		map::layerptr{new tile_layer{std::move(layer)}}
+	);
 }
 
-void map_parser::parse_things(const jsondoc& _doc, map& _map) {
-
-	if(!_doc.HasMember("things")) {
-
-		errors.push_back("no 'things' node found, things will be skipped");
-		return;
-	}
-
-	if(!_doc["things"].IsArray()) {
-
-		errors.push_back("'things' node must be an array, things will be skipped");
-		return;
-	}
-
-	for(const auto& item : _doc["things"].GetArray()) {
-
-		parse_thing_layer(item, _map);
-	}
-}
-
-void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
+void map_parser::parse_thing_layer(
+	const jsonval& _node, 
+	const meta& _meta,
+	map& _map
+) {
 
 	if(!_node.IsObject()) {
 
@@ -246,14 +254,12 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 		return;
 	}
 
-	auto metadata=parse_meta_node(_node);
-
 	if(!check_data_node(_node, "thing")) {
 
 		return;
 	}
 
-	thing_layer layer{metadata.set, metadata.alpha, {}};
+	thing_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -345,32 +351,16 @@ void map_parser::parse_thing_layer(const jsonval& _node, map& _map) {
 		errors.push_back("thing layer node has extraneous members that will be skipped");
 	}
 
-	//Add the layer to the map.
-	_map.thing_layers.push_back(std::move(layer));
+	_map.layers.emplace_back(
+		map::layerptr{new thing_layer{std::move(layer)}}
+	);
 }
 
-void map_parser::parse_polys(const jsondoc& _doc, map& _map) {
-
-	if(!_doc.HasMember("polys")) {
-
-		errors.push_back("no 'polys' node found, polys will be skipped");
-		return;
-	}
-
-	if(!_doc["polys"].IsArray()) {
-
-		errors.push_back("'polys' node must be an array, polys will be skipped");
-		return;
-	}
-
-	for(const auto& item : _doc["polys"].GetArray()) {
-
-		parse_poly_layer(item, _map);
-	}
-
-}
-
-void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
+void map_parser::parse_poly_layer(
+	const jsonval& _node, 
+	const meta& _meta,
+	map& _map
+) {
 
 	if(!_node.IsObject()) {
 
@@ -378,14 +368,12 @@ void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 		return;
 	}
 
-	auto metadata=parse_meta_node(_node);
-
 	if(!check_data_node(_node, "poly")) {
 
 		return;
 	}
 
-	poly_layer layer{metadata.set, metadata.alpha, {}};
+	poly_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -424,7 +412,6 @@ void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 			continue;
 		}
 
-		//BEGIN TODO.
 		std::vector<tile_editor::poly_point> points;
 		bool must_skip=false;
 		for(const auto& point : item["p"].GetArray()) {
@@ -498,8 +485,9 @@ void map_parser::parse_poly_layer(const jsonval& _node, map& _map) {
 		errors.push_back("poly layer node has extraneous members that will be skipped");
 	}
 
-	//Add the layer to the map.
-	_map.poly_layers.push_back(std::move(layer));
+	_map.layers.emplace_back(
+		map::layerptr{new poly_layer{std::move(layer)}}
+	);
 }
 
 map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
@@ -507,45 +495,108 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 	if(!_layer.HasMember("meta")) {
 
 		errors.push_back("missing meta node in layer, skipping layer meta");
-		return {0,0};
+		return {0,0, generate_default_id(), meta::types::bad};
 	}
 
 	if(!_layer["meta"].IsObject()) {
 
 		errors.push_back("meta node in layer must be an object, skipping layer meta");
-		return {0,0};
+		return {0,0, generate_default_id(), meta::types::bad};
 	}
 
-	meta result{0,0};
-
-	auto can_be_extracted=[this, &_layer](const std::string& _key) -> bool {
+	auto node_exists=[this, &_layer](const std::string& _key) -> bool {
 
 		if(!_layer["meta"].HasMember(_key.c_str())) {
 
-			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default set will be used");
-			return false;
-		}
-
-		if(!_layer["meta"][_key.c_str()].IsInt()) {
-
-			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default set will be used");
+			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default will be used");
 			return false;
 		}
 
 		return true;
 	};
 
-	if(can_be_extracted("alpha")) {
+	auto int_can_be_extracted=[this, &_layer, node_exists](const std::string& _key) -> bool {
+
+		if(!node_exists(_key)) {
+
+			return false;
+		}
+
+		if(!_layer["meta"][_key.c_str()].IsInt()) {
+
+			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default will be used");
+			return false;
+		}
+
+		return true;
+	};
+
+	auto string_can_be_extracted=[this, &_layer, node_exists](const std::string& _key) -> bool {
+
+		if(!node_exists(_key)) {
+
+			return false;
+		}
+
+		if(!_layer["meta"][_key.c_str()].IsString()) {
+
+			errors.push_back(std::string{"meta:"}+_key+" node is not a string, a default will be used");
+			return false;
+		}
+
+		std::string val{_layer["meta"][_key.c_str()].GetString()};
+		if(!val.size()) {
+
+			errors.push_back(std::string{"meta:"}+_key+" is an empty string, a default will be used");
+			return false;
+		}
+
+		return true;
+	};
+
+	if(!string_can_be_extracted("type")) {
+
+		errors.push_back("meta node does not contain type: cannot be parsed");
+		return {0,0, "", meta::types::bad};
+	}
+
+	std::string strtype{_layer["meta"]["type"].GetString()};
+	meta::types type{meta::types::bad};
+
+	if(strtype=="tiles") {
+
+		type=meta::types::tiles;
+	}
+	else if(strtype=="things") {
+
+		type=meta::types::things;
+	}
+	else if(strtype=="polys") {
+
+		type=meta::types::polys;
+	}
+	else {
+
+		errors.push_back(std::string{"unkown meta node type '"}+strtype+"', cannot be parsed");
+		return {0,0, "", meta::types::bad};
+	}
+
+	meta result{0,0, "", type};
+	if(int_can_be_extracted("alpha")) {
 
 		result.alpha=_layer["meta"]["alpha"].GetInt();
 	}
 
-	if(can_be_extracted("set")) {
+	if(int_can_be_extracted("set")) {
 
 		result.set=_layer["meta"]["set"].GetInt();
 	}
 
-	if(_layer["meta"].MemberCount() > 2) {
+	result.id=string_can_be_extracted("id")
+		? _layer["meta"]["id"].GetString()
+		: generate_default_id();
+
+	if(_layer["meta"].MemberCount() > 4) {
 
 		errors.push_back("meta node in layer has extraneous members which will be ignored");
 	}
@@ -569,7 +620,6 @@ bool map_parser::check_data_node(const jsonval& _node, const std::string& _type)
 
 	return true;
 }
-
 
 void map_parser::parse_attributes(const jsonval& _item, tile_editor::property_manager& _pm) {
 
@@ -598,4 +648,10 @@ void map_parser::parse_attributes(const jsonval& _item, tile_editor::property_ma
 			errors.push_back(std::string{"invalid data type in attribute, skipping property '"}+propname+"'");
 		}
 	}
+}
+
+std::string map_parser::generate_default_id() {
+
+	std::string result{"default_id_"};
+	return result+std::to_string(++default_id_count);
 }

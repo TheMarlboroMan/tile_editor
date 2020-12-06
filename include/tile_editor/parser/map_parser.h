@@ -29,24 +29,27 @@ class map_parser {
 	using jsonval=rapidjson::Value;
 
 	struct meta {
+		enum class types{tiles, things, polys, bad};
 		std::size_t        set;
 		int                alpha;
+		std::string        id;
+		types              type;
 	};
 
 	void                   parse_meta(const jsondoc&);
 	void                   parse_attributes(const jsondoc&, map&);
-	void                   parse_tiles(const jsondoc&, map&);
-	void                   parse_tile_layer(const jsonval&, map&);
-	void                   parse_things(const jsondoc&, map&);
-	void                   parse_thing_layer(const jsonval&, map&);
-	void                   parse_polys(const jsondoc&, map&);
-	void                   parse_poly_layer(const jsonval&, map&);
+	void                   parse_layers(const jsondoc&, map&);
+	void                   parse_tile_layer(const jsonval&, const meta&, map&);
+	void                   parse_thing_layer(const jsonval&, const meta&, map&);
+	void                   parse_poly_layer(const jsonval&, const meta&, map&);
 	meta                   parse_meta_node(const jsonval&);
 	bool                   check_data_node(const jsonval&, const std::string&);
 	void                   parse_attributes(const jsonval&, tile_editor::property_manager&);
+	std::string            generate_default_id();
 
 	errvector              errors;
 	std::string            version;
+	int                    default_id_count{0};
 };
 
 }

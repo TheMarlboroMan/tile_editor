@@ -10,9 +10,11 @@
 		"special_effects": 12,
 		"gravity_factor": 1.2
 	},
-	"tiles":[
+	"layers":[
 		{
 			"meta": {
+				"id":"first",
+				"type":"tiles",
 				"set": 1,
 				"alpha": 0
 			},
@@ -29,6 +31,8 @@
 		},
 		{
 			"meta": {
+				"id":"second",
+				"type":"tiles",
 				"set":2,
 				"alpha": 128
 			},
@@ -43,11 +47,11 @@
 				}
 			]
 		},
-		{"skip":"me"}
-	],
-	"things":[
+		{"skip":"me"},
 		{
 			"meta": {
+				"type":"things",
+				"id":"third",
 				"set": 3,
 				"alpha": 32
 			},
@@ -72,6 +76,8 @@
 		},
 		{
 			"meta": {
+				"type":"things",
+				"id":"fourth",
 				"set":4,
 				"alpha": 64
 			},
@@ -87,11 +93,11 @@
 				}
 			]
 		},
-		{"skip":"me"}
-	],
-	"polys":[
+		{"skip":"me"},
 		{
 			"meta": {
+				"id":"fifth",
+				"type":"polys",
 				"set": 4,
 				"alpha": 64
 			},
@@ -121,6 +127,8 @@
 		},
 		{
 			"meta": {
+				"type":"polys",
+				"id":"sixth",
 				"set":5,
 				"alpha": 128
 			},

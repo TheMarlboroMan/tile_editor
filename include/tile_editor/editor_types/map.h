@@ -6,18 +6,16 @@
 #include "../editor_types/property_manager.h"
 
 #include <vector>
+#include <memory>
 
 namespace tile_editor {
 
-//!An in-editor map, the container for tiles and things, plus all of its
-//!properties.
+//!An in-editor map.
 struct map {
 
-	std::vector<tile_layer>         tile_layers;
-	std::vector<thing_layer>        thing_layers;
-	std::vector<poly_layer>         poly_layers;
+	using layerptr=std::unique_ptr<layer>;
+	std::vector<layerptr>           layers;
 	property_manager                properties;
-
 };
 
 }

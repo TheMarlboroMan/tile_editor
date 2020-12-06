@@ -6,9 +6,11 @@
 		"name": "entryway",
 		"map_id": 1
 	},
-	"tiles": [
+	"layers": [
 		{
 			"meta": {
+				"id":"background",
+				"type":"tiles",
 				"set": 1,
 				"alpha": 0
 			},
@@ -45,6 +47,8 @@
 		},
 		{
 			"meta": {
+				"id":"foreground",
+				"type":"tiles",
 				"set": 2,
 				"alpha": 128
 			},
@@ -71,11 +75,11 @@
 					]
 				}
 			]
-		}
-	],
-	"things": [
+		},
 		{
 			"meta": {
+				"id":"things",
+				"type":"things",
 				"set": 1,
 				"alpha": 128
 			},
@@ -118,11 +122,11 @@
 					}
 				}
 			]
-		}
-	],
-	"polys": [
+		},
 		{
 			"meta": {
+				"id":"shapes",
+				"type":"polys",
 				"set": 1,
 				"alpha": 128
 			},
