@@ -3,16 +3,9 @@
 ## TODO
 
 - Think about the HUD for a bit.
-	- The HUD should have:
-		- info on the current layer
-		- info on the number of layer we are in
-		- the set selector
-	- Each layer is separate, there's no poly+tile+thing layer, but rather three separate layers.
-	- adding a new layer should either prompt for the type or maybe we could just have shortcuts to add a thing, poly or tile layers.
-	- layers should be able to be rearranged for display.
-	- TODO: A problem, the order of the layers for display might just fuck up different maps between the same application (one goes Thing, Tile, Poly, Tile and the other goes Tile, Tile, Poly, Thing... perhaps layers could have an alias on their meta?, this would do the whole ordering thing easier by having a meta order with just their aliases, it would also make easy to add a new layer with a controller: just add the alias, type, set and shit.
-
-- Setup "grid", draw stuff...
+- Add help controller.
+- Setup "grid", draw layers from the one we are in onwards.
+- Check that it saves stuff.
 
 ## Building
 
@@ -92,6 +85,8 @@ TODO
 	- Hacked the life away to support png alpha.
 - 7-8-2017: Changes.
 	- Added the possibility to change the size of logic objects... This actually has consequences in many places (loaders, exporters, logic editor...).
+- 2020: Refactor.
+	- Complete refactor, backwards compatibility breaking.
 
 ## Credits
 

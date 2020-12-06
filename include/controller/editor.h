@@ -35,6 +35,11 @@ class editor:
 	ldt::point_2d<int>          get_mouse_position(dfw::input&) const;
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
+	void                        draw_grid(ldv::screen&);
+	void                        draw_layers(ldv::screen&);
+	void                        draw_layer(ldv::screen&, const tile_editor::tile_layer&);
+	void                        draw_layer(ldv::screen&, const tile_editor::thing_layer&);
+	void                        draw_layer(ldv::screen&, const tile_editor::poly_layer&);
 	void                        zoom_in();
 	void                        zoom_out();
 	void                        save_current();
@@ -55,6 +60,7 @@ class editor:
 	ldv::ttf_representation     last_message_rep;
 	ldt::point_2d<int>			mouse_pos;
 	std::string                 current_filename;
+	std::size_t	                current_layer{0};
 
 };
 }

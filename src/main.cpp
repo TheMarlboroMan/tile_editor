@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 
 	if(!carg.exists("-c") || !carg.arg_follows("-c")) {
 
-		std::cerr<<"./tile_editor -c #config_file#"<<std::endl;
+		std::cerr<<"./tile_editor -c config_file [-f filename] [-w 200x200]"<<std::endl;
 		return 1;
 	}
 

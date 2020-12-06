@@ -7,14 +7,20 @@
 
 using namespace tile_editor;
 
-void map_serializer::to_file(
+bool map_serializer::to_file(
 	const tile_editor::map& _map,
 	const std::string& _version,
 	const std::string& _filename
 ) {
 
 	std::ofstream file{_filename};
+	if(!file) {
+
+		return false;
+	}
+
 	file<<this->to_string(_map, _version);
+	return true;
 }
 
 std::string map_serializer::to_string(

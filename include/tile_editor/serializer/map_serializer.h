@@ -15,7 +15,7 @@ class map_serializer {
 
 	using errvector=std::vector<std::string>;
 
-	void                    to_file(const tile_editor::map&, const std::string&, const std::string&);
+	bool                    to_file(const tile_editor::map&, const std::string&, const std::string&);
 	std::string             to_string(const tile_editor::map&, const std::string&);
 
 	const errvector&        get_errors() const {return errors;}

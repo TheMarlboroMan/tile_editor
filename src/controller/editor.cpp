@@ -162,8 +162,10 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 void editor::draw(ldv::screen& _screen, int /*fps*/) {
 
-	_screen.clear(ldv::rgba8(0, 0, 0, 255));
+	_screen.clear(ldv::rgba8(session.bg_color.r, session.bg_color.g, session.bg_color.b, session.bg_color.a));
 
+	draw_grid(_screen);
+	draw_layers(_screen);
 	draw_messages(_screen);
 	draw_hud(_screen);
 }
@@ -173,7 +175,101 @@ void editor::draw_messages(ldv::screen& _screen) {
 	last_message_rep.draw(_screen);
 }
 
+void editor::draw_grid(
+	ldv::screen&
+) {
+	//TODO:
+}
+
+void editor::draw_layers(ldv::screen& _screen) {
+
+	struct draw_layer_visitor:tile_editor::const_layer_visitor {
+
+		ldv::screen * screen{nullptr};
+		editor * controller{nullptr};
+
+		void visit(const tile_editor::tile_layer& _layer) {
+			controller->draw_layer(*screen, _layer);
+		}
+
+		void visit(const tile_editor::thing_layer& _layer) {
+			controller->draw_layer(*screen, _layer);
+		}
+
+		void visit(const tile_editor::poly_layer& _layer) {
+			controller->draw_layer(*screen, _layer);
+		}
+	} visitor;
+
+	visitor.screen=&_screen;
+	visitor.controller=this;
+
+	for(const auto& layer : map.layers) {
+		layer->accept(visitor);
+	}
+}
+
+void editor::draw_layer(
+	ldv::screen&, 
+	const tile_editor::tile_layer&
+) {
+
+	//TODO:
+}
+
+void editor::draw_layer(
+	ldv::screen&, 
+	const tile_editor::thing_layer&
+) {
+
+	//TODO:
+}
+
+void editor::draw_layer(
+	ldv::screen&, 
+	const tile_editor::poly_layer&
+) {
+
+	//TODO:
+}
+
 void editor::draw_hud(ldv::screen& _screen) {
+
+	std::stringstream ss;
+	ss<<mouse_pos.x<<","<<mouse_pos.y;
+
+	if(!map.layers.size()) {
+
+		ss<<" no layers";
+	}
+	else {
+
+		struct draw_layer_hud_visitor:tile_editor::const_layer_visitor {
+
+			tile_editor::map_blueprint * session{nullptr};
+			std::string contents;
+
+			void visit(const tile_editor::tile_layer& _layer) {
+				contents=std::string{" type: tile, set: "}+session->tilesets[_layer.set].name;
+			}
+
+			void visit(const tile_editor::thing_layer& _layer) {
+				contents=std::string{" type: thing, set: "}+session->thingsets[_layer.set].name;
+			}
+
+			void visit(const tile_editor::poly_layer& _layer) {
+				contents=std::string{" type: poly, set: "}+session->polysets[_layer.set].name;
+			}
+		} visitor;
+
+		visitor.session=&session;
+		map.layers[current_layer]->accept(visitor);
+
+		ss<<" layer "
+			<<" '"<<map.layers[current_layer]->id<<"'"
+			<<visitor.contents
+			<<" "<<(current_layer+1)<<" / "<<map.layers.size();
+	}
 
 	ldv::ttf_representation txt_hud{
 		ttf_manager.get("main", 14),
@@ -181,9 +277,8 @@ void editor::draw_hud(ldv::screen& _screen) {
 		""
 	};
 
-	std::string txt=std::to_string(mouse_pos.x)+","+std::to_string(mouse_pos.y);
 	txt_hud.go_to({0,0});
-	txt_hud.set_text(txt);
+	txt_hud.set_text(ss.str());
 	txt_hud.draw(_screen);
 }
 
@@ -241,8 +336,16 @@ void editor::receive_message(tools::message_manager::notify_event_type /*_type*/
 
 void editor::save_current() {
 
-	tile_editor::map_saver ms{log, message_manager};
-	ms.save(map, current_filename);
+	tile_editor::map_saver ms{log};
+
+	if(!ms.save(map, current_filename)) {
+		
+		message_manager.add("could not save map!");
+	}
+	else {
+
+		message_manager.add("map saved");
+	}
 }
 
 void editor::load_map(const std::string& _path) {

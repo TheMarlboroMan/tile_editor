@@ -34,11 +34,9 @@
 		"double_buffer":1,
 		"fullscreen":false,
 		"vsync":false,
-		"window_h_logical":600,
 		"window_h_px":600,
 		"window_show_cursor":true,
 		"window_title":"Tile Editor",
-		"window_w_logical":800,
 		"window_w_px":800
 	}
 }

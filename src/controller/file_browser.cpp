@@ -326,11 +326,11 @@ void file_browser::input_create(dfw::input& _input) {
 			return;
 		}
 
-		_input().stop_text_input();
-		_input().clear_text_input();
-
 		auto path=current_directory;
 		path/=tools::str_trim({_input().get_text_input()});
+
+		_input().stop_text_input();
+		_input().clear_text_input();
 
 		return solve(true, path.string());
 	}

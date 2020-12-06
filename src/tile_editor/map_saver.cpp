@@ -7,16 +7,14 @@
 using namespace tile_editor;
 
 map_saver::map_saver(
-	lm::logger& _logger,
-	tools::message_manager& _mm
+	lm::logger& _logger
 ):
-	log{_logger},
-	message_manager{_mm}
+	log{_logger}
 {
 
 }
 
-void map_saver::save(
+bool map_saver::save(
 	const tile_editor::map& _map,
 	const std::string& _filename
 ) {
@@ -25,9 +23,14 @@ void map_saver::save(
 
 	tile_editor::map_serializer serializer;
 	//TODO: Where does the version reside????
-	serializer.to_file(_map, "1.0,0", _filename);
+
+	if(!serializer.to_file(_map, "1.0,0", _filename)) {
+
+		lm::log(log, lm::lvl::warning)<<"could not save into "<<_filename<<std::endl;
+		return false;
+	}
 
 	//TODO: Errors and shit, log dem?
-	message_manager.add("map saved");
 	lm::log(log, lm::lvl::info)<<"map saved into "<<_filename<<std::endl;
+	return true;
 }

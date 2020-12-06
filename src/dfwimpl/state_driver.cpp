@@ -8,7 +8,10 @@
 
 using namespace dfwimpl;
 
-state_driver::state_driver(dfw::kernel& kernel, dfwimpl::config& c)
+state_driver::state_driver(
+	dfw::kernel& kernel, 
+	dfwimpl::config& c
+)
 	:state_driver_interface(controller::t_states::state_editor),
 	config(c),
 	log(kernel.get_log()),
@@ -47,11 +50,29 @@ state_driver::state_driver(dfw::kernel& kernel, dfwimpl::config& c)
 
 void state_driver::prepare_video(dfw::kernel& kernel) {
 
+	const auto& argman=kernel.get_arg_manager();
+
+	int w=config.int_from_path("video:window_w_px");
+	int h=config.int_from_path("video:window_h_px");
+
+	if(argman.exists("-w") && argman.arg_follows("-w")) {
+
+		const std::string& window_size_str=argman.get_following("-w");
+
+		auto xpos=window_size_str.find("x");
+		if(std::string::npos==xpos) {
+			throw std::runtime_error("-w parameter must be specified in wxh");
+		}
+
+		w=std::stoi(window_size_str.substr(0, xpos));
+		h=std::stoi(window_size_str.substr(xpos+1));
+
+		lm::log(log, lm::lvl::info)<<"window size specified by command line as "<<window_size_str<<" ["<<w<<"x"<<h<<"]"<<std::endl;
+	}
+
 	kernel.init_video_system({
-		config.int_from_path("video:window_w_px"),
-		config.int_from_path("video:window_h_px"),
-		config.int_from_path("video:window_w_logical"),
-		config.int_from_path("video:window_h_logical"),
+		w, h, 
+		w, h,
 		config.string_from_path("video:window_title"),
 		config.bool_from_path("video:window_show_cursor"),
 		config.get_screen_vsync()
@@ -112,16 +133,16 @@ void state_driver::prepare_resources(dfw::kernel& /*kernel*/) {
 */
 }
 
-void state_driver::register_controllers(dfw::kernel& /*kernel*/) {
+void state_driver::register_controllers(dfw::kernel& _kernel) {
 
 	auto reg=[this](ptr_controller& _ptr, int _i, dfw::controller_interface * _ci) {
 		_ptr.reset(_ci);
 		register_controller(_i, *_ptr);
 	};
 
-
-	unsigned int    screen_w=config.int_from_path("video:window_w_logical"),
-					screen_h=config.int_from_path("video:window_h_logical");
+	auto& screen=_kernel.get_screen();
+	unsigned int    screen_w=screen.get_w(),
+					screen_h=screen.get_h();
 
 	reg(
 		c_editor,
