@@ -63,9 +63,10 @@ void map_serializer::put_layers(
 	sv.doc=&_doc;
 
 	for(const auto& layer : _map.layers) {
-
 		layer->accept(sv);
 	}
+
+	_doc.AddMember("layers", layers, _doc.GetAllocator());
 }
 
 void map_serializer::put_meta(
