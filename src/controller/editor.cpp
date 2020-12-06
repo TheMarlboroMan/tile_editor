@@ -130,8 +130,8 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		: &dfw::input::is_input_pressed;
 
 	const int factor=_input.is_input_pressed(input::left_control) 
-		? 1 
-		: session.grid_data.size;
+		? session.grid_data.size / 4
+		: session.grid_data.size / 2;
 
 	int movement_x=0,
 		movement_y=0;
