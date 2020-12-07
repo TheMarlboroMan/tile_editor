@@ -3,7 +3,7 @@ beginobject
 	name start
 	w 32
 	h 32
-	color 0 255 0 0
+	color 0 255 0 255
 	beginproperty
 		name id
 		type int
@@ -25,7 +25,7 @@ beginobject
 	name exit
 	w 32
 	h 32
-	color 0 0 255 0
+	color 0 0 255 255
 	beginproperty
 		name map_id
 		type int

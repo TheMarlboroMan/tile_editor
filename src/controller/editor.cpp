@@ -6,6 +6,10 @@
 #include "app/map_saver.h"
 #include "app/map_loader.h"
 #include "tile_editor/parser/blueprint_parser.h"
+#include "tile_editor/editor_types/tile_layer.h"
+#include "tile_editor/editor_types/thing_layer.h"
+#include "tile_editor/editor_types/poly_layer.h"
+
 
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
@@ -358,8 +362,10 @@ void editor::draw_layer(
 
 	for(const auto& thing : _layer.data) {
 
-		box.set_location({thing.x, thing.y, thing.w, thing.h});
-//TODO: how come things can have colours?
+		unsigned int w=thing.w,
+		             h=thing.h;
+
+		box.set_location({thing.x, thing.y, w, h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a)); 
 		box.draw(_screen, camera);
 	}
@@ -506,7 +512,7 @@ void editor::save_current() {
 
 void editor::load_map(const std::string& _path) {
 
-	tile_editor::map_loader ml{log, message_manager};
+	tile_editor::map_loader ml{log, message_manager, session.thingsets};
 	map=ml.load_from_file(_path);
 	current_filename=_path;
 }

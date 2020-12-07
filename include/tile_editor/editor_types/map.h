@@ -1,8 +1,6 @@
 #pragma once
 
-#include "tile_layer.h"
-#include "thing_layer.h"
-#include "poly_layer.h"
+#include "layer.h"
 #include "../editor_types/property_manager.h"
 
 #include <vector>

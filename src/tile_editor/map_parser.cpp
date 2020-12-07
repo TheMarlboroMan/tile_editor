@@ -1,4 +1,7 @@
 #include "parser/map_parser.h"
+#include "editor_types/tile_layer.h"
+#include "editor_types/thing_layer.h"
+#include "editor_types/poly_layer.h"
 
 #include <tools/json.h>
 #include <tools/file_utils.h>
@@ -166,6 +169,9 @@ void map_parser::parse_tile_layer(
 
 	//create the layer.
 	tile_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
+	if(0==_meta.alpha) {
+		errors.push_back("warning, zero alpha layer detected, will not be shown!");
+	}
 
 	//iterate on its items.
 	for(const auto& item : _node["data"].GetArray()) {
@@ -329,8 +335,8 @@ void map_parser::parse_thing_layer(
 		tile_editor::thing thing{
 			item["p"][0].GetInt(),
 			item["p"][1].GetInt(),
-			//Width and height values are set by default and will be reviewed later when the blueprints are loaded.
-			//TODO: Is this ever done???
+//The map parser knows NOTHING about the thing types, so it will not fill
+//width and height  Let the "map_loader" do that.
 			1,
 			1,
 			(std::size_t)item["t"].GetInt(),

@@ -1,4 +1,7 @@
 #include "serializer/map_serializer.h"
+#include "editor_types/tile_layer.h"
+#include "editor_types/thing_layer.h"
+#include "editor_types/poly_layer.h"
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>

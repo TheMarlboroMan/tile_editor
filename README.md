@@ -21,6 +21,7 @@ Contains:
 - Templates for map properties
 - Tilesets
 - Object sets
+	- Linked properties can ONLY be integers :D.
 - Polygon sets
 - Session data
 

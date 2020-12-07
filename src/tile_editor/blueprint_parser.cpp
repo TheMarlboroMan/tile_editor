@@ -167,6 +167,9 @@ void blueprint_parser::thing_mode(
 		throw std::runtime_error("repeated id value");
 	}
 
+	//TODO: if the alpha for the thing is zero,
+	//should emit a warning.
+
 	thing_parser tp;
 	_blueprint.thingsets.emplace(
 		index,
@@ -195,6 +198,9 @@ void blueprint_parser::poly_mode(
 
 		throw std::runtime_error("repeated id value");
 	}
+
+	//TODO: if the alpha for the poly is zero,
+	//should emit a warning.
 
 	poly_parser pp;
 
