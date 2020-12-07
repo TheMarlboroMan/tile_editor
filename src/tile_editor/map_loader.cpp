@@ -14,11 +14,13 @@ using namespace tile_editor;
 map_loader::map_loader(
 	lm::logger& _logger,
 	tools::message_manager& _message_manager,
-	const std::map<std::size_t, thing_definition_table>& _thingsets
+	const std::map<std::size_t, thing_definition_table>& _thingsets,
+	const std::map<std::size_t, poly_definition_table>& _polysets
 ):
 	log(_logger),
 	message_manager{_message_manager},
-	thingsets{_thingsets} {
+	thingsets{_thingsets},
+	polysets{_polysets} {
 
 }
 
@@ -76,6 +78,7 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 		layer->accept(visitor);
 	}
 	
+	//inflate things...
 	for(auto& ptr : visitor.things) {
 
 		for(auto& thing : ptr->data) {
@@ -112,5 +115,36 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 		}
 	}
 
-	//TODO: inflate polys.
+	//inflate polys.
+	for(auto& ptr : visitor.polys) {
+
+		for(auto& poly : ptr->data) {
+
+			const auto blueprint=polysets.at(ptr->set).table.at(poly.type);
+			poly.color=blueprint.color;
+		
+			for(const auto& prop : blueprint.properties.int_properties) {
+
+				if(!poly.properties.int_properties.count(prop.second.name)) {
+
+					//TODO: What if the properties are removed from the file????				
+				}
+
+				switch(prop.second.linked_to) {
+
+					case tile_editor::property_links::color_red:
+						poly.color.r=poly.properties.int_properties.at(prop.second.name); break;
+					case tile_editor::property_links::color_green:
+						poly.color.g=poly.properties.int_properties.at(prop.second.name); break;
+					case tile_editor::property_links::color_blue:
+						poly.color.b=poly.properties.int_properties.at(prop.second.name); break;
+					case tile_editor::property_links::color_alpha:
+						poly.color.a=poly.properties.int_properties.at(prop.second.name); break;
+					case tile_editor::property_links::w:
+					case tile_editor::property_links::h:
+					case tile_editor::property_links::nothing: break;
+				}
+			}
+		}
+	}
 }

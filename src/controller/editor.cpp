@@ -10,11 +10,12 @@
 #include "tile_editor/editor_types/thing_layer.h"
 #include "tile_editor/editor_types/poly_layer.h"
 
-
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
 #include <ldv/bitmap_representation.h>
 #include <ldv/box_representation.h>
+
+#include <algorithm>
 
 using namespace controller;
 
@@ -236,6 +237,8 @@ void editor::draw_grid(
 		ldv::line_representation line(
 			{x, focus.origin.y}, 
 			{x, y_max},
+			//TODO: This does not work properly, we want the ruler each N logical
+			//units, not always drawn in the same place.
 			index % session.grid_data.horizontal_ruler 
 				? to_color(session.grid_data.color)
 				: to_color(session.grid_data.ruler_color)
@@ -386,11 +389,20 @@ void editor::draw_layer(
 
 	for(const auto& poly : _layer.data) {
 
-//TODO:...
-//		box.set_location({thing.x, thing.y, thing.w, thing.h});
-//		shape.set_points();
-//		shape.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a)); 
-//	shape.draw(_screen, camera);
+		std::vector<ldv::point> points(poly.points.size());
+		std::transform(
+			std::begin(poly.points),
+			std::end(poly.points),
+			std::begin(points),
+			[](const ldv::point& _point) -> tile_editor::poly_point {
+
+				return {_point.x, -_point.y};
+			}
+		);
+
+		shape.set_points(points);
+		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, poly.color.a)); 
+		shape.draw(_screen, camera);
 	}
 }
 
@@ -512,7 +524,12 @@ void editor::save_current() {
 
 void editor::load_map(const std::string& _path) {
 
-	tile_editor::map_loader ml{log, message_manager, session.thingsets};
+	tile_editor::map_loader ml{
+		log, 
+		message_manager, 
+		session.thingsets, 
+		session.polysets
+	};
 	map=ml.load_from_file(_path);
 	current_filename=_path;
 }

@@ -475,6 +475,7 @@ void map_parser::parse_poly_layer(
 		tile_editor::poly poly{
 			points,
 			(std::size_t)item["t"].GetInt(),
+			{128,128,128,128}, //default color too.
 			pm
 		};
 

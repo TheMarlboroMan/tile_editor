@@ -2,6 +2,7 @@
 
 ## TODO
 
+
 - Think about the HUD for a bit.
 - draw layers from the one we are in onwards.
 
@@ -23,6 +24,7 @@ Contains:
 - Object sets
 	- Linked properties can ONLY be integers :D.
 - Polygon sets
+	- Linked properties can ONLY be integers :D. W and H cannot be linked.
 - Session data
 
 Can be reused along many map files thast share the same building blocks.

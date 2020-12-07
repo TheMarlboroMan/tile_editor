@@ -3,6 +3,9 @@ This file tests the map file parsers.
 */
 
 #include "parser/map_parser.h"
+#include "editor_types/poly_layer.h"
+#include "editor_types/thing_layer.h"
+#include "editor_types/tile_layer.h"
 #include "../tests.h"
 
 #include <iostream>

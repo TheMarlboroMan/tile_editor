@@ -18,7 +18,6 @@ struct thing {
 	                                    h;
 	std::size_t                         type;
 	tile_editor::color                  color;
-
 	property_manager                    properties;
 };
 

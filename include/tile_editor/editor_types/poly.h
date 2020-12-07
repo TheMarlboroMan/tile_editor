@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../editor_types/property_manager.h"
+#include "../blueprint_types/color.h"
 #include <ldt/point_2d.h>
 #include <vector>
 
@@ -17,6 +18,7 @@ struct poly {
 
 	std::vector<poly_point>             points;
 	std::size_t                         type;
+	tile_editor::color                  color;
 	property_manager                    properties;
 };
 
