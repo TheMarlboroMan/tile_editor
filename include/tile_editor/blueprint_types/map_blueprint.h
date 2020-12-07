@@ -16,8 +16,9 @@ struct grid_data {
 	int                 size=32,
 	                    vertical_ruler=8,
 	                    horizontal_ruler=8;
-	tile_editor::color  color={0,0,0,0},
-	                    ruler_color={0,255,0,0};
+	tile_editor::color  color={0,0,0,255},
+	                    ruler_color={0,255,0,255},
+	                    origin_color={255,255,255,255};
 };
 
 //!The different blueprints for a map session.

@@ -30,10 +30,11 @@ endpolyset
 
 beginsession
 	thingcenter center
-	bgcolor 16 16 16 0
+	bgcolor 16 16 16 255
 	gridsize 32
 	gridvruler 8
 	gridhruler 8
-	gridcolor 128 128 128 0
-	gridrulercolor 32 32 32 0
+	gridcolor 64 64 64 255
+	gridrulercolor 128 128 128 255
+	gridorigincolor 255 255 255 255
 endsession

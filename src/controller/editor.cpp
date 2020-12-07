@@ -231,43 +231,53 @@ void editor::draw_grid(
 	//Horizontal lines...
 	int module=euclidean_module(focus.origin.x, session.grid_data.size);
 	int x=focus.origin.x-module;
-	int index=0;
+	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
+
 	while(x < x_max) {
+
+		auto gridcolor=0==x
+			? to_color(session.grid_data.origin_color)
+			: (
+				(x % ruler_units) 
+					? to_color(session.grid_data.color)
+					: to_color(session.grid_data.ruler_color)
+			);
 
 		ldv::line_representation line(
 			{x, focus.origin.y}, 
 			{x, y_max},
-			//TODO: This does not work properly, we want the ruler each N logical
-			//units, not always drawn in the same place.
-			index % session.grid_data.horizontal_ruler 
-				? to_color(session.grid_data.color)
-				: to_color(session.grid_data.ruler_color)
+			gridcolor
 		);
 
 		line.draw(_screen, camera);
 
 		x+=session.grid_data.size;
-		++index;
 	}
 
 	//Horizontal lines...
 	module=euclidean_module(focus.origin.y, session.grid_data.size);
 	int y=focus.origin.y-module;
-	index=0;
+	ruler_units=session.grid_data.vertical_ruler * session.grid_data.size;
 	while(y < y_max) {
+
+		auto gridcolor=0==y
+			? to_color(session.grid_data.origin_color)
+			: (
+				(y % ruler_units) 
+					? to_color(session.grid_data.color)
+					: to_color(session.grid_data.ruler_color)
+			);
+
 
 		ldv::line_representation line(
 			{focus.origin.x, y}, 
 			{x_max, y},
-			index % session.grid_data.vertical_ruler 
-				? to_color(session.grid_data.color)
-				: to_color(session.grid_data.ruler_color)
+			gridcolor
 		);
 
 		line.draw(_screen, camera);
 
 		y+=session.grid_data.size;
-		++index;
 	}
 }
 

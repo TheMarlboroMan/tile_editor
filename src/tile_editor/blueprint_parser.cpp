@@ -223,6 +223,7 @@ void blueprint_parser::session_mode(
 		"gridhruler",
 		"gridcolor",
 		"gridrulercolor",
+		"gridorigincolor"
 	}, false);
 
 	const std::string& thingcenter=propmap["thingcenter"];
@@ -267,6 +268,11 @@ void blueprint_parser::session_mode(
 	if(propmap["gridrulercolor"].size()) {
 
 		_blueprint.grid_data.ruler_color=parse_color(propmap["gridrulercolor"]);
+	}
+
+	if(propmap["gridorigincolor"].size()) {
+
+		_blueprint.grid_data.origin_color=parse_color(propmap["gridorigincolor"]);
 	}
 
 	auto to_int=[](const std::string& _str, const std::string& _key) -> int {

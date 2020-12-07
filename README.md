@@ -2,9 +2,11 @@
 
 ## TODO
 
-
-- Think about the HUD for a bit.
-- draw layers from the one we are in onwards.
+- show the set items (tiles, objects, poly types...)
+- add new layer
+- delete layer
+- reorder layers
+- edit layer properties
 
 ## Building
 
@@ -12,7 +14,7 @@ TODO:
 
 ## How to use
 
-./editor.out -c #configfile# [-f #mapfile#]
+./editor.out -c #configfile# [-f #mapfile#] [-w #WxH#]
 
 ## Input files
 ### configfile
