@@ -318,8 +318,6 @@ void editor::draw_layer(
 	const auto& tileset=session.tilesets.at(_layer.set);
 	const auto& table=tileset.table;
 
-std::cout<<"using image path "<<tileset.image_path<<std::endl;
-
 	ldv::bitmap_representation bmp(
 		*tileset_textures.at(tileset.image_path)
 	);
