@@ -3,8 +3,7 @@
 ## TODO
 
 - Think about the HUD for a bit.
-- Add help controller.
-- Setup "grid", draw layers from the one we are in onwards.
+- draw layers from the one we are in onwards.
 
 ## Building
 

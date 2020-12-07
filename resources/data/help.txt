@@ -8,5 +8,10 @@ l - load new file
 + - zoom in
 - - zoom out
 ctrl+s - save to new file
-
+	- next layer
+	- previous layer
+	- change layer drawing mode
+	- change tile element (with keyboard)
+	- new layer (perhaps its own controller)
+	- delete layer (perhaps its own controller)
 

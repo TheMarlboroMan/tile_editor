@@ -40,6 +40,9 @@ class editor:
 	void                        draw_layer(ldv::screen&, const tile_editor::poly_layer&);
 	void                        zoom_in();
 	void                        zoom_out();
+	void                        next_layer();
+	void                        previous_layer();
+	void                        toggle_layer_draw_mode();
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
 
@@ -49,14 +52,19 @@ class editor:
 	tools::message_manager&     message_manager;
 	tile_editor::exchange_data& exchange_data;
 
+	//TODO: These should likely go somewhere else...
 	tile_editor::map_blueprint  session;
 	tile_editor::map            map;
+	std::map<std::string, std::unique_ptr<ldv::texture>> tileset_textures;
+
+	enum class layer_draw_modes {all, current, stack} layer_draw_mode{layer_draw_modes::stack};
 	ldv::rect                   screen_rect;
 	ldv::camera                 camera;
 	ldv::ttf_representation     last_message_rep;
 	ldt::point_2d<int>			mouse_pos;
 	std::string                 current_filename;
-	std::size_t	                current_layer{0};
+	std::size_t	                current_layer{0},
+	                            component_index{0}; //!< Currently chosen tile/thing/poly.
 
 };
 }

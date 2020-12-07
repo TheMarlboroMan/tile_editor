@@ -9,6 +9,8 @@
 
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
+#include <ldv/bitmap_representation.h>
+#include <ldv/box_representation.h>
 
 using namespace controller;
 
@@ -58,7 +60,7 @@ void editor::awake(dfw::input& /*_input*/) {
 				lm::log(log, lm::lvl::info)<<"map editor changes current filename to "<<current_filename<<std::endl;
 				save_current();
 			}
-			//Load requested...
+			//Entry point for when loading of a map was requested...
 			else {
 
 				load_map(exchange_data.file_browser_choice);
@@ -121,6 +123,23 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	else if(_input.is_input_down(input::zoom_out)) {
 
 		zoom_out();
+		return;
+	}
+
+	if(_input.is_input_down(input::pageup)) {
+
+		previous_layer();
+		return;
+	}
+	else if(_input.is_input_down(input::pagedown)) {
+
+		next_layer();
+		return;
+	}
+
+	if(_input.is_input_down(input::space)) {
+
+		toggle_layer_draw_mode();
 		return;
 	}
 
@@ -268,33 +287,107 @@ void editor::draw_layers(ldv::screen& _screen) {
 	visitor.screen=&_screen;
 	visitor.controller=this;
 
-	for(const auto& layer : map.layers) {
-		layer->accept(visitor);
+	switch(layer_draw_mode) {
+	
+		case layer_draw_modes::all: {
+			for(std::size_t index=0; index < map.layers.size(); index++) {
+				map.layers[index]->accept(visitor);
+			}
+		}
+		break;
+
+		case layer_draw_modes::stack: {
+
+			for(std::size_t index=current_layer; index < map.layers.size(); index++) {
+				map.layers[index]->accept(visitor);
+			}
+		}
+		break;
+
+		case layer_draw_modes::current: 
+			map.layers[current_layer]->accept(visitor);
+		break;
 	}
 }
 
 void editor::draw_layer(
-	ldv::screen&, 
-	const tile_editor::tile_layer&
+	ldv::screen& _screen, 
+	const tile_editor::tile_layer& _layer
 ) {
 
-	//TODO:
+	const auto& tileset=session.tilesets.at(_layer.set);
+	const auto& table=tileset.table;
+
+std::cout<<"using image path "<<tileset.image_path<<std::endl;
+
+	ldv::bitmap_representation bmp(
+		*tileset_textures.at(tileset.image_path)
+	);
+
+	bmp.set_alpha(_layer.alpha);
+	bmp.set_blend(ldv::representation::blends::alpha);
+
+	for(const auto& tile : _layer.data) {
+
+		//Calculate the world position...
+		int x=tile.x * session.grid_data.size,
+		    y=tile.y * session.grid_data.size;
+
+		unsigned int size=session.grid_data.size;
+		bmp.set_location({x, y, size, size});
+
+		//TODO: Check errors with "exists"?
+		//TODO: If it fails -> DRAW DEFAULT.
+		const auto& rect=table.get(tile.type).get_rect();
+		bmp.set_clip(rect);
+
+		bmp.draw(_screen, camera);
+	}
 }
 
 void editor::draw_layer(
-	ldv::screen&, 
-	const tile_editor::thing_layer&
+	ldv::screen& _screen,
+	const tile_editor::thing_layer& _layer
 ) {
 
-	//TODO:
+	ldv::box_representation box(
+		{0,0,0,0},
+		ldv::rgba8(0,0,0,0)
+	);
+
+	box.set_alpha(_layer.alpha);
+	box.set_blend(ldv::representation::blends::alpha);
+
+	for(const auto& thing : _layer.data) {
+
+		box.set_location({thing.x, thing.y, thing.w, thing.h});
+//TODO: how come things can have colours?
+		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a)); 
+		box.draw(_screen, camera);
+	}
 }
 
 void editor::draw_layer(
-	ldv::screen&, 
-	const tile_editor::poly_layer&
+	ldv::screen& _screen, 
+	const tile_editor::poly_layer& _layer
 ) {
 
-	//TODO:
+	ldv::polygon_representation shape(
+		{{0,0}},
+		ldv::rgba8(0,0,0,0)
+	);
+
+	shape.set_alpha(_layer.alpha);
+	shape.set_blend(ldv::representation::blends::alpha);
+
+	for(const auto& poly : _layer.data) {
+
+//TODO:...
+//		box.set_location({thing.x, thing.y, thing.w, thing.h});
+//		shape.set_points();
+//		shape.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a)); 
+//	shape.draw(_screen, camera);
+	}
 }
 
 void editor::draw_hud(ldv::screen& _screen) {
@@ -313,15 +406,15 @@ void editor::draw_hud(ldv::screen& _screen) {
 			std::string contents;
 
 			void visit(const tile_editor::tile_layer& _layer) {
-				contents=std::string{" type: tile, set: "}+session->tilesets[_layer.set].name;
+				contents=std::string{" type: tile, set: "}+session->tilesets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
 			}
 
 			void visit(const tile_editor::thing_layer& _layer) {
-				contents=std::string{" type: thing, set: "}+session->thingsets[_layer.set].name;
+				contents=std::string{" type: thing, set: "}+session->thingsets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
 			}
 
 			void visit(const tile_editor::poly_layer& _layer) {
-				contents=std::string{" type: poly, set: "}+session->polysets[_layer.set].name;
+				contents=std::string{" type: poly, set: "}+session->polysets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
 			}
 		} visitor;
 
@@ -422,6 +515,68 @@ void editor::load_map(const std::string& _path) {
 
 void editor::load_session(const std::string& _path) {
 
+	lm::log(log, lm::lvl::info)<<"map editor will load session data from "<<_path<<std::endl;
+
 	tile_editor::blueprint_parser cfp;
 	session=cfp.parse_file(_path);
+
+	//TODO: I would enjoy if this was another component.
+	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;
+	tileset_textures.clear();
+	for(const auto& set : session.tilesets) {
+
+		if(!tileset_textures.count(set.second.image_path)) {
+
+			//TODO: Control failures and shit.
+			ldv::image img(set.second.image_path);
+			tileset_textures.emplace(
+				set.second.image_path,
+				std::unique_ptr<ldv::texture>(new ldv::texture(img))
+			);
+
+			lm::log(log, lm::lvl::info)<<"loaded "<<set.second.image_path<<std::endl;
+		}
+	}
+}
+
+void editor::previous_layer() {
+
+	if(!map.layers.size() || 0==current_layer) {
+
+		return;
+	}
+
+	--current_layer;
+}
+
+void editor::next_layer() {
+
+	const auto size=map.layers.size();
+	if(!size || current_layer+1==size) {
+
+		return;
+	}
+
+	++current_layer;
+}
+
+void editor::toggle_layer_draw_mode() {
+
+	switch(layer_draw_mode) {
+	
+		case layer_draw_modes::all:
+			layer_draw_mode=layer_draw_modes::stack;
+			message_manager.add("layer draw mode: stack");
+			return;
+
+		case layer_draw_modes::stack:
+			layer_draw_mode=layer_draw_modes::current;
+			message_manager.add("layer draw mode: current"); 
+			return;
+
+		case layer_draw_modes::current: 
+			layer_draw_mode=layer_draw_modes::all; 
+			message_manager.add("layer draw mode: all");
+			return;
+	}
 }
