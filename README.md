@@ -5,6 +5,7 @@
 - click on tile to add tiles
 - delete click to delete tiles
 - sort tiles on save
+- check layer id integrity on save
 - use object centeron session attr.
 - click to add object
 - click to select object
