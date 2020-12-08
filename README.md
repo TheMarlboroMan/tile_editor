@@ -1,8 +1,15 @@
 # Tile editor
 
 ## TODO
-
-- fix tile selector: some tiles are missing!!!!!!
+- toolset width configurable by session as a %
+- click on tile to add tiles
+- delete click to delete tiles
+- sort tiles on save
+- use object centeron session attr.
+- click to add object
+- click to select object
+- move selected object
+- delete selected object
 - add new layer
 - delete layer
 - reorder layers
