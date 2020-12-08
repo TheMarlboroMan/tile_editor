@@ -2,10 +2,7 @@
 
 ## TODO
 
-- do the input for the selector:
-	- toggle selector with tab
-	- arrows to choose current
-	- pageup and down for pager
+- fix tile selector: some tiles are missing!!!!!!
 - add new layer
 - delete layer
 - reorder layers
