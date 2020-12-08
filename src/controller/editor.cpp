@@ -85,6 +85,7 @@ void editor::awake(dfw::input& /*_input*/) {
 void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) {
 
 	if(_input().is_exit_signal() || _input.is_input_down(input::escape)) {
+
 		set_leave(true);
 		return;
 	}
@@ -92,6 +93,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	if(_input.is_input_down(input::help)) {
 
 		push_state(state_help);
+		return;
 	}
 
 	if(_input.is_input_down(input::load)) {
@@ -126,8 +128,6 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		}
 	}
 
-	mouse_pos=get_mouse_position(_input);
-
 	if(_input.is_input_down(input::zoom_in)) {
 
 		zoom_in();
@@ -144,6 +144,15 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		toggle_layer_draw_mode();
 		return;
 	}
+
+	if(_input.is_input_down(input::tab)) {
+
+		show_set=!show_set;
+	}
+
+	mouse_pos=get_mouse_position(_input);
+
+	//TODO: Separate now inputs for show_set and not show_set.
 
 	typedef  bool (dfw::input::*input_fn)(int) const;
 	input_fn movement_fn=_input.is_input_pressed(input::left_control)
