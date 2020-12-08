@@ -33,6 +33,8 @@ class editor:
 	private:
 
 	ldt::point_2d<int>          get_mouse_position(dfw::input&) const;
+	void                        arrow_input_set(int, int);
+	void                        arrow_input_map(int, int);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
 	void                        draw_grid(ldv::screen&);

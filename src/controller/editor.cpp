@@ -152,64 +152,143 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	mouse_pos=get_mouse_position(_input);
 
-	//TODO: Separate now inputs for show_set and not show_set.
-
-	typedef  bool (dfw::input::*input_fn)(int) const;
-	input_fn movement_fn=_input.is_input_pressed(input::left_control)
-		? &dfw::input::is_input_down
-		: &dfw::input::is_input_pressed;
-
-	const int factor=_input.is_input_pressed(input::left_control) 
-		? session.grid_data.size / 4
-		: session.grid_data.size / 2;
-
-	int movement_x=0,
-		movement_y=0;
-
-	//TODO: if toolset is not shown...
 	if(_input.is_input_down(input::pageup)) {
 
 		previous_layer();
 		return;
 	}
-	//TODO: if toolset is not shown...
 	else if(_input.is_input_down(input::pagedown)) {
 
 		next_layer();
 		return;
 	}
 
-	if(std::invoke(movement_fn, _input, input::up)) {
+	if(show_set) {
 
-		movement_y=-1*factor;
-	}
-	if(std::invoke(movement_fn, _input, input::down)) {
+		int movement_x=0,
+			movement_y=0;
 
-		movement_y=1*factor;
-	}
+		if(_input.is_input_down(input::up)) {
+			movement_y=-1;
+		}
+		else if(_input.is_input_down(input::down)) {
+			movement_y=1;
+		}
+		else if(_input.is_input_down(input::left)) {
+			movement_x=-1;
+		}
+		else if(_input.is_input_down(input::right)) {
+			movement_x=1;
+		}
 
-	if(std::invoke(movement_fn, _input, input::left)) {
+		if(movement_x || movement_y) {
 
-		movement_x=-1*factor;
-	}
-	if(std::invoke(movement_fn, _input, input::right)) {
+			 arrow_input_set(movement_x, movement_y);
+		}
 
-		movement_x=1*factor;
-	}
-
-	if(movement_x || movement_y) {
-
-		//TODO: if toolset is not shown...
-
-		camera.move_by(movement_x, movement_y);
-//		perform_movement(
-//			movement_x,
-//			movement_y,
-//			_input.is_input_pressed(input::resize),
-//			_input.is_input_pressed(input::align)
-//		);
 		return;
 	}
+	else {
+
+		typedef  bool (dfw::input::*input_fn)(int) const;
+		input_fn movement_fn=_input.is_input_pressed(input::left_control)
+			? &dfw::input::is_input_down
+			: &dfw::input::is_input_pressed;
+
+		const int factor=_input.is_input_pressed(input::left_control) 
+			? session.grid_data.size / 4
+			: session.grid_data.size / 2;
+
+		int movement_x=0,
+			movement_y=0;
+
+		if(std::invoke(movement_fn, _input, input::up)) {
+
+			movement_y=-1*factor;
+		}
+		if(std::invoke(movement_fn, _input, input::down)) {
+
+			movement_y=1*factor;
+		}
+
+		if(std::invoke(movement_fn, _input, input::left)) {
+
+			movement_x=-1*factor;
+		}
+		if(std::invoke(movement_fn, _input, input::right)) {
+
+			movement_x=1*factor;
+		}
+
+		if(movement_x || movement_y) {
+
+			 arrow_input_map(movement_x, movement_y);
+		}
+
+		return;
+	}
+}
+
+void editor::arrow_input_set(
+	int _movement_x, 
+	int _movement_y
+) {
+
+	struct : tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		int      movement_x{0},
+		         movement_y{0};
+
+		void visit(const tile_editor::tile_layer&) {
+
+			if(movement_y < 0) {
+				controller->tile_list.previous_row();
+				return;
+			}
+			else if(movement_y > 0) {
+				controller->tile_list.next_row();
+				return;
+			}
+
+			if(movement_x < 0) {
+				controller->tile_list.previous();
+			}
+			else if(movement_x > 0) {
+				controller->tile_list.next();
+			}
+		}
+		void visit(const tile_editor::thing_layer&) {
+
+			if(movement_y < 0) {
+				controller->thing_list.previous();
+			}
+			else if(movement_y > 0) {
+				controller->thing_list.next();
+			}
+		}
+		void visit(const tile_editor::poly_layer&) {
+
+			if(movement_y < 0) {
+				controller->poly_list.previous();
+			}
+			else if(movement_y > 0) {
+				controller->poly_list.next();
+			}
+		}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.movement_x=_movement_x;
+	dispatcher.movement_y=_movement_y;
+
+	map.layers.at(current_layer)->accept(dispatcher);
+}
+
+void editor::arrow_input_map(
+	int _movement_x, 
+	int _movement_y
+) {
+
+	camera.move_by(_movement_x, _movement_y);
 }
 
 void editor::draw(ldv::screen& _screen, int /*fps*/) {
