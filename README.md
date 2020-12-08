@@ -2,7 +2,10 @@
 
 ## TODO
 
-- show the set items (tiles, objects, poly types...)
+- do the input for the selector:
+	- toggle selector with tab
+	- arrows to choose current
+	- pageup and down for pager
 - add new layer
 - delete layer
 - reorder layers

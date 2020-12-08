@@ -12,6 +12,7 @@ set(SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/map_loader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/map_saver.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/map_serializer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/set_layer_loader.cpp
 	PARENT_SCOPE
 )
 

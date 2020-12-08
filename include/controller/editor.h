@@ -11,6 +11,8 @@
 #include <dfw/controller_interface.h>
 #include <lm/logger.h>
 #include <ldtools/ttf_manager.h>
+#include <tools/grid_list.h>
+#include <tools/vertical_list.h>
 
 namespace controller {
 
@@ -38,11 +40,20 @@ class editor:
 	void                        draw_layer(ldv::screen&, const tile_editor::tile_layer&);
 	void                        draw_layer(ldv::screen&, const tile_editor::thing_layer&);
 	void                        draw_layer(ldv::screen&, const tile_editor::poly_layer&);
+	void                        draw_set(ldv::screen&);
+	//!draws the background box for the toolset. also returns its x.
+	int                         draw_set_background(ldv::screen&);
+	//!draws a text item for the toolset.
+	void                        draw_set_text(ldv::screen& _screen, int _x, int _y, int _h, tile_editor::color _color, const std::string& _name, bool _is_current);
+	void                        draw_set(ldv::screen&, const tile_editor::tile_layer&);
+	void                        draw_set(ldv::screen&, const tile_editor::thing_layer&);
+	void                        draw_set(ldv::screen&, const tile_editor::poly_layer&);
 	void                        zoom_in();
 	void                        zoom_out();
 	void                        next_layer();
 	void                        previous_layer();
 	void                        toggle_layer_draw_mode();
+	void                        load_layer_toolset();
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
 
@@ -61,11 +72,21 @@ class editor:
 	ldv::rect                   screen_rect;
 	ldv::camera                 camera;
 	ldv::ttf_representation     last_message_rep;
-	ldt::point_2d<int>			mouse_pos;
+	ldt::point_2d<int>          mouse_pos;
+	tools::grid_list<ldtools::sprite_frame> tile_list;
+	tools::vertical_list<tile_editor::thing_definition> thing_list;
+	tools::vertical_list<tile_editor::poly_definition> poly_list;
 	std::string                 current_filename;
 	std::size_t	                current_layer{0},
 	                            component_index{0}; //!< Currently chosen tile/thing/poly.
+	bool                        show_set{true};
 
+	static const int            grid_list_w{32},
+	                            grid_list_h{32},
+	                            grid_list_margin{8},
+	                            vertical_list_h{32},
+	                            vertical_list_margin{8},
+	                            list_screen_portion{3}; //1 / x of the full w.
 };
 }
 

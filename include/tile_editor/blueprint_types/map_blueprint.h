@@ -2,8 +2,8 @@
 
 #include "thing_definition_table.h"
 #include "poly_definition_table.h"
-#include "property_table.h"
 #include "tileset.h"
+#include "property_table.h"
 #include "color.h"
 
 #include <map>

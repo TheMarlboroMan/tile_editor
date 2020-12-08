@@ -9,6 +9,7 @@
 #include "tile_editor/editor_types/tile_layer.h"
 #include "tile_editor/editor_types/thing_layer.h"
 #include "tile_editor/editor_types/poly_layer.h"
+#include "tile_editor/app/set_layer_loader.h"
 
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
@@ -40,8 +41,15 @@ editor::editor(
 		ttf_manager.get("main", 14),
 		ldv::rgba8(255, 255, 255, 255),
 	},
-	mouse_pos{0,0}
-{
+	mouse_pos{0,0},
+	tile_list{_screen_w / list_screen_portion, _screen_h, grid_list_w, grid_list_h},
+	thing_list{_screen_h, vertical_list_h},
+	poly_list{_screen_h, vertical_list_h} {
+
+	tile_list.set_margin_w(grid_list_margin);
+	tile_list.set_margin_h(grid_list_margin);
+	thing_list.set_margin_h(vertical_list_margin);
+	poly_list.set_margin_h(8);
 
 	message_manager.subscribe("editor", [this](tools::message_manager::notify_event_type _type) {
 
@@ -131,17 +139,6 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
-	if(_input.is_input_down(input::pageup)) {
-
-		previous_layer();
-		return;
-	}
-	else if(_input.is_input_down(input::pagedown)) {
-
-		next_layer();
-		return;
-	}
-
 	if(_input.is_input_down(input::space)) {
 
 		toggle_layer_draw_mode();
@@ -159,6 +156,19 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	int movement_x=0,
 		movement_y=0;
+
+	//TODO: if toolset is not shown...
+	if(_input.is_input_down(input::pageup)) {
+
+		previous_layer();
+		return;
+	}
+	//TODO: if toolset is not shown...
+	else if(_input.is_input_down(input::pagedown)) {
+
+		next_layer();
+		return;
+	}
 
 	if(std::invoke(movement_fn, _input, input::up)) {
 
@@ -180,6 +190,8 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(movement_x || movement_y) {
 
+		//TODO: if toolset is not shown...
+
 		camera.move_by(movement_x, movement_y);
 //		perform_movement(
 //			movement_x,
@@ -197,8 +209,11 @@ void editor::draw(ldv::screen& _screen, int /*fps*/) {
 
 	draw_grid(_screen);
 	draw_layers(_screen);
-	draw_messages(_screen);
 	draw_hud(_screen);
+	if(show_set) {
+		draw_set(_screen);
+	}
+	draw_messages(_screen);
 }
 
 void editor::draw_messages(ldv::screen& _screen) {
@@ -206,6 +221,163 @@ void editor::draw_messages(ldv::screen& _screen) {
 	last_message_rep.draw(_screen);
 }
 
+void editor::draw_set(
+	ldv::screen& _screen
+) {
+
+	if(!map.layers.size()) {
+
+		return;
+	}
+
+	struct : tile_editor::const_layer_visitor {
+
+		editor *         controller{nullptr};
+		ldv::screen *    screen{nullptr};
+		void visit(const tile_editor::tile_layer& _layer) {controller->draw_set(*screen, _layer);}
+		void visit(const tile_editor::thing_layer& _layer) {controller->draw_set(*screen, _layer);}
+		void visit(const tile_editor::poly_layer& _layer) {controller->draw_set(*screen, _layer);}
+		
+	} dispatcher;
+
+	dispatcher.controller=this;
+	dispatcher.screen=&_screen;
+	map.layers.at(current_layer)->accept(dispatcher);
+}
+
+int editor::draw_set_background(
+	ldv::screen& _screen
+) {
+	ldv::box_representation box(
+		{0,0, tile_list.get_available_w(), tile_list.get_available_h()},
+		ldv::rgba8(0,0,0,128)
+	);
+
+	box.set_blend(ldv::representation::blends::alpha);
+	box.align(
+		screen_rect, 
+		{
+			ldv::representation_alignment::h::inner_right,
+			ldv::representation_alignment::v::inner_top
+		}
+	);
+
+	box.draw(_screen);
+
+	return box.get_position().x;
+}
+
+void editor::draw_set(
+	ldv::screen& _screen,
+	const tile_editor::tile_layer& _layer
+) {
+
+	//draw the tiles...
+	ldv::bitmap_representation bmp(
+		*tileset_textures.at(session.tilesets.at(_layer.set).image_path)
+	);
+
+	const int background_start{draw_set_background(_screen)};
+	const unsigned int item_w{tile_list.get_item_w()},
+	                   item_h{tile_list.get_item_h()};
+
+	for(const auto& item : tile_list.get_page()) {
+
+		if(item.index==tile_list.get_current_index()) {
+
+			ldv::box_representation current_box(
+				{background_start+item.x-1,item.y-1, item_w+2 , item_h+2},
+				ldv::rgba8(0,0,255,128)
+			);
+
+			current_box.draw(_screen);
+		}
+
+		bmp.set_clip(item.item.get_rect());
+		bmp.set_location({background_start+item.x, item.y, item_w, item_h});
+		bmp.draw(_screen);
+	}
+}
+
+void editor::draw_set(
+	ldv::screen& _screen,
+	const tile_editor::thing_layer& _layer
+) {
+	const int background_start{draw_set_background(_screen)};
+	const unsigned int item_h{thing_list.get_item_h()};
+
+	for(const auto& item : thing_list.get_page()) {
+
+		const auto prototype=session.thingsets.at(_layer.set).table.at(item.item.type_id);
+
+		draw_set_text(
+			_screen,
+			background_start,
+			item.y,
+			item_h,
+			prototype.color,
+			prototype.name,
+			item.index==thing_list.get_current_index()
+		);
+	}
+}
+
+void editor::draw_set(
+	ldv::screen& _screen,
+	const tile_editor::poly_layer& _layer
+) {
+
+	const int background_start{draw_set_background(_screen)};
+	const unsigned int item_h{poly_list.get_item_h()};
+
+	for(const auto& item : poly_list.get_page()) {
+
+		const auto prototype=session.polysets.at(_layer.set).table.at(item.item.poly_id);
+
+		draw_set_text(
+			_screen,
+			background_start,
+			item.y,
+			item_h,
+			prototype.color,
+			prototype.name,
+			item.index==poly_list.get_current_index()
+		);
+	}
+}
+
+void editor::draw_set_text(
+	ldv::screen& _screen,
+	int _x,
+	int _y,
+	int _h,
+	tile_editor::color _color,
+	const std::string& _name,
+	bool _is_current
+) {
+
+	//Color...
+	ldv::box_representation color_box(
+		{_x, _y, _h , _h},
+		ldv::rgba8(_color.r, _color.g, _color.b, _color.a)
+	);
+
+	color_box.draw(_screen);
+
+	//Name...
+	ldv::ttf_representation txt_name{
+		ttf_manager.get("main", 14),
+		_is_current
+			? ldv::rgba8(0, 0, 255, 255)
+			: ldv::rgba8(255, 255, 255, 255),
+		_name
+	};
+
+	txt_name.go_to({_x+_h+2, _y});
+	txt_name.draw(_screen);
+}
+
+//TODO: Take me to some toolset I can reuse.
 void editor::draw_grid(
 	ldv::screen& _screen
 ) {
@@ -268,7 +440,6 @@ void editor::draw_grid(
 					: to_color(session.grid_data.ruler_color)
 			);
 
-
 		ldv::line_representation line(
 			{focus.origin.x, y}, 
 			{x_max, y},
@@ -283,22 +454,13 @@ void editor::draw_grid(
 
 void editor::draw_layers(ldv::screen& _screen) {
 
-	struct draw_layer_visitor:tile_editor::const_layer_visitor {
+	struct :tile_editor::const_layer_visitor {
 
 		ldv::screen * screen{nullptr};
 		editor * controller{nullptr};
-
-		void visit(const tile_editor::tile_layer& _layer) {
-			controller->draw_layer(*screen, _layer);
-		}
-
-		void visit(const tile_editor::thing_layer& _layer) {
-			controller->draw_layer(*screen, _layer);
-		}
-
-		void visit(const tile_editor::poly_layer& _layer) {
-			controller->draw_layer(*screen, _layer);
-		}
+		void visit(const tile_editor::tile_layer& _layer) {controller->draw_layer(*screen, _layer);}
+		void visit(const tile_editor::thing_layer& _layer) {controller->draw_layer(*screen, _layer);}
+		void visit(const tile_editor::poly_layer& _layer) {controller->draw_layer(*screen, _layer);}
 	} visitor;
 
 	visitor.screen=&_screen;
@@ -426,7 +588,7 @@ void editor::draw_hud(ldv::screen& _screen) {
 	}
 	else {
 
-		struct draw_layer_hud_visitor:tile_editor::const_layer_visitor {
+		struct :tile_editor::const_layer_visitor {
 
 			tile_editor::map_blueprint * session{nullptr};
 			std::string contents;
@@ -542,6 +704,8 @@ void editor::load_map(const std::string& _path) {
 	};
 	map=ml.load_from_file(_path);
 	current_filename=_path;
+	current_layer=0;
+	load_layer_toolset();
 }
 
 void editor::load_session(const std::string& _path) {
@@ -578,6 +742,7 @@ void editor::previous_layer() {
 	}
 
 	--current_layer;
+	load_layer_toolset();
 }
 
 void editor::next_layer() {
@@ -589,6 +754,7 @@ void editor::next_layer() {
 	}
 
 	++current_layer;
+	load_layer_toolset();
 }
 
 void editor::toggle_layer_draw_mode() {
@@ -610,4 +776,23 @@ void editor::toggle_layer_draw_mode() {
 			message_manager.add("layer draw mode: all");
 			return;
 	}
+}
+
+void editor::load_layer_toolset() {
+
+	if(!map.layers.size()) {
+
+		return;
+	}
+
+	tile_editor::set_layer_loader ll{
+		tile_list,
+		thing_list,
+		poly_list,
+		session.tilesets,
+		session.thingsets,
+		session.polysets
+	};
+
+	map.layers.at(current_layer)->accept(ll);
 }
