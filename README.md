@@ -2,20 +2,27 @@
 
 ## TODO
 
-- control click to add straight lines
-- control + shift + click to fill squares
-- same with delete, of course, to delete lines or squares
 - sort tiles on save
+- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
 - check layer id integrity on save
 - use object centeron session attr.
 - click to add object
 - click to select object
-- move selected object
+- move selected object with arrows
+- change properties of object
 - delete selected object
+- sort objects on save
 - add new layer
 - delete layer
 - reorder layers
-- edit layer properties
+- poly layers could have winding and allow concave / convex / all properties
+- add poly
+- select poly
+- move poly
+- delete poly
+- sort polys on save
+- change properties of poly
+- console mode (move_by multiple of grid)
 
 ## Building
 
