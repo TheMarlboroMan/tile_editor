@@ -219,7 +219,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 			? &dfw::input::is_input_down
 			: &dfw::input::is_input_pressed;
 
-		const int factor=_input.is_input_pressed(input::lctrl) 
+		const int factor=_input.is_input_pressed(input::lctrl)
 			? session.grid_data.size / 4
 			: session.grid_data.size / 2;
 
@@ -273,26 +273,28 @@ void editor::click_input(
 
 void editor::click_input(
 	int _input,
-	int _modifiers,  
+	int _modifiers,
 	tile_editor::tile_layer& _layer
 ) {
 	auto world_pos=get_world_position(mouse_pos);
 	auto grid=get_grid_position(world_pos);
 
-	//TODO: This is a disaster :D.
-
-	if(!_modifiers & click_modifier_lshift) {
+	//Process multiclick with lshift. Multiclick acts by delimiting a box.
+	if(! (_modifiers & click_modifier_lshift)) {
 
 		multiclick.engaged=false;
 	}
 	else {
-	
-		if(!multiclick.engaged) {
+
+		if(multiclick.point!=grid) {
 
 			multiclick.engaged=true;
-			multiclick.point=grid;
+			multiclick.rangex={std::min(grid.x, multiclick.point.x), std::max(grid.x, multiclick.point.x)};
+			multiclick.rangey={std::min(grid.y, multiclick.point.y), std::max(grid.y, multiclick.point.y)};
 		}
 	}
+
+	multiclick.point=grid;
 
 	auto find_tile_at=[&_layer](editor_point _pt) {
 
@@ -305,6 +307,8 @@ void editor::click_input(
 		);
 	};
 
+	//Delete...
+	//TODO: the key combination is not practical.
 	if(_modifiers & click_modifier_delete) {
 
 		auto delete_tile_if_exists=[&_layer, find_tile_at](editor_point _pt) {
@@ -316,48 +320,48 @@ void editor::click_input(
 			}
 		};
 
-		if(multiclick.engaged) {
-
-			//TODO: order grid and multiclick.point...
-			//then call delete_tile_if_exists
-
-			multiclick.engaged=false;
-		}
-		else {
-
+		if(!multiclick.engaged) {
 			delete_tile_if_exists(grid);
+			return;
 		}
+
+		for(int x=multiclick.rangex.min; x<=multiclick.rangex.max; x++) {
+			for(int y=multiclick.rangey.min; y<=multiclick.rangey.max; y++) {
+				delete_tile_if_exists({x, y});
+			}
+		}
+		return;
 	}
-	else {
 
-		auto set_tile=[&_layer, find_tile_at](editor_point _pt, int _type) {
+	//Insert or update...
+	auto set_tile=[&_layer, find_tile_at](editor_point _pt, int _type) {
 
-			auto it=find_tile_at(_pt);
-			if(it!=std::end(_layer.data)) {
-				it->type=_type;
-			}
-			//did not find anything...
-			else {
-				_layer.data.push_back({_pt.x, _pt.y, _type});
-			}
-		};
-
-		if(multiclick.engaged) {
-
-			//TODO: order grid and multiclick.point...
-			//then call set_tile
-
-			multiclick.engaged=false;
+		auto it=find_tile_at(_pt);
+		if(it!=std::end(_layer.data)) {
+			it->type=_type;
 		}
+		//did not find anything...
 		else {
+			_layer.data.push_back({_pt.x, _pt.y, _type});
+		}
+	};
 
-			set_tile(grid, tile_list.get().first);
+	if(!multiclick.engaged) {
+		set_tile(grid, tile_list.get().first);
+		return;
+	}
+
+	for(int x=multiclick.rangex.min; x<=multiclick.rangex.max; x++) {
+		for(int y=multiclick.rangey.min; y<=multiclick.rangey.max; y++) {
+			set_tile({x, y}, tile_list.get().first);
 		}
 	}
+
+	return;
 }
 
 void editor::arrow_input_set(
-	int _movement_x, 
+	int _movement_x,
 	int _movement_y
 ) {
 
@@ -411,7 +415,7 @@ void editor::arrow_input_set(
 }
 
 void editor::arrow_input_map(
-	int _movement_x, 
+	int _movement_x,
 	int _movement_y
 ) {
 
@@ -452,7 +456,7 @@ void editor::draw_set(
 		void visit(const tile_editor::tile_layer& _layer) {controller->draw_set(*screen, _layer);}
 		void visit(const tile_editor::thing_layer& _layer) {controller->draw_set(*screen, _layer);}
 		void visit(const tile_editor::poly_layer& _layer) {controller->draw_set(*screen, _layer);}
-		
+
 	} dispatcher;
 
 	dispatcher.controller=this;
@@ -472,7 +476,7 @@ int editor::draw_set_background(
 
 	box.set_blend(ldv::representation::blends::alpha);
 	box.align(
-		screen_rect, 
+		screen_rect,
 		{
 			ldv::representation_alignment::h::inner_right,
 			ldv::representation_alignment::v::inner_top
@@ -627,13 +631,13 @@ void editor::draw_grid(
 		auto gridcolor=0==x
 			? to_color(session.grid_data.origin_color)
 			: (
-				(x % ruler_units) 
+				(x % ruler_units)
 					? to_color(session.grid_data.color)
 					: to_color(session.grid_data.ruler_color)
 			);
 
 		ldv::line_representation line(
-			{x, focus.origin.y}, 
+			{x, focus.origin.y},
 			{x, y_max},
 			gridcolor
 		);
@@ -652,13 +656,13 @@ void editor::draw_grid(
 		auto gridcolor=0==y
 			? to_color(session.grid_data.origin_color)
 			: (
-				(y % ruler_units) 
+				(y % ruler_units)
 					? to_color(session.grid_data.color)
 					: to_color(session.grid_data.ruler_color)
 			);
 
 		ldv::line_representation line(
-			{focus.origin.x, y}, 
+			{focus.origin.x, y},
 			{x_max, y},
 			gridcolor
 		);
@@ -684,7 +688,7 @@ void editor::draw_layers(ldv::screen& _screen) {
 	visitor.controller=this;
 
 	switch(layer_draw_mode) {
-	
+
 		case layer_draw_modes::all: {
 			for(std::size_t index=0; index < map.layers.size(); index++) {
 				map.layers[index]->accept(visitor);
@@ -700,14 +704,14 @@ void editor::draw_layers(ldv::screen& _screen) {
 		}
 		break;
 
-		case layer_draw_modes::current: 
+		case layer_draw_modes::current:
 			map.layers[current_layer]->accept(visitor);
 		break;
 	}
 }
 
 void editor::draw_layer(
-	ldv::screen& _screen, 
+	ldv::screen& _screen,
 	const tile_editor::tile_layer& _layer
 ) {
 
@@ -758,13 +762,13 @@ void editor::draw_layer(
 		             h=thing.h;
 
 		box.set_location({thing.x, thing.y, w, h});
-		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a)); 
+		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a));
 		box.draw(_screen, camera);
 	}
 }
 
 void editor::draw_layer(
-	ldv::screen& _screen, 
+	ldv::screen& _screen,
 	const tile_editor::poly_layer& _layer
 ) {
 
@@ -790,7 +794,7 @@ void editor::draw_layer(
 		);
 
 		shape.set_points(points);
-		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, poly.color.a)); 
+		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, poly.color.a));
 		shape.draw(_screen, camera);
 	}
 }
@@ -889,7 +893,7 @@ void editor::save_current() {
 	tile_editor::map_saver ms{log};
 
 	if(!ms.save(map, current_filename)) {
-		
+
 		message_manager.add("could not save map!");
 	}
 	else {
@@ -901,9 +905,9 @@ void editor::save_current() {
 void editor::load_map(const std::string& _path) {
 
 	tile_editor::map_loader ml{
-		log, 
-		message_manager, 
-		session.thingsets, 
+		log,
+		message_manager,
+		session.thingsets,
 		session.polysets
 	};
 	map=ml.load_from_file(_path);
@@ -922,7 +926,7 @@ void editor::load_session(const std::string& _path) {
 	//set the toolbox width...
 	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
 	tile_list.set_available_w(w);
-	
+
 	//TODO: I would enjoy if this was another component.
 	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;
 	tileset_textures.clear();
@@ -970,7 +974,7 @@ void editor::next_layer() {
 void editor::toggle_layer_draw_mode() {
 
 	switch(layer_draw_mode) {
-	
+
 		case layer_draw_modes::all:
 			layer_draw_mode=layer_draw_modes::stack;
 			message_manager.add("layer draw mode: stack");
@@ -978,11 +982,11 @@ void editor::toggle_layer_draw_mode() {
 
 		case layer_draw_modes::stack:
 			layer_draw_mode=layer_draw_modes::current;
-			message_manager.add("layer draw mode: current"); 
+			message_manager.add("layer draw mode: current");
 			return;
 
-		case layer_draw_modes::current: 
-			layer_draw_mode=layer_draw_modes::all; 
+		case layer_draw_modes::current:
+			layer_draw_mode=layer_draw_modes::all;
 			message_manager.add("layer draw mode: all");
 			return;
 	}
@@ -1024,7 +1028,7 @@ ldt::point_2d<int> editor::get_grid_position(ldt::point_2d<int> _point) const {
 
 	return {
 		(floor(_point.x / size)) ,
-		(floor(_point.y / size)) 
+		(floor(_point.y / size))
 	};
 }
 
@@ -1032,4 +1036,5 @@ void editor::layer_change_cleanup() {
 
 	selected_poly=nullptr;
 	selected_thing=nullptr;
+	multiclick.engaged=false;
 }

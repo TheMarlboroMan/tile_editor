@@ -38,14 +38,17 @@ class editor:
 		click_modifier_none=0,
 		click_modifier_delete=1,
 		click_modifier_lshift=2,
-		click_modifier_lctrl=3
+		click_modifier_lctrl=4
 	};
 
 	using editor_point=ldt::point_2d<int>;
 
 	struct {
-		editor_point       point{0,0};
-		bool               engaged{false};
+		editor_point        point{0,0};
+		bool                engaged{false};
+		struct {
+			int min{0}, max{0};
+		}                  rangex, rangey;
 	} multiclick;
 
 	//!returns the world position from the mouse position.
@@ -104,7 +107,7 @@ class editor:
 		ldtools::sprite_frame   frame;
 	};
 
-	//The sprite_frame does not store its id, so the grid will store the 
+	//The sprite_frame does not store its id, so the grid will store the
 	//natural pair id-sprite.
 	tools::grid_list<ldtools::sprite_table::container::value_type> tile_list;
 	tools::vertical_list<tile_editor::thing_definition> thing_list;

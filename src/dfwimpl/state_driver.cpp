@@ -9,7 +9,7 @@
 using namespace dfwimpl;
 
 state_driver::state_driver(
-	dfw::kernel& kernel, 
+	dfw::kernel& kernel,
 	dfwimpl::config& c
 )
 	:state_driver_interface(controller::t_states::state_editor),
@@ -71,7 +71,7 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	}
 
 	kernel.init_video_system({
-		w, h, 
+		w, h,
 		w, h,
 		config.string_from_path("video:window_title"),
 		config.bool_from_path("video:window_show_cursor"),
@@ -112,8 +112,8 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
 		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
 		{input_description_from_config_token(config.token_from_path("input:del")), input::del},
-		{input_description_from_config_token(config.token_from_path("input:left_control")), input::lctrl},
-		{input_description_from_config_token(config.token_from_path("input:left_shift")), input::lshift},
+		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
+		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
 		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
 		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
 		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
@@ -172,8 +172,8 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 	);
 
 	reg(
-		c_help, 
-		controller::t_states::state_help, 
+		c_help,
+		controller::t_states::state_help,
 		new controller::help{
 			log,
 			ttf_manager,
