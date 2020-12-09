@@ -223,7 +223,8 @@ void blueprint_parser::session_mode(
 		"gridhruler",
 		"gridcolor",
 		"gridrulercolor",
-		"gridorigincolor"
+		"gridorigincolor",
+		"toolboxwidthpercent"
 	}, false);
 
 	const std::string& thingcenter=propmap["thingcenter"];
@@ -288,6 +289,19 @@ void blueprint_parser::session_mode(
 
 		return result;
 	};
+
+	if(propmap["toolboxwidthpercent"].size()) {
+
+		int percent=to_int(propmap["gridsize"], "toolboxwidthpercent");
+
+		if(percent < 1 || percent > 100) {
+
+			throw std::runtime_error("toolboxwidth percent must be between 1 and 100");
+		}
+
+		_blueprint.toolbox_width_percent=percent;
+
+	}
 
 	if(propmap["gridsize"].size()) {
 

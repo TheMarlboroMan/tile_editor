@@ -1,7 +1,6 @@
 # Tile editor
 
 ## TODO
-- toolset width configurable by session as a %
 - click on tile to add tiles
 - delete click to delete tiles
 - sort tiles on save
@@ -50,6 +49,11 @@ Contains
 - Polygons
 
 ## What are...
+
+### Layers
+
+A layer is a homogeneous group of map entities (tiles, objects or polygons). The number and ordering of layers is open.
+
 ### Templates for map properties
 
 TODO

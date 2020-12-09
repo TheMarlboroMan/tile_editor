@@ -87,8 +87,7 @@ class editor:
 	                            grid_list_h{32},
 	                            grid_list_margin{8},
 	                            vertical_list_h{32},
-	                            vertical_list_margin{8},
-	                            list_screen_portion{3}; //1 / x of the full w.
+	                            vertical_list_margin{8};
 };
 }
 

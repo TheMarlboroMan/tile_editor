@@ -42,7 +42,7 @@ editor::editor(
 		ldv::rgba8(255, 255, 255, 255),
 	},
 	mouse_pos{0,0},
-	tile_list{_screen_w / list_screen_portion, _screen_h, grid_list_w, grid_list_h},
+	tile_list{_screen_w, _screen_h, grid_list_w, grid_list_h},
 	thing_list{_screen_h, vertical_list_h},
 	poly_list{_screen_h, vertical_list_h} {
 
@@ -336,8 +336,10 @@ void editor::draw_set(
 int editor::draw_set_background(
 	ldv::screen& _screen
 ) {
+	int w=_screen.get_w() * (session.toolbox_width_percent / 100.);
+
 	ldv::box_representation box(
-		{0,0, tile_list.get_available_w(), tile_list.get_available_h()},
+		{0,0, w, _screen.get_h()},
 		ldv::rgba8(0,0,0,128)
 	);
 
@@ -803,6 +805,10 @@ void editor::load_session(const std::string& _path) {
 	tile_editor::blueprint_parser cfp;
 	session=cfp.parse_file(_path);
 
+	//set the toolbox width...
+	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
+	tile_list.set_available_w(w);
+	
 	//TODO: I would enjoy if this was another component.
 	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;
 	tileset_textures.clear();

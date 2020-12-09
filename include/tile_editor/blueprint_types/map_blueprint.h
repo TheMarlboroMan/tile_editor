@@ -33,6 +33,7 @@ struct map_blueprint {
 	};
 
 	tile_editor::grid_data                          grid_data;
+	int                                             toolbox_width_percent=33;
 	tile_editor::color                              bg_color{32,32,32,0};
 	thing_centers                                   thing_center{thing_centers::center};
 
