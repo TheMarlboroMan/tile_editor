@@ -1,8 +1,10 @@
 # Tile editor
 
 ## TODO
-- click on tile to add tiles
-- delete click to delete tiles
+
+- control click to add straight lines
+- control + shift + click to fill squares
+- same with delete, of course, to delete lines or squares
 - sort tiles on save
 - check layer id integrity on save
 - use object centeron session attr.

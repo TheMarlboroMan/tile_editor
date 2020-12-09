@@ -4,14 +4,21 @@
 
 f1 - Help.
 s - save current file
+lctrl+s - save to new file
 l - load new file
 + - zoom in
 - - zoom out
-ctrl+s - save to new file
-	- next layer
-	- previous layer
-	- change layer drawing mode
-	- change tile element (with keyboard)
-	- new layer (perhaps its own controller)
-	- delete layer (perhaps its own controller)
+pagedown - next layer
+pageup - previous layer
+space - change layer drawing mode
+tab - toggle toolset 
+arrows - move / change toolset element (depending on toolset visibility)
 
+??? - new layer (perhaps its own controller)
+??? - delete layer (perhaps its own controller)
+
+=== TILE EDITOR MODE ===
+
+click - add / change tile
+del + click - delete tile
+lshift + click - between two points, add/change/delete area

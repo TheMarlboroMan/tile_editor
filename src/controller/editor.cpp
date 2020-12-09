@@ -108,7 +108,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::save)) {
 
-		if(_input.is_input_pressed(input::left_control)) {
+		if(_input.is_input_pressed(input::lctrl)) {
 
 			exchange_data.file_browser_allow_create=true;
 			exchange_data.file_browser_title="Save map file as";
@@ -150,7 +150,8 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		show_set=!show_set;
 	}
 
-	mouse_pos=get_mouse_position(_input);
+	auto mpos=_input().get_mouse_position();
+	mouse_pos={mpos.x, mpos.y};
 
 	if(_input.is_input_down(input::pageup)) {
 
@@ -160,6 +161,29 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	else if(_input.is_input_down(input::pagedown)) {
 
 		next_layer();
+		return;
+	}
+
+	if(_input.is_input_down(input::left_click)) {
+
+		int click_modifiers=click_modifier_none;
+
+		if(_input.is_input_pressed(input::del)) {
+
+			click_modifiers|=click_modifier_delete;
+		}
+
+		if(_input.is_input_pressed(input::lshift)) {
+
+			click_modifiers|=click_modifier_lshift;
+		}
+
+		if(_input.is_input_pressed(input::lctrl)) {
+
+			click_modifiers|=click_modifier_lctrl;
+		}
+
+		click_input(input::left_click, click_modifiers);
 		return;
 	}
 
@@ -191,11 +215,11 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	else {
 
 		typedef  bool (dfw::input::*input_fn)(int) const;
-		input_fn movement_fn=_input.is_input_pressed(input::left_control)
+		input_fn movement_fn=_input.is_input_pressed(input::lctrl)
 			? &dfw::input::is_input_down
 			: &dfw::input::is_input_pressed;
 
-		const int factor=_input.is_input_pressed(input::left_control) 
+		const int factor=_input.is_input_pressed(input::lctrl) 
 			? session.grid_data.size / 4
 			: session.grid_data.size / 2;
 
@@ -226,6 +250,109 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		}
 
 		return;
+	}
+}
+
+void editor::click_input(
+	int _input,
+	int _modifiers
+) {
+	struct : tile_editor::layer_visitor {
+		editor * controller{nullptr};
+		int input{0};
+		int modifiers{0};
+		void visit(tile_editor::tile_layer& _layer) {controller->click_input(input, modifiers, _layer);}
+		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::poly_layer&) {}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.input=_input;
+	dispatcher.modifiers=_modifiers;
+	map.layers.at(current_layer)->accept(dispatcher);
+}
+
+void editor::click_input(
+	int _input,
+	int _modifiers,  
+	tile_editor::tile_layer& _layer
+) {
+	auto world_pos=get_world_position(mouse_pos);
+	auto grid=get_grid_position(world_pos);
+
+	//TODO: This is a disaster :D.
+
+	if(!_modifiers & click_modifier_lshift) {
+
+		multiclick.engaged=false;
+	}
+	else {
+	
+		if(!multiclick.engaged) {
+
+			multiclick.engaged=true;
+			multiclick.point=grid;
+		}
+	}
+
+	auto find_tile_at=[&_layer](editor_point _pt) {
+
+		return std::find_if(
+			std::begin(_layer.data),
+			std::end(_layer.data),
+			[_pt](const tile_editor::tile& _tile) {
+				return _tile.x==_pt.x && _tile.y==_pt.y;
+			}
+		);
+	};
+
+	if(_modifiers & click_modifier_delete) {
+
+		auto delete_tile_if_exists=[&_layer, find_tile_at](editor_point _pt) {
+
+			auto it=find_tile_at(_pt);
+			if(it!=std::end(_layer.data)) {
+
+				_layer.data.erase(it);
+			}
+		};
+
+		if(multiclick.engaged) {
+
+			//TODO: order grid and multiclick.point...
+			//then call delete_tile_if_exists
+
+			multiclick.engaged=false;
+		}
+		else {
+
+			delete_tile_if_exists(grid);
+		}
+	}
+	else {
+
+		auto set_tile=[&_layer, find_tile_at](editor_point _pt, int _type) {
+
+			auto it=find_tile_at(_pt);
+			if(it!=std::end(_layer.data)) {
+				it->type=_type;
+			}
+			//did not find anything...
+			else {
+				_layer.data.push_back({_pt.x, _pt.y, _type});
+			}
+		};
+
+		if(multiclick.engaged) {
+
+			//TODO: order grid and multiclick.point...
+			//then call set_tile
+
+			multiclick.engaged=false;
+		}
+		else {
+
+			set_tile(grid, tile_list.get().first);
+		}
 	}
 }
 
@@ -383,7 +510,7 @@ void editor::draw_set(
 			current_box.draw(_screen);
 		}
 
-		bmp.set_clip(item.item.get_rect());
+		bmp.set_clip(item.item.second.get_rect());
 		bmp.set_location({background_start+item.x, item.y, item_w, item_h});
 		bmp.draw(_screen);
 	}
@@ -718,19 +845,6 @@ void editor::draw_hud(ldv::screen& _screen) {
 	txt_hud.draw(_screen);
 }
 
-ldt::point_2d<int> editor::get_mouse_position(dfw::input& _input) const {
-
-	auto pos=_input().get_mouse_position();
-
-	pos.x/=camera.get_zoom();
-	pos.y/=camera.get_zoom();
-
-	pos.x+=camera.get_x();
-	pos.y+=camera.get_y();
-
-	return {pos.x, pos.y};
-}
-
 void editor::zoom_in() {
 
 	auto zoom=camera.get_zoom();
@@ -837,6 +951,7 @@ void editor::previous_layer() {
 
 	--current_layer;
 	load_layer_toolset();
+	layer_change_cleanup();
 }
 
 void editor::next_layer() {
@@ -849,6 +964,7 @@ void editor::next_layer() {
 
 	++current_layer;
 	load_layer_toolset();
+	layer_change_cleanup();
 }
 
 void editor::toggle_layer_draw_mode() {
@@ -889,4 +1005,31 @@ void editor::load_layer_toolset() {
 	};
 
 	map.layers.at(current_layer)->accept(ll);
+}
+
+ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
+
+	_pos.x/=camera.get_zoom();
+	_pos.y/=camera.get_zoom();
+
+	_pos.x+=camera.get_x();
+	_pos.y+=camera.get_y();
+
+	return {_pos.x, _pos.y};
+}
+
+ldt::point_2d<int> editor::get_grid_position(ldt::point_2d<int> _point) const {
+
+	double size{session.grid_data.size};
+
+	return {
+		(floor(_point.x / size)) ,
+		(floor(_point.y / size)) 
+	};
+}
+
+void editor::layer_change_cleanup() {
+
+	selected_poly=nullptr;
+	selected_thing=nullptr;
 }

@@ -15,7 +15,7 @@ struct set_layer_loader:
 	const_layer_visitor {
 
 	set_layer_loader(
-		tools::grid_list<ldtools::sprite_frame>&,
+		tools::grid_list<ldtools::sprite_table::container::value_type>&,
 		tools::vertical_list<tile_editor::thing_definition>&,
 		tools::vertical_list<tile_editor::poly_definition>&,
 		std::map<std::size_t, tileset>&,
@@ -23,7 +23,7 @@ struct set_layer_loader:
 		std::map<std::size_t, poly_definition_table>&
 	);
 
-	tools::grid_list<ldtools::sprite_frame>& tile_list;
+	tools::grid_list<ldtools::sprite_table::container::value_type>& tile_list;
 	tools::vertical_list<tile_editor::thing_definition>& thing_list;
 	tools::vertical_list<tile_editor::poly_definition>& poly_list;
 	std::map<std::size_t, tileset>&                 tilesets;

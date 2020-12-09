@@ -6,7 +6,7 @@
 using namespace tile_editor;
 
 set_layer_loader::set_layer_loader(
-	tools::grid_list<ldtools::sprite_frame>& _tilelist,
+	tools::grid_list<ldtools::sprite_table::container::value_type>& _tilelist,
 	tools::vertical_list<tile_editor::thing_definition>& _thinglist,
 	tools::vertical_list<tile_editor::poly_definition>& _polylist,
 	std::map<std::size_t, tileset>& _tilesets,
@@ -24,7 +24,11 @@ set_layer_loader::set_layer_loader(
 
 void set_layer_loader::visit(const tile_editor::tile_layer& _layer) {
 
-	insert(_layer, tile_list, tilesets);
+	tile_list.clear();
+	for(const auto& item : tilesets.at(_layer.set).table) {
+
+		tile_list.insert(item);
+	}
 }
 
 void set_layer_loader::visit(const tile_editor::thing_layer& _layer) {

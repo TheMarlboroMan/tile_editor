@@ -6,6 +6,8 @@
 #include "app/exchange_data.h"
 #include "blueprint_types/map_blueprint.h"
 #include "editor_types/map.h"
+#include "editor_types/thing.h"
+#include "editor_types/poly.h"
 
 #include <ldv/ttf_representation.h>
 #include <dfw/controller_interface.h>
@@ -32,9 +34,28 @@ class editor:
 
 	private:
 
-	ldt::point_2d<int>          get_mouse_position(dfw::input&) const;
+	enum key_modifiers {
+		click_modifier_none=0,
+		click_modifier_delete=1,
+		click_modifier_lshift=2,
+		click_modifier_lctrl=3
+	};
+
+	using editor_point=ldt::point_2d<int>;
+
+	struct {
+		editor_point       point{0,0};
+		bool               engaged{false};
+	} multiclick;
+
+	//!returns the world position from the mouse position.
+	editor_point                get_world_position(ldt::point_2d<int>) const;
+	//!returns grid-based position from world position.
+	editor_point                get_grid_position(ldt::point_2d<int>) const;
 	void                        arrow_input_set(int, int);
 	void                        arrow_input_map(int, int);
+	void                        click_input(int, int);
+	void                        click_input(int, int, tile_editor::tile_layer&);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
 	void                        draw_grid(ldv::screen&);
@@ -54,6 +75,8 @@ class editor:
 	void                        zoom_out();
 	void                        next_layer();
 	void                        previous_layer();
+	//!resets all layer sensitive data (selections, polygons in the making...).
+	void                        layer_change_cleanup();
 	void                        toggle_layer_draw_mode();
 	void                        load_layer_toolset();
 	void                        save_current();
@@ -75,13 +98,24 @@ class editor:
 	ldv::camera                 camera;
 	ldv::ttf_representation     last_message_rep;
 	ldt::point_2d<int>          mouse_pos;
-	tools::grid_list<ldtools::sprite_frame> tile_list;
+
+	struct frame {
+		std::size_t             id;
+		ldtools::sprite_frame   frame;
+	};
+
+	//The sprite_frame does not store its id, so the grid will store the 
+	//natural pair id-sprite.
+	tools::grid_list<ldtools::sprite_table::container::value_type> tile_list;
 	tools::vertical_list<tile_editor::thing_definition> thing_list;
 	tools::vertical_list<tile_editor::poly_definition> poly_list;
 	std::string                 current_filename;
 	std::size_t	                current_layer{0},
 	                            component_index{0}; //!< Currently chosen tile/thing/poly.
+	tile_editor::thing *        selected_thing{nullptr};
+	tile_editor::poly *         selected_poly{nullptr};
 	bool                        show_set{true};
+
 
 	static const int            grid_list_w{32},
 	                            grid_list_h{32},
