@@ -11,6 +11,7 @@
 #include "controller/editor.h"
 #include "controller/file_browser.h"
 #include "../../include/controller/help.h"
+#include "../../include/controller/tile_editor_properties.h"
 //[new-controller-header-mark]
 
 //Specific app_config
@@ -50,6 +51,7 @@ class state_driver:
 	ptr_controller                  c_editor;
 	ptr_controller                  c_file_browser;
 	ptr_controller					c_help;
+	ptr_controller					c_tile_editor_properties;
 	//[new-controller-property-mark]
 
 	ldtools::ttf_manager            ttf_manager;

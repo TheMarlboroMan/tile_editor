@@ -84,6 +84,7 @@ class editor:
 	void                        load_layer_toolset();
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
+	void                        open_layer_settings();
 
 	//references...
 	lm::logger&                 log;

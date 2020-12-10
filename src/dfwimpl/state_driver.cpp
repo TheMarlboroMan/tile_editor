@@ -115,6 +115,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
 		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
 		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
+		{input_description_from_config_token(config.token_from_path("input:layer_settings")), input::layer_settings},
 		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
 		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
 		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
@@ -180,6 +181,15 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			screen_w,
 			screen_h
 		}
+	);
+	reg(
+		c_tile_editor_properties, 
+		controller::t_states::state_tile_editor_properties, 
+		new controller::tile_editor_properties(
+			log, 
+			ttf_manager,
+			exchange_data
+			)
 	);
 	//[new-controller-mark]
 }

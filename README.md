@@ -2,7 +2,6 @@
 
 ## TODO
 
-- sort tiles on save
 - edit layer properties (set, id, alpha), send a ptr to the layer and be done.
 - check layer id integrity on save
 - use object centeron session attr.

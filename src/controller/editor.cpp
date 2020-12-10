@@ -96,6 +96,12 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	if(_input.is_input_down(input::layer_settings)) {
+
+		open_layer_settings();
+		return;
+	}
+
 	if(_input.is_input_down(input::load)) {
 
 		exchange_data.file_browser_allow_create=false;
@@ -1037,4 +1043,32 @@ void editor::layer_change_cleanup() {
 	selected_poly=nullptr;
 	selected_thing=nullptr;
 	multiclick.engaged=false;
+}
+
+void editor::open_layer_settings() {
+
+	if(!map.layers.size()) {
+
+		return;
+	}
+
+	struct :public tile_editor::layer_visitor {
+		editor * controller{nullptr};
+		void visit(tile_editor::tile_layer& _layer) {
+
+			controller->exchange_data.layer=&_layer;
+			controller->exchange_data.blueprint=&controller->session;
+			start(state_tile_editor_properties);
+		}
+		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::poly_layer&) {}
+
+		private:
+		void start(int _state) {
+			controller->exchange_data.put(_state);
+			controller->push_state(_state);
+		}
+	} dispatcher;
+	dispatcher.controller=this;
+	map.layers.at(current_layer)->accept(dispatcher);
 }

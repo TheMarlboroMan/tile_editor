@@ -2,7 +2,8 @@
 
 == EDITOR MODE ==
 
-f1 - Help.
+f1 - help.
+f2 - layer settings
 s - save current file
 lctrl+s - save to new file
 l - load new file
