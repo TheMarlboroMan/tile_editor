@@ -108,6 +108,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:down")), input::down},
 		{input_description_from_config_token(config.token_from_path("input:enter")), input::enter},
 		{input_description_from_config_token(config.token_from_path("input:space")), input::space},
+		{input_description_from_config_token(config.token_from_path("input:backspace")), input::backspace},
 		{input_description_from_config_token(config.token_from_path("input:tab")), input::tab},
 		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
 		{input_description_from_config_token(config.token_from_path("input:load")), input::load},

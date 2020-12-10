@@ -66,32 +66,18 @@ void tile_editor_properties::loop(dfw::input& _input, const dfw::loop_iteration_
 		return;
 	}
 
- 	if(_input.is_input_down(input::escape)) {
-
-		pop_state();
-		return;
-	}
-
 	text_mode 
 		? input_text(_input)
 		: input_traverse(_input);
 }
 
-void tile_editor_properties::input_text(dfw::input& _input) {
-
-	//TODO: feed the value from the menu...
-
-	if(_input.is_input_down(input::enter)) {
-
-		//TODO: validate input data...
-
-		text_mode=false;
-		//TODO: clear and exit text mode
-	}
-
-}
-
 void tile_editor_properties::input_traverse(dfw::input& _input) {
+
+ 	if(_input.is_input_down(input::escape)) {
+
+		pop_state();
+		return;
+	}
 
 	if(_input.is_input_down(input::down)) {
 		current_key=menu.adjacent_key(current_key, decltype(menu)::browse_dir::next);
@@ -119,11 +105,80 @@ void tile_editor_properties::input_traverse(dfw::input& _input) {
 				menu.browse(menu_layer_set, decltype(menu)::browse_dir::next);
 				return;
 
-			default:
+			case menu_layer_alpha:
 				text_mode=true;
-				//TODO: clear and start text mode
+				input_value.clear();
+				_input().start_text_input();
+				_input().set_text_filter([](const SDL_Event& _event) -> bool {
+					try {
+						int val=std::stoi(_event.text.text);
+						return val >= 0 && val <= 9;
+					}
+					catch(std::invalid_argument&) {
+						return false;
+					}
+				});
+			break;
+			case menu_layer_id:
+				text_mode=true;
+				input_value.clear();
+				_input().start_text_input();
 			break;
 		}
+	}
+}
+
+void tile_editor_properties::input_text(dfw::input& _input) {
+
+	auto done=[&_input, this]() {
+
+		_input().clear_text_filter();
+		_input().stop_text_input();
+		_input().clear_text_input();
+		input_value="";
+		text_mode=false;
+	};
+
+	if(_input.is_input_down(input::escape)) {
+
+		done();
+		return;
+	}
+
+	if(_input.is_input_down(input::enter)) {
+
+		switch(current_key) {
+			case menu_layer_id:
+				menu.set(menu_layer_id, input_value);
+			break;
+			case menu_layer_alpha:
+			{
+				int val=std::stoi(input_value);
+				if(val >= 0 && val <= 255) {
+					menu.set(menu_layer_alpha, val);
+				}
+			}
+			break;
+		}
+
+		done();
+		return;
+	}
+
+	if(_input.is_input_down(input::backspace)) {
+
+		if(input_value.length()) {
+			input_value.pop_back(); 
+		}
+
+		_input().clear_text_input();
+		return;
+	}
+
+	if(_input().is_text_input()) {
+
+		input_value+=_input().get_text_input();
+		_input().clear_text_input();
 	}
 }
 
@@ -131,9 +186,13 @@ void tile_editor_properties::draw(ldv::screen& _screen, int /*fps*/) {
 
 	_screen.clear(ldv::rgba8(0, 0, 0, 255));
 
-	auto selected=[this](int index) -> const char *{
+	auto is_current=[this](int _index) -> bool {
+		return _index==current_key;
+	};
 
-		return index==current_key ? "[>] " : "[ ] ";
+	auto selected=[is_current](int _index) -> const char *{
+
+		return is_current(_index) ? "[>] " : "[ ] ";
 	};
 
 	std::stringstream ss;
@@ -141,12 +200,21 @@ void tile_editor_properties::draw(ldv::screen& _screen, int /*fps*/) {
 
 		switch(i) {
 			case menu_layer_id:
-				ss<<selected(i)<<"id (string): "<<menu.get_string(i)<<std::endl;
+				if(is_current(i) && text_mode) {
+					ss<<"[*] id (string): "<<input_value<<std::endl;
+				}
+				else {
+					ss<<selected(i)<<"id (string): "<<menu.get_string(i)<<std::endl;
+				}
 			break;
 			case menu_layer_alpha:
-				ss<<selected(i)<<"alpha (0-255): "<<menu.get_int(i)<<std::endl;
+				if(is_current(i) && text_mode) {
+					ss<<"[*] alpha (0-255): "<<input_value<<std::endl;
+				}
+				else {
+					ss<<selected(i)<<"alpha (0-255): "<<menu.get_int(i)<<std::endl;
+				}
 			break;
-				//TODO: sets should be translated!!!
 			case menu_layer_set:
 				ss<<selected(i)<<"set (choice): "<<sets[menu.get_int(i)]<<std::endl;
 			break;

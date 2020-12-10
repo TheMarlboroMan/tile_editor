@@ -51,6 +51,7 @@ class tile_editor_properties:
 	int                         current_key{0};
 	std::map<int, std::string>  sets;
 	bool                        text_mode{false};
+	std::string                 input_value;
 
 };
 

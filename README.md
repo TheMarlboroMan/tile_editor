@@ -2,7 +2,6 @@
 
 ## TODO
 
-- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
 - check layer id integrity on save
 - use object centeron session attr.
 - click to add object
@@ -11,6 +10,7 @@
 - change properties of object
 - delete selected object
 - sort objects on save
+- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
 - add new layer
 - delete layer
 - reorder layers
@@ -21,6 +21,7 @@
 - delete poly
 - sort polys on save
 - change properties of poly
+- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
 - console mode (move_by multiple of grid)
 
 ## Building
