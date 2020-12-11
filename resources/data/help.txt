@@ -30,4 +30,8 @@ lshift + click - between two points, add/change/delete area
 
 === THING EDITOR MODE ===
 
+lalt - snap to grid
+
 === POLY EDITOR MODE ===
+
+lalt - snap to grid

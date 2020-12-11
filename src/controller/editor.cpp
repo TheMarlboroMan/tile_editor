@@ -157,10 +157,24 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	if(_input.is_input_down(input::tab)) {
 
 		show_set=!show_set;
+		return;
 	}
 
 	auto mpos=_input().get_mouse_position();
 	mouse_pos={mpos.x, mpos.y};
+	if(_input.is_input_pressed(input::lalt)) {
+
+		struct : tile_editor::const_layer_visitor {
+			bool snappable=true;
+			void visit(const tile_editor::tile_layer&) {snappable=false;}
+			void visit(const tile_editor::thing_layer&) {}
+			void visit(const tile_editor::poly_layer&) {}
+		} dispatcher;
+
+		if(dispatch_layer(dispatcher) && dispatcher.snappable) {
+			mouse_pos=snap_to_grid(mouse_pos);
+		}
+	}
 
 	if(_input.is_input_down(input::pageup)) {
 
@@ -541,6 +555,9 @@ void editor::draw_cursor(ldv::screen& _screen) {
 	cursor.set_clip(rect);
 	int x=mouse_pos.x-(rect.w/2),
 		y=mouse_pos.y-(rect.h/2);
+
+	//TODO: What about snap to grid???
+
 	cursor.set_location({x, y, rect.w, rect.h});
 	cursor.draw(_screen);
 }
@@ -1186,6 +1203,7 @@ void editor::layer_change_cleanup() {
 	selected_thing=nullptr;
 	multiclick.engaged=false;
 	tile_delete_mode=false;
+	subgrid_factor=session.grid_data.size;
 }
 
 void editor::open_layer_settings() {
@@ -1255,4 +1273,16 @@ bool editor::dispatch_layer(tile_editor::layer_visitor& _dispatcher) {
 
 	map.layers.at(current_layer)->accept(_dispatcher);
 	return true;
+}
+
+editor::editor_point editor::snap_to_grid(editor_point _point) const {
+
+	double  x=_point.x,
+	        y=_point.y,
+	        factor=subgrid_factor;
+
+	int px=round(x / factor) * factor;
+	int py=round(y / factor) * factor;
+
+	return {px, py};
 }

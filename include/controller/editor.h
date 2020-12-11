@@ -54,6 +54,7 @@ class editor:
 	editor_point                get_world_position(ldt::point_2d<int>) const;
 	//!returns grid-based position from world position.
 	editor_point                get_grid_position(ldt::point_2d<int>) const;
+	editor_point                snap_to_grid(editor_point) const;
 	void                        arrow_input_set(int, int);
 	void                        arrow_input_map(int, int);
 	void                        click_input(int, int);
