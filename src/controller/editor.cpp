@@ -847,25 +847,10 @@ void editor::draw_layer(
 		hline.set_color(color);
 	};
 
-	auto thing_center=[](int _x, int _y, int _w, int _h, tile_editor::map_blueprint::thing_centers _center) -> editor_point {
-
-		using namespace tile_editor;
-
-		switch(_center) {
-			case map_blueprint::thing_centers::center: return {_x-_w/2, _y-_h/2};
-			case map_blueprint::thing_centers::top_left: return {_x, _y};
-			case map_blueprint::thing_centers::top_right: return {_x+_w, _y};
-			case map_blueprint::thing_centers::bottom_right: return {_x+_w, _y+_h};
-			case map_blueprint::thing_centers::bottom_left: return {_x, _y+_w};
-		}
-
-		return {_x, _y};
-	};
-
 	for(const auto& thing : _layer.data) {
 
-		auto center=thing_center(thing.x, thing.y, thing.w, thing.h, session.thing_center);
-		box.set_location({center.x, center.y, (unsigned)thing.w, (unsigned)thing.h});
+		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
+		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a));
 		box.draw(_screen, camera);
 
@@ -1035,6 +1020,35 @@ void editor::load_session(const std::string& _path) {
 	//set the toolbox width...
 	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
 	tile_list.set_available_w(w);
+
+	//set the thing origin function...
+	switch(session.thing_center) {
+		case tile_editor::map_blueprint::thing_centers::center: 
+			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
+				return {_x-_w/2, _y-_h/2};
+			};
+		break;
+		case tile_editor::map_blueprint::thing_centers::top_left: 
+			thing_origin_fn=[](int _x, int _y, int, int) -> editor_point {
+				return {_x, _y};
+			};
+		break;
+		case tile_editor::map_blueprint::thing_centers::top_right: 
+			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
+				return {_x+_w, _y};
+			};
+		break;
+		case tile_editor::map_blueprint::thing_centers::bottom_right: 
+			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
+				return {_x+_w, _y+_h};
+			};
+		break;
+		case tile_editor::map_blueprint::thing_centers::bottom_left: 
+			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
+				return {_x, _y+_w};
+			};
+		break;
+	}
 
 	//TODO: I would enjoy if this was another component.
 	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;

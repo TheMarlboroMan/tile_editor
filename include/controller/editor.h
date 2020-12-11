@@ -16,6 +16,8 @@
 #include <tools/grid_list.h>
 #include <tools/vertical_list.h>
 
+#include <functional>
+
 namespace controller {
 
 class editor:
@@ -124,7 +126,8 @@ class editor:
 	tile_editor::thing *        selected_thing{nullptr};
 	tile_editor::poly *         selected_poly{nullptr};
 	bool                        show_set{true};
-
+	//!Function that returns the origin of a "thing" based on the current "thing_center" attribute.
+	std::function<editor_point(int, int, int, int)>	thing_origin_fn;
 
 	static const int            grid_list_w{32},
 	                            grid_list_h{32},
