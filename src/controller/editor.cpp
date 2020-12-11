@@ -33,6 +33,8 @@ editor::editor(
 	ttf_manager(_ttf_manager),
 	message_manager{_message_manager},
 	exchange_data{_exchange_data},
+	cursor_tex{ldv::texture(ldv::image("assets/bitmap/cursor.png"))},
+	cursor_table{"data/cursor.dat"},
 	screen_rect{0, 0, _screen_w, _screen_h},
 	camera{
 		screen_rect, //pointing at world 0,0.
@@ -440,6 +442,19 @@ void editor::draw(ldv::screen& _screen, int /*fps*/) {
 		draw_set(_screen);
 	}
 	draw_messages(_screen);
+	draw_cursor(_screen);
+}
+
+void editor::draw_cursor(ldv::screen& _screen) {
+
+	ldv::bitmap_representation cursor(cursor_tex);
+	cursor.set_blend(ldv::representation::blends::alpha);
+	const auto rect=cursor_table.get(1).get_rect();
+	cursor.set_clip(rect);
+	int x=mouse_pos.x-(rect.w/2),
+		y=mouse_pos.y-(rect.h/2);
+	cursor.set_location({x, y, rect.w, rect.h});
+	cursor.draw(_screen);
 }
 
 void editor::draw_messages(ldv::screen& _screen) {

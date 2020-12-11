@@ -74,6 +74,7 @@ class editor:
 	void                        draw_set(ldv::screen&, const tile_editor::tile_layer&);
 	void                        draw_set(ldv::screen&, const tile_editor::thing_layer&);
 	void                        draw_set(ldv::screen&, const tile_editor::poly_layer&);
+	void                        draw_cursor(ldv::screen&);
 	void                        zoom_in();
 	void                        zoom_out();
 	void                        next_layer();
@@ -93,6 +94,8 @@ class editor:
 	tile_editor::exchange_data& exchange_data;
 
 	//TODO: These should likely go somewhere else...
+	ldv::texture                cursor_tex;
+	ldtools::sprite_table       cursor_table;
 	tile_editor::map_blueprint  session;
 	tile_editor::map            map;
 	std::map<std::string, std::unique_ptr<ldv::texture>> tileset_textures;

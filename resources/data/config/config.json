@@ -40,7 +40,7 @@
 		"fullscreen":false,
 		"vsync":false,
 		"window_h_px":600,
-		"window_show_cursor":true,
+		"window_show_cursor":false,
 		"window_title":"Tile Editor",
 		"window_w_px":800
 	}
