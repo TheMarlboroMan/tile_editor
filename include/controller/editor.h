@@ -61,6 +61,7 @@ class editor:
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
 	void                        del_input();
+	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
 	void                        draw_grid(ldv::screen&);
@@ -79,6 +80,8 @@ class editor:
 	void                        draw_cursor(ldv::screen&);
 	void                        zoom_in();
 	void                        zoom_out();
+	void                        make_subgrid_smaller();
+	void                        make_subgrid_larger();
 	void                        next_layer();
 	void                        previous_layer();
 	//!resets all layer sensitive data (selections, polygons in the making...).
@@ -88,6 +91,9 @@ class editor:
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
 	void                        open_layer_settings();
+	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
+	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
+	bool                        dispatch_layer(tile_editor::layer_visitor&);
 
 	//references...
 	lm::logger&                 log;
@@ -120,7 +126,7 @@ class editor:
 	tools::vertical_list<tile_editor::poly_definition> poly_list;
 	std::string                 current_filename;
 	std::size_t	                current_layer{0},
-	                            component_index{0}; //!< Currently chosen tile/thing/poly.
+	                            subgrid_factor{0};
 	tile_editor::thing *        selected_thing{nullptr};
 	tile_editor::poly *         selected_poly{nullptr};
 	bool                        show_set{true},

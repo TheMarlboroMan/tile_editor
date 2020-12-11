@@ -24,6 +24,8 @@ lctrl,
 lshift,
 zoom_in,
 zoom_out,
+smaller_subgrid,
+larger_subgrid,
 left_click,
 right_click
 };

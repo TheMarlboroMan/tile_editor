@@ -224,6 +224,7 @@ void blueprint_parser::session_mode(
 		"gridcolor",
 		"gridrulercolor",
 		"gridorigincolor",
+		"gridsubcolor",
 		"toolboxwidthpercent"
 	}, false);
 
@@ -275,6 +276,12 @@ void blueprint_parser::session_mode(
 
 		_blueprint.grid_data.origin_color=parse_color(propmap["gridorigincolor"]);
 	}
+
+	if(propmap["gridsubcolor"].size()) {
+
+		_blueprint.grid_data.subcolor=parse_color(propmap["gridsubcolor"]);
+	}
+
 
 	auto to_int=[](const std::string& _str, const std::string& _key) -> int {
 

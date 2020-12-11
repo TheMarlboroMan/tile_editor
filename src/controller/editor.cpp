@@ -178,6 +178,12 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		del_input();
 	}
 
+	if(_input.is_input_down(input::smaller_subgrid) || _input.is_input_down(input::larger_subgrid)) {
+
+		subgrid_input(_input.is_input_down(input::smaller_subgrid));
+		return;
+	}
+
 	if(_input.is_input_down(input::left_click)
 		|| _input.is_input_down(input::right_click)) {
 
@@ -281,7 +287,23 @@ void editor::del_input() {
 		void visit(const tile_editor::poly_layer&) {}
 	} dispatcher;
 	dispatcher.controller=this;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
+}
+
+void editor::subgrid_input(
+	bool _make_smaller
+) {
+
+	struct : public tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		bool smaller;
+		void visit(const tile_editor::tile_layer&) {}
+		void visit(const tile_editor::thing_layer&) {smaller ? controller->make_subgrid_smaller() : controller->make_subgrid_larger();}
+		void visit(const tile_editor::poly_layer&) {smaller ? controller->make_subgrid_smaller() : controller->make_subgrid_larger();}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.smaller=_make_smaller;
+	dispatch_layer(dispatcher);
 }
 
 void editor::click_input(
@@ -299,7 +321,7 @@ void editor::click_input(
 	dispatcher.controller=this;
 	dispatcher.input=_input;
 	dispatcher.modifiers=_modifiers;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
 }
 
 void editor::click_input(
@@ -486,8 +508,7 @@ void editor::arrow_input_set(
 	dispatcher.controller=this;
 	dispatcher.movement_x=_movement_x;
 	dispatcher.movement_y=_movement_y;
-
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
 }
 
 void editor::arrow_input_map(
@@ -532,12 +553,6 @@ void editor::draw_messages(ldv::screen& _screen) {
 void editor::draw_set(
 	ldv::screen& _screen
 ) {
-
-	if(!map.layers.size()) {
-
-		return;
-	}
-
 	struct : tile_editor::const_layer_visitor {
 
 		editor *         controller{nullptr};
@@ -550,7 +565,7 @@ void editor::draw_set(
 
 	dispatcher.controller=this;
 	dispatcher.screen=&_screen;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
 }
 
 int editor::draw_set_background(
@@ -697,6 +712,14 @@ void editor::draw_set_text(
 void editor::draw_grid(
 	ldv::screen& _screen
 ) {
+	struct : public tile_editor::const_layer_visitor {
+		bool show_subgrid{true};
+		void visit(const tile_editor::tile_layer&) {show_subgrid=false;}
+		void visit(const tile_editor::thing_layer&) {}
+		void visit(const tile_editor::poly_layer&) {}
+	} dispatcher;
+	dispatch_layer(dispatcher);
+
 	auto euclidean_module=[](int a, int b) -> int {
 
 		int m=a%b;
@@ -721,25 +744,34 @@ void editor::draw_grid(
 	int x=focus.origin.x-module;
 	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
 
-	while(x < x_max) {
+	auto choose_color=[to_color, this, ruler_units](int _value) {
 
-		auto gridcolor=0==x
-			? to_color(session.grid_data.origin_color)
-			: (
-				(x % ruler_units)
-					? to_color(session.grid_data.color)
-					: to_color(session.grid_data.ruler_color)
-			);
+		if(0==_value) {
+			return to_color(session.grid_data.origin_color);
+		}
+
+		if(0== (_value % ruler_units)) {
+			return to_color(session.grid_data.ruler_color);
+		}
+
+		if(0 == (_value % session.grid_data.size)) {
+			return to_color(session.grid_data.color);
+		}
+
+		return to_color(session.grid_data.subcolor);
+	};
+
+	while(x < x_max) {
 
 		ldv::line_representation line(
 			{x, focus.origin.y},
 			{x, y_max},
-			gridcolor
+			choose_color(x)
 		);
 
 		line.draw(_screen, camera);
 
-		x+=session.grid_data.size;
+		x+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
 	}
 
 	//Horizontal lines...
@@ -748,23 +780,15 @@ void editor::draw_grid(
 	ruler_units=session.grid_data.vertical_ruler * session.grid_data.size;
 	while(y < y_max) {
 
-		auto gridcolor=0==y
-			? to_color(session.grid_data.origin_color)
-			: (
-				(y % ruler_units)
-					? to_color(session.grid_data.color)
-					: to_color(session.grid_data.ruler_color)
-			);
-
 		ldv::line_representation line(
 			{focus.origin.x, y},
 			{x_max, y},
-			gridcolor
+			choose_color(y)
 		);
 
 		line.draw(_screen, camera);
 
-		y+=session.grid_data.size;
+		y+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
 	}
 }
 
@@ -1050,6 +1074,8 @@ void editor::load_session(const std::string& _path) {
 	tile_editor::blueprint_parser cfp;
 	session=cfp.parse_file(_path);
 
+	subgrid_factor=session.grid_data.size;
+
 	//set the toolbox width...
 	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
 	tile_list.set_available_w(w);
@@ -1121,11 +1147,6 @@ void editor::toggle_layer_draw_mode() {
 
 void editor::load_layer_toolset() {
 
-	if(!map.layers.size()) {
-
-		return;
-	}
-
 	tile_editor::set_layer_loader ll{
 		tile_list,
 		thing_list,
@@ -1135,7 +1156,7 @@ void editor::load_layer_toolset() {
 		session.polysets
 	};
 
-	map.layers.at(current_layer)->accept(ll);
+	dispatch_layer(ll);
 }
 
 ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
@@ -1169,11 +1190,6 @@ void editor::layer_change_cleanup() {
 
 void editor::open_layer_settings() {
 
-	if(!map.layers.size()) {
-
-		return;
-	}
-
 	struct :public tile_editor::layer_visitor {
 		editor * controller{nullptr};
 		void visit(tile_editor::tile_layer& _layer) {
@@ -1192,5 +1208,51 @@ void editor::open_layer_settings() {
 		}
 	} dispatcher;
 	dispatcher.controller=this;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
+}
+
+void editor::make_subgrid_smaller() {
+
+	if((int)subgrid_factor <= session.grid_data.size / 8) {
+
+		message_manager.add("fine grid is already at its smallest");
+		return;
+	}
+
+	subgrid_factor/=2;
+	message_manager.add(std::string{"fine grid set at "}+std::to_string(subgrid_factor));
+}
+
+void editor::make_subgrid_larger() {
+
+	if((int)subgrid_factor==session.grid_data.size) {
+
+		message_manager.add("fine grid is already at its largest");
+		return;
+	}
+
+	subgrid_factor*=2;
+	message_manager.add(std::string{"fine grid set at "}+std::to_string(subgrid_factor));
+}
+
+bool editor::dispatch_layer(tile_editor::const_layer_visitor& _dispatcher) {
+
+	if(!map.layers.size()) {
+
+		return false;
+	}
+
+	map.layers.at(current_layer)->accept(_dispatcher);
+	return true;
+}
+
+bool editor::dispatch_layer(tile_editor::layer_visitor& _dispatcher) {
+
+	if(!map.layers.size()) {
+
+		return false;
+	}
+
+	map.layers.at(current_layer)->accept(_dispatcher);
+	return true;
 }
