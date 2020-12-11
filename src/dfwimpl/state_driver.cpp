@@ -115,12 +115,15 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:del")), input::del},
 		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
 		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
+		{input_description_from_config_token(config.token_from_path("input:lalt")), input::lalt},
 		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
 		{input_description_from_config_token(config.token_from_path("input:layer_settings")), input::layer_settings},
 		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
 		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
 		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
 		{input_description_from_config_token(config.token_from_path("input:zoom_out")), input::zoom_out},
+		{input_description_from_config_token(config.token_from_path("input:smaller_subgrid")), input::smaller_subgrid},
+		{input_description_from_config_token(config.token_from_path("input:larger_subgrid")), input::larger_subgrid},
 		{input_description_from_config_token(config.token_from_path("input:left_click")), input::left_click},
 		{input_description_from_config_token(config.token_from_path("input:right_click")), input::right_click}
 	};
@@ -185,10 +188,10 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		}
 	);
 	reg(
-		c_tile_editor_properties, 
-		controller::t_states::state_tile_editor_properties, 
+		c_tile_editor_properties,
+		controller::t_states::state_tile_editor_properties,
 		new controller::tile_editor_properties(
-			log, 
+			log,
 			ttf_manager,
 			exchange_data
 			)

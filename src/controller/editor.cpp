@@ -157,10 +157,24 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	if(_input.is_input_down(input::tab)) {
 
 		show_set=!show_set;
+		return;
 	}
 
 	auto mpos=_input().get_mouse_position();
 	mouse_pos={mpos.x, mpos.y};
+	if(_input.is_input_pressed(input::lalt)) {
+
+		struct : tile_editor::const_layer_visitor {
+			bool snappable=true;
+			void visit(const tile_editor::tile_layer&) {snappable=false;}
+			void visit(const tile_editor::thing_layer&) {}
+			void visit(const tile_editor::poly_layer&) {}
+		} dispatcher;
+
+		if(dispatch_layer(dispatcher) && dispatcher.snappable) {
+			mouse_pos=snap_to_grid(mouse_pos);
+		}
+	}
 
 	if(_input.is_input_down(input::pageup)) {
 
@@ -173,15 +187,21 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	if(_input.is_input_down(input::del)) {
+
+		del_input();
+	}
+
+	if(_input.is_input_down(input::smaller_subgrid) || _input.is_input_down(input::larger_subgrid)) {
+
+		subgrid_input(_input.is_input_down(input::smaller_subgrid));
+		return;
+	}
+
 	if(_input.is_input_down(input::left_click)
 		|| _input.is_input_down(input::right_click)) {
 
 		int click_modifiers=click_modifier_none;
-
-		if(_input.is_input_pressed(input::del)) {
-
-			click_modifiers|=click_modifier_delete;
-		}
 
 		if(_input.is_input_pressed(input::lshift)) {
 
@@ -202,7 +222,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 			click_input(input::right_click, click_modifiers);
 			return;
 		}
-	
+
 		return;
 	}
 
@@ -272,6 +292,34 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	}
 }
 
+void editor::del_input() {
+
+	struct : public tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		void visit(const tile_editor::tile_layer&) {controller->tile_delete_mode=!controller->tile_delete_mode;}
+		void visit(const tile_editor::thing_layer&) {}
+		void visit(const tile_editor::poly_layer&) {}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatch_layer(dispatcher);
+}
+
+void editor::subgrid_input(
+	bool _make_smaller
+) {
+
+	struct : public tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		bool smaller;
+		void visit(const tile_editor::tile_layer&) {}
+		void visit(const tile_editor::thing_layer&) {smaller ? controller->make_subgrid_smaller() : controller->make_subgrid_larger();}
+		void visit(const tile_editor::poly_layer&) {smaller ? controller->make_subgrid_smaller() : controller->make_subgrid_larger();}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.smaller=_make_smaller;
+	dispatch_layer(dispatcher);
+}
+
 void editor::click_input(
 	int _input,
 	int _modifiers
@@ -281,13 +329,24 @@ void editor::click_input(
 		int input{0};
 		int modifiers{0};
 		void visit(tile_editor::tile_layer& _layer) {controller->click_input(input, modifiers, _layer);}
-		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::thing_layer& _layer) {controller->click_input(input, modifiers, _layer);}
 		void visit(tile_editor::poly_layer&) {}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatcher.input=_input;
 	dispatcher.modifiers=_modifiers;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
+}
+
+void editor::click_input(
+	int _input,
+	int _modifiers,
+	tile_editor::thing_layer& _layer
+) {
+	switch(_input) {
+		case input::left_click: left_click_input(_modifiers, _layer); break;
+		case input::right_click: right_click_input(_modifiers, _layer); break;
+	}
 }
 
 void editor::click_input(
@@ -338,9 +397,7 @@ void editor::left_click_input(
 		);
 	};
 
-	//Delete...
-	//TODO: the key combination is not practical.
-	if(_modifiers & click_modifier_delete) {
+	if(tile_delete_mode) {
 
 		auto delete_tile_if_exists=[&_layer, find_tile_at](editor_point _pt) {
 
@@ -413,9 +470,63 @@ void editor::right_click_input(
 
 	auto it=find_tile_at(grid);
 	if(it!=std::end(_layer.data)) {
-		std::cout<<"right click ->" <<it->type<<std::endl;
-		tile_list.set_index(it->type);
+
+		//Is there anything in the tile list that matches this id?
+		const auto id=it->type;
+		auto index=tile_list.find([id](const ldtools::sprite_table::container::value_type& _item) -> bool {
+			return id==_item.first;
+		});
+
+		if(tile_list.none!=index) {
+			tile_list.set_index(index);
+		}
 	}
+}
+
+void editor::left_click_input(
+	int /*_modifiers*/,
+	tile_editor::thing_layer& _layer
+) {
+
+	//TODO: Try to locate the thing under the cursor to select it.
+	//TODO: This will be funky since the rectangle of the thing does depend on
+	//TODO: the current center mode: I guess we can have a "make rect" and
+	//then go point_in_rectangle.
+
+	//Add the current thing...
+	const auto prototype=thing_list.get();
+
+	tile_editor::thing thing{
+		mouse_pos.x,
+		mouse_pos.y,
+		prototype.w,
+		prototype.h,
+		prototype.type_id,
+		prototype.color,
+		tile_editor::property_manager{}
+	};
+
+	auto dump_properties=[](auto list, auto& destination){
+
+		for(const auto& prop : list) {
+			destination[prop.first]=prop.second.default_value;
+		}
+	};
+
+	dump_properties(prototype.properties.int_properties, thing.properties.int_properties);
+	dump_properties(prototype.properties.double_properties, thing.properties.double_properties);
+	dump_properties(prototype.properties.string_properties, thing.properties.string_properties);
+
+	_layer.data.push_back(thing);
+}
+
+void editor::right_click_input(
+	int /*_modifiers*/,
+	tile_editor::thing_layer& /*_layer*/
+) {
+
+	//TODO:
+	//Open the thing editor!!!
 }
 
 void editor::arrow_input_set(
@@ -468,8 +579,7 @@ void editor::arrow_input_set(
 	dispatcher.controller=this;
 	dispatcher.movement_x=_movement_x;
 	dispatcher.movement_y=_movement_y;
-
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
 }
 
 void editor::arrow_input_map(
@@ -498,10 +608,13 @@ void editor::draw_cursor(ldv::screen& _screen) {
 
 	ldv::bitmap_representation cursor(cursor_tex);
 	cursor.set_blend(ldv::representation::blends::alpha);
-	const auto rect=cursor_table.get(1).get_rect();
+	const auto rect=cursor_table.get(tile_delete_mode ? 2 : 1).get_rect();
 	cursor.set_clip(rect);
 	int x=mouse_pos.x-(rect.w/2),
 		y=mouse_pos.y-(rect.h/2);
+
+	//TODO: What about snap to grid???
+
 	cursor.set_location({x, y, rect.w, rect.h});
 	cursor.draw(_screen);
 }
@@ -514,12 +627,6 @@ void editor::draw_messages(ldv::screen& _screen) {
 void editor::draw_set(
 	ldv::screen& _screen
 ) {
-
-	if(!map.layers.size()) {
-
-		return;
-	}
-
 	struct : tile_editor::const_layer_visitor {
 
 		editor *         controller{nullptr};
@@ -532,7 +639,7 @@ void editor::draw_set(
 
 	dispatcher.controller=this;
 	dispatcher.screen=&_screen;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
 }
 
 int editor::draw_set_background(
@@ -679,6 +786,14 @@ void editor::draw_set_text(
 void editor::draw_grid(
 	ldv::screen& _screen
 ) {
+	struct : public tile_editor::const_layer_visitor {
+		bool show_subgrid{true};
+		void visit(const tile_editor::tile_layer&) {show_subgrid=false;}
+		void visit(const tile_editor::thing_layer&) {}
+		void visit(const tile_editor::poly_layer&) {}
+	} dispatcher;
+	dispatch_layer(dispatcher);
+
 	auto euclidean_module=[](int a, int b) -> int {
 
 		int m=a%b;
@@ -703,25 +818,34 @@ void editor::draw_grid(
 	int x=focus.origin.x-module;
 	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
 
-	while(x < x_max) {
+	auto choose_color=[to_color, this, ruler_units](int _value) {
 
-		auto gridcolor=0==x
-			? to_color(session.grid_data.origin_color)
-			: (
-				(x % ruler_units)
-					? to_color(session.grid_data.color)
-					: to_color(session.grid_data.ruler_color)
-			);
+		if(0==_value) {
+			return to_color(session.grid_data.origin_color);
+		}
+
+		if(0== (_value % ruler_units)) {
+			return to_color(session.grid_data.ruler_color);
+		}
+
+		if(0 == (_value % session.grid_data.size)) {
+			return to_color(session.grid_data.color);
+		}
+
+		return to_color(session.grid_data.subcolor);
+	};
+
+	while(x < x_max) {
 
 		ldv::line_representation line(
 			{x, focus.origin.y},
 			{x, y_max},
-			gridcolor
+			choose_color(x)
 		);
 
 		line.draw(_screen, camera);
 
-		x+=session.grid_data.size;
+		x+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
 	}
 
 	//Horizontal lines...
@@ -730,23 +854,15 @@ void editor::draw_grid(
 	ruler_units=session.grid_data.vertical_ruler * session.grid_data.size;
 	while(y < y_max) {
 
-		auto gridcolor=0==y
-			? to_color(session.grid_data.origin_color)
-			: (
-				(y % ruler_units)
-					? to_color(session.grid_data.color)
-					: to_color(session.grid_data.ruler_color)
-			);
-
 		ldv::line_representation line(
 			{focus.origin.x, y},
 			{x_max, y},
-			gridcolor
+			choose_color(y)
 		);
 
 		line.draw(_screen, camera);
 
-		y+=session.grid_data.size;
+		y+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
 	}
 }
 
@@ -1017,6 +1133,8 @@ void editor::load_session(const std::string& _path) {
 	tile_editor::blueprint_parser cfp;
 	session=cfp.parse_file(_path);
 
+	subgrid_factor=session.grid_data.size;
+
 	//set the toolbox width...
 	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
 	tile_list.set_available_w(w);
@@ -1117,11 +1235,6 @@ void editor::toggle_layer_draw_mode() {
 
 void editor::load_layer_toolset() {
 
-	if(!map.layers.size()) {
-
-		return;
-	}
-
 	tile_editor::set_layer_loader ll{
 		tile_list,
 		thing_list,
@@ -1131,7 +1244,7 @@ void editor::load_layer_toolset() {
 		session.polysets
 	};
 
-	map.layers.at(current_layer)->accept(ll);
+	dispatch_layer(ll);
 }
 
 ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
@@ -1160,14 +1273,11 @@ void editor::layer_change_cleanup() {
 	selected_poly=nullptr;
 	selected_thing=nullptr;
 	multiclick.engaged=false;
+	tile_delete_mode=false;
+	subgrid_factor=session.grid_data.size;
 }
 
 void editor::open_layer_settings() {
-
-	if(!map.layers.size()) {
-
-		return;
-	}
 
 	struct :public tile_editor::layer_visitor {
 		editor * controller{nullptr};
@@ -1187,5 +1297,63 @@ void editor::open_layer_settings() {
 		}
 	} dispatcher;
 	dispatcher.controller=this;
-	map.layers.at(current_layer)->accept(dispatcher);
+	dispatch_layer(dispatcher);
+}
+
+void editor::make_subgrid_smaller() {
+
+	if((int)subgrid_factor <= session.grid_data.size / 8) {
+
+		message_manager.add("fine grid is already at its smallest");
+		return;
+	}
+
+	subgrid_factor/=2;
+	message_manager.add(std::string{"fine grid set at "}+std::to_string(subgrid_factor));
+}
+
+void editor::make_subgrid_larger() {
+
+	if((int)subgrid_factor==session.grid_data.size) {
+
+		message_manager.add("fine grid is already at its largest");
+		return;
+	}
+
+	subgrid_factor*=2;
+	message_manager.add(std::string{"fine grid set at "}+std::to_string(subgrid_factor));
+}
+
+bool editor::dispatch_layer(tile_editor::const_layer_visitor& _dispatcher) {
+
+	if(!map.layers.size()) {
+
+		return false;
+	}
+
+	map.layers.at(current_layer)->accept(_dispatcher);
+	return true;
+}
+
+bool editor::dispatch_layer(tile_editor::layer_visitor& _dispatcher) {
+
+	if(!map.layers.size()) {
+
+		return false;
+	}
+
+	map.layers.at(current_layer)->accept(_dispatcher);
+	return true;
+}
+
+editor::editor_point editor::snap_to_grid(editor_point _point) const {
+
+	double  x=_point.x,
+	        y=_point.y,
+	        factor=subgrid_factor;
+
+	int px=round(x / factor) * factor;
+	int py=round(y / factor) * factor;
+
+	return {px, py};
 }

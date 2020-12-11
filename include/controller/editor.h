@@ -38,9 +38,8 @@ class editor:
 
 	enum key_modifiers {
 		click_modifier_none=0,
-		click_modifier_delete=1,
-		click_modifier_lshift=2,
-		click_modifier_lctrl=4
+		click_modifier_lshift=1,
+		click_modifier_lctrl=2
 	};
 
 	using editor_point=ldt::point_2d<int>;
@@ -57,12 +56,18 @@ class editor:
 	editor_point                get_world_position(ldt::point_2d<int>) const;
 	//!returns grid-based position from world position.
 	editor_point                get_grid_position(ldt::point_2d<int>) const;
+	editor_point                snap_to_grid(editor_point) const;
 	void                        arrow_input_set(int, int);
 	void                        arrow_input_map(int, int);
 	void                        click_input(int, int);
 	void                        click_input(int, int, tile_editor::tile_layer&);
+	void                        click_input(int, int, tile_editor::thing_layer&);
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
+	void                        left_click_input(int, tile_editor::thing_layer&);
+	void                        right_click_input(int, tile_editor::thing_layer&);
+	void                        del_input();
+	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
 	void                        draw_grid(ldv::screen&);
@@ -81,6 +86,8 @@ class editor:
 	void                        draw_cursor(ldv::screen&);
 	void                        zoom_in();
 	void                        zoom_out();
+	void                        make_subgrid_smaller();
+	void                        make_subgrid_larger();
 	void                        next_layer();
 	void                        previous_layer();
 	//!resets all layer sensitive data (selections, polygons in the making...).
@@ -90,6 +97,9 @@ class editor:
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
 	void                        open_layer_settings();
+	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
+	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
+	bool                        dispatch_layer(tile_editor::layer_visitor&);
 
 	//references...
 	lm::logger&                 log;
@@ -122,12 +132,13 @@ class editor:
 	tools::vertical_list<tile_editor::poly_definition> poly_list;
 	std::string                 current_filename;
 	std::size_t	                current_layer{0},
-	                            component_index{0}; //!< Currently chosen tile/thing/poly.
+	                            subgrid_factor{0};
 	tile_editor::thing *        selected_thing{nullptr};
 	tile_editor::poly *         selected_poly{nullptr};
-	bool                        show_set{true};
 	//!Function that returns the origin of a "thing" based on the current "thing_center" attribute.
 	std::function<editor_point(int, int, int, int)>	thing_origin_fn;
+	bool                        show_set{true},
+	                            tile_delete_mode{false};
 
 	static const int            grid_list_w{32},
 	                            grid_list_h{32},
