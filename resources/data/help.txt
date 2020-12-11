@@ -20,6 +20,7 @@ arrows - move / change toolset element (depending on toolset visibility)
 
 === TILE EDITOR MODE ===
 
-click - add / change tile
+left click - add / change tile
+right click - select tile type under cursor
 del + click - delete tile
 lshift + click - between two points, add/change/delete area

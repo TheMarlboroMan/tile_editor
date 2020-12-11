@@ -173,7 +173,8 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
-	if(_input.is_input_down(input::left_click)) {
+	if(_input.is_input_down(input::left_click)
+		|| _input.is_input_down(input::right_click)) {
 
 		int click_modifiers=click_modifier_none;
 
@@ -192,7 +193,16 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 			click_modifiers|=click_modifier_lctrl;
 		}
 
-		click_input(input::left_click, click_modifiers);
+		if(_input.is_input_down(input::left_click)) {
+			click_input(input::left_click, click_modifiers);
+			return;
+		}
+
+		if(_input.is_input_down(input::right_click)) {
+			click_input(input::right_click, click_modifiers);
+			return;
+		}
+	
 		return;
 	}
 
@@ -281,10 +291,21 @@ void editor::click_input(
 }
 
 void editor::click_input(
-	int /*_input*/,
+	int _input,
 	int _modifiers,
 	tile_editor::tile_layer& _layer
 ) {
+	switch(_input) {
+		case input::left_click: left_click_input(_modifiers, _layer); break;
+		case input::right_click: right_click_input(_modifiers, _layer); break;
+	}
+}
+
+void editor::left_click_input(
+	int _modifiers,
+	tile_editor::tile_layer& _layer
+) {
+
 	auto world_pos=get_world_position(mouse_pos);
 	auto grid=get_grid_position(world_pos);
 
@@ -305,6 +326,7 @@ void editor::click_input(
 
 	multiclick.point=grid;
 
+	//TODO: duplicate.
 	auto find_tile_at=[&_layer](editor_point _pt) {
 
 		return std::find_if(
@@ -367,6 +389,33 @@ void editor::click_input(
 	}
 
 	return;
+}
+
+void editor::right_click_input(
+	int /*_modifiers*/,
+	tile_editor::tile_layer& _layer
+) {
+
+	auto world_pos=get_world_position(mouse_pos);
+	auto grid=get_grid_position(world_pos);
+
+	//TODO: duplicate.
+	auto find_tile_at=[&_layer](editor_point _pt) {
+
+		return std::find_if(
+			std::begin(_layer.data),
+			std::end(_layer.data),
+			[_pt](const tile_editor::tile& _tile) {
+				return _tile.x==_pt.x && _tile.y==_pt.y;
+			}
+		);
+	};
+
+	auto it=find_tile_at(grid);
+	if(it!=std::end(_layer.data)) {
+		std::cout<<"right click ->" <<it->type<<std::endl;
+		tile_list.set_index(it->type);
+	}
 }
 
 void editor::arrow_input_set(

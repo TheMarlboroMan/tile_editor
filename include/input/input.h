@@ -24,7 +24,8 @@ lctrl,
 lshift,
 zoom_in,
 zoom_out,
-left_click
+left_click,
+right_click
 };
 
 }
