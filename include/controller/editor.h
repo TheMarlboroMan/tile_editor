@@ -36,9 +36,8 @@ class editor:
 
 	enum key_modifiers {
 		click_modifier_none=0,
-		click_modifier_delete=1,
-		click_modifier_lshift=2,
-		click_modifier_lctrl=4
+		click_modifier_lshift=1,
+		click_modifier_lctrl=2
 	};
 
 	using editor_point=ldt::point_2d<int>;
@@ -61,6 +60,7 @@ class editor:
 	void                        click_input(int, int, tile_editor::tile_layer&);
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
+	void                        del_input();
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
 	void                        draw_grid(ldv::screen&);
@@ -123,7 +123,8 @@ class editor:
 	                            component_index{0}; //!< Currently chosen tile/thing/poly.
 	tile_editor::thing *        selected_thing{nullptr};
 	tile_editor::poly *         selected_poly{nullptr};
-	bool                        show_set{true};
+	bool                        show_set{true},
+	                            tile_delete_mode{false};
 
 
 	static const int            grid_list_w{32},

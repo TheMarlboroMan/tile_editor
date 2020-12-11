@@ -173,15 +173,15 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	if(_input.is_input_down(input::del)) {
+
+		del_input();
+	}
+
 	if(_input.is_input_down(input::left_click)
 		|| _input.is_input_down(input::right_click)) {
 
 		int click_modifiers=click_modifier_none;
-
-		if(_input.is_input_pressed(input::del)) {
-
-			click_modifiers|=click_modifier_delete;
-		}
 
 		if(_input.is_input_pressed(input::lshift)) {
 
@@ -202,7 +202,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 			click_input(input::right_click, click_modifiers);
 			return;
 		}
-	
+
 		return;
 	}
 
@@ -272,6 +272,18 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	}
 }
 
+void editor::del_input() {
+
+	struct : public tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		void visit(const tile_editor::tile_layer&) {controller->tile_delete_mode=!controller->tile_delete_mode;}
+		void visit(const tile_editor::thing_layer&) {}
+		void visit(const tile_editor::poly_layer&) {}
+	} dispatcher;
+	dispatcher.controller=this;
+	map.layers.at(current_layer)->accept(dispatcher);
+}
+
 void editor::click_input(
 	int _input,
 	int _modifiers
@@ -338,9 +350,7 @@ void editor::left_click_input(
 		);
 	};
 
-	//Delete...
-	//TODO: the key combination is not practical.
-	if(_modifiers & click_modifier_delete) {
+	if(tile_delete_mode) {
 
 		auto delete_tile_if_exists=[&_layer, find_tile_at](editor_point _pt) {
 
@@ -413,8 +423,16 @@ void editor::right_click_input(
 
 	auto it=find_tile_at(grid);
 	if(it!=std::end(_layer.data)) {
-		std::cout<<"right click ->" <<it->type<<std::endl;
-		tile_list.set_index(it->type);
+
+		//Is there anything in the tile list that matches this id?
+		const auto id=it->type;
+		auto index=tile_list.find([id](const ldtools::sprite_table::container::value_type& _item) -> bool {
+			return id==_item.first;
+		});
+
+		if(tile_list.none!=index) {
+			tile_list.set_index(index);
+		}
 	}
 }
 
@@ -498,7 +516,7 @@ void editor::draw_cursor(ldv::screen& _screen) {
 
 	ldv::bitmap_representation cursor(cursor_tex);
 	cursor.set_blend(ldv::representation::blends::alpha);
-	const auto rect=cursor_table.get(1).get_rect();
+	const auto rect=cursor_table.get(tile_delete_mode ? 2 : 1).get_rect();
 	cursor.set_clip(rect);
 	int x=mouse_pos.x-(rect.w/2),
 		y=mouse_pos.y-(rect.h/2);
@@ -1146,6 +1164,7 @@ void editor::layer_change_cleanup() {
 	selected_poly=nullptr;
 	selected_thing=nullptr;
 	multiclick.engaged=false;
+	tile_delete_mode=false;
 }
 
 void editor::open_layer_settings() {

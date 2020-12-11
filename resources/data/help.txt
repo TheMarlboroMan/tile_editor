@@ -1,9 +1,10 @@
 = HELP =
 
-== EDITOR MODE ==
+== COMMON EDITOR MODE ==
 
 f1 - help.
 f2 - layer settings
+esc - exit, no save checks are done so save often
 s - save current file
 lctrl+s - save to new file
 l - load new file
@@ -12,7 +13,7 @@ l - load new file
 pagedown - next layer
 pageup - previous layer
 space - change layer drawing mode
-tab - toggle toolset 
+tab - toggle toolset
 arrows - move / change toolset element (depending on toolset visibility)
 
 ??? - new layer (perhaps its own controller)
@@ -20,7 +21,11 @@ arrows - move / change toolset element (depending on toolset visibility)
 
 === TILE EDITOR MODE ===
 
-left click - add / change tile
+delete - set / unset tile delete mode.
+left click - add/change/delete tile
 right click - select tile type under cursor
-del + click - delete tile
 lshift + click - between two points, add/change/delete area
+
+=== THING EDITOR MODE ===
+
+=== POLY EDITOR MODE ===
