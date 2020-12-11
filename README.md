@@ -2,10 +2,11 @@
 
 ## TODO
 
-- check layer id integrity on save
-- use object centeron session attr.
 - click to add object
 - click to select object
+- in tile layer, right button to copy current???
+- in tile layer, better way to delete, perhaps use "del" to choose special tile
+	and change the crosshair???
 - move selected object with arrows
 - change properties of object
 - delete selected object

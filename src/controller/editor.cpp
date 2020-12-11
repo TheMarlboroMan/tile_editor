@@ -15,6 +15,7 @@
 #include <ldv/line_representation.h>
 #include <ldv/bitmap_representation.h>
 #include <ldv/box_representation.h>
+#include <ldv/line_representation.h>
 
 #include <algorithm>
 
@@ -278,7 +279,7 @@ void editor::click_input(
 }
 
 void editor::click_input(
-	int _input,
+	int /*_input*/,
 	int _modifiers,
 	tile_editor::tile_layer& _layer
 ) {
@@ -340,7 +341,7 @@ void editor::click_input(
 	}
 
 	//Insert or update...
-	auto set_tile=[&_layer, find_tile_at](editor_point _pt, int _type) {
+	auto set_tile=[&_layer, find_tile_at](editor_point _pt, std::size_t _type) {
 
 		auto it=find_tile_at(_pt);
 		if(it!=std::end(_layer.data)) {
@@ -473,7 +474,7 @@ void editor::draw_set(
 int editor::draw_set_background(
 	ldv::screen& _screen
 ) {
-	int w=_screen.get_w() * (session.toolbox_width_percent / 100.);
+	unsigned int w=_screen.get_w() * (session.toolbox_width_percent / 100.);
 
 	ldv::box_representation box(
 		{0,0, w, _screen.get_h()},
@@ -505,15 +506,21 @@ void editor::draw_set(
 	);
 
 	const int background_start{draw_set_background(_screen)};
-	const unsigned int item_w{tile_list.get_item_w()},
+	const auto item_w{tile_list.get_item_w()},
 	                   item_h{tile_list.get_item_h()};
 
 	for(const auto& item : tile_list.get_page()) {
 
+		const int x=background_start+item.x,
+				y=item.y;
+
+		const unsigned int w=item_w,
+							h=item_h;
+
 		if(item.index==tile_list.get_current_index()) {
 
 			ldv::box_representation current_box(
-				{background_start+item.x-1,item.y-1, item_w+2 , item_h+2},
+				{x-1, y-1, w+2, h+2},
 				ldv::rgba8(0,0,255,128)
 			);
 
@@ -521,7 +528,7 @@ void editor::draw_set(
 		}
 
 		bmp.set_clip(item.item.second.get_rect());
-		bmp.set_location({background_start+item.x, item.y, item_w, item_h});
+		bmp.set_location({x, y, w, h});
 		bmp.draw(_screen);
 	}
 }
@@ -530,8 +537,8 @@ void editor::draw_set(
 	ldv::screen& _screen,
 	const tile_editor::thing_layer& _layer
 ) {
-	const int background_start{draw_set_background(_screen)};
-	const unsigned int item_h{thing_list.get_item_h()};
+	const auto background_start{draw_set_background(_screen)};
+	const auto item_h{thing_list.get_item_h()};
 
 	for(const auto& item : thing_list.get_page()) {
 
@@ -554,8 +561,8 @@ void editor::draw_set(
 	const tile_editor::poly_layer& _layer
 ) {
 
-	const int background_start{draw_set_background(_screen)};
-	const unsigned int item_h{poly_list.get_item_h()};
+	const auto background_start{draw_set_background(_screen)};
+	const auto item_h{poly_list.get_item_h()};
 
 	for(const auto& item : poly_list.get_page()) {
 
@@ -585,7 +592,7 @@ void editor::draw_set_text(
 
 	//Color...
 	ldv::box_representation color_box(
-		{_x, _y, _h , _h},
+		{_x, _y, (unsigned)_h , (unsigned)_h},
 		ldv::rgba8(_color.r, _color.g, _color.b, _color.a)
 	);
 
@@ -762,14 +769,46 @@ void editor::draw_layer(
 	box.set_alpha(_layer.alpha);
 	box.set_blend(ldv::representation::blends::alpha);
 
+	ldv::line_representation vline({0,0},{0,0}, ldv::rgba8(0,0,0, 128)),
+		hline({0,0},{0,0}, ldv::rgba8(0,0,0, 128));
+
+	//Sets the crosshair position
+	auto crosshair=[&vline, &hline](int _x, int _y, int _w, int _h, tile_editor::color _color) {
+
+		auto color=ldv::rgba8(255-_color.r, 255-_color.g, 255-_color.b, 128);
+
+		vline.set_points({_x-(_w/2), _y}, {_x+(_w/2), _y});
+		vline.set_color(color);
+		hline.set_points({_x, _y-(_h/2)}, {_x, _y+(_h/2)});
+		hline.set_color(color);
+	};
+
+	auto thing_center=[](int _x, int _y, int _w, int _h, tile_editor::map_blueprint::thing_centers _center) -> editor_point {
+
+		using namespace tile_editor;
+
+		switch(_center) {
+			case map_blueprint::thing_centers::center: return {_x-_w/2, _y-_h/2};
+			case map_blueprint::thing_centers::top_left: return {_x, _y};
+			case map_blueprint::thing_centers::top_right: return {_x+_w, _y};
+			case map_blueprint::thing_centers::bottom_right: return {_x+_w, _y+_h};
+			case map_blueprint::thing_centers::bottom_left: return {_x, _y+_w};
+		}
+
+		return {_x, _y};
+	};
+
 	for(const auto& thing : _layer.data) {
 
-		unsigned int w=thing.w,
-		             h=thing.h;
-
-		box.set_location({thing.x, thing.y, w, h});
+		auto center=thing_center(thing.x, thing.y, thing.w, thing.h, session.thing_center);
+		box.set_location({center.x, center.y, (unsigned)thing.w, (unsigned)thing.h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a));
 		box.draw(_screen, camera);
+
+		//The crosshair indicates where the x and y in the map file reside.
+		crosshair(thing.x, thing.y, thing.w /4 , thing.h /4, thing.color);
+		vline.draw(_screen, camera);
+		hline.draw(_screen, camera);
 	}
 }
 
@@ -1030,11 +1069,11 @@ ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
 
 ldt::point_2d<int> editor::get_grid_position(ldt::point_2d<int> _point) const {
 
-	double size{session.grid_data.size};
+	double size=session.grid_data.size;
 
 	return {
-		(floor(_point.x / size)) ,
-		(floor(_point.y / size))
+		(int)(floor(_point.x / size)) ,
+		(int)(floor(_point.y / size))
 	};
 }
 
