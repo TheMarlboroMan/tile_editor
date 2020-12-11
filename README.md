@@ -2,7 +2,6 @@
 
 ## TODO
 
-- click to add object
 - click to select object
 - move selected object with arrows
 - change properties of object

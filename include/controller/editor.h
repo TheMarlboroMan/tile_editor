@@ -59,8 +59,11 @@ class editor:
 	void                        arrow_input_map(int, int);
 	void                        click_input(int, int);
 	void                        click_input(int, int, tile_editor::tile_layer&);
+	void                        click_input(int, int, tile_editor::thing_layer&);
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
+	void                        left_click_input(int, tile_editor::thing_layer&);
+	void                        right_click_input(int, tile_editor::thing_layer&);
 	void                        del_input();
 	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);

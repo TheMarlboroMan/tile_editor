@@ -329,13 +329,24 @@ void editor::click_input(
 		int input{0};
 		int modifiers{0};
 		void visit(tile_editor::tile_layer& _layer) {controller->click_input(input, modifiers, _layer);}
-		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::thing_layer& _layer) {controller->click_input(input, modifiers, _layer);}
 		void visit(tile_editor::poly_layer&) {}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatcher.input=_input;
 	dispatcher.modifiers=_modifiers;
 	dispatch_layer(dispatcher);
+}
+
+void editor::click_input(
+	int _input,
+	int _modifiers,
+	tile_editor::thing_layer& _layer
+) {
+	switch(_input) {
+		case input::left_click: left_click_input(_modifiers, _layer); break;
+		case input::right_click: right_click_input(_modifiers, _layer); break;
+	}
 }
 
 void editor::click_input(
@@ -470,6 +481,52 @@ void editor::right_click_input(
 			tile_list.set_index(index);
 		}
 	}
+}
+
+void editor::left_click_input(
+	int /*_modifiers*/,
+	tile_editor::thing_layer& _layer
+) {
+
+	//TODO: Try to locate the thing under the cursor to select it.
+	//TODO: This will be funky since the rectangle of the thing does depend on
+	//TODO: the current center mode: I guess we can have a "make rect" and
+	//then go point_in_rectangle.
+
+	//Add the current thing...
+	const auto prototype=thing_list.get();
+
+	tile_editor::thing thing{
+		mouse_pos.x,
+		mouse_pos.y,
+		prototype.w,
+		prototype.h,
+		prototype.type_id,
+		prototype.color,
+		tile_editor::property_manager{}
+	};
+
+	auto dump_properties=[](auto list, auto& destination){
+
+		for(const auto& prop : list) {
+			destination[prop.first]=prop.second.default_value;
+		}
+	};
+
+	dump_properties(prototype.properties.int_properties, thing.properties.int_properties);
+	dump_properties(prototype.properties.double_properties, thing.properties.double_properties);
+	dump_properties(prototype.properties.string_properties, thing.properties.string_properties);
+
+	_layer.data.push_back(thing);
+}
+
+void editor::right_click_input(
+	int /*_modifiers*/,
+	tile_editor::thing_layer& /*_layer*/
+) {
+
+	//TODO:
+	//Open the thing editor!!!
 }
 
 void editor::arrow_input_set(
