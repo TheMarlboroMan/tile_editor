@@ -11,3 +11,10 @@ beginproperty
 	default 0
 	comment An unique identifier for the map
 endproperty
+
+beginproperty
+	name gravity_pull
+	type double
+	default 1.0
+	comment How much gravity pulls, 1.0 means regular, 2.0 means twice as regular
+endproperty

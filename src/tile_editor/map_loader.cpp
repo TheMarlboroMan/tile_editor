@@ -62,15 +62,15 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 	//Collector of pointers...
 	struct :layer_visitor {
 
-		std::vector<tile_editor::thing_layer*> things;
-		std::vector<tile_editor::poly_layer*> polys;
+		std::vector<tile_editor::thing_layer*> thing_layers;
+		std::vector<tile_editor::poly_layer*> poly_layers;
 
 		void visit(tile_editor::tile_layer&) {}
 		void visit(tile_editor::thing_layer& _layer) {
-			things.push_back(&_layer);
+			thing_layers.push_back(&_layer);
 		}
 		void visit(tile_editor::poly_layer& _layer) {
-			polys.push_back(&_layer);
+			poly_layers.push_back(&_layer);
 		}
 	} visitor;
 
@@ -78,22 +78,40 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 		layer->accept(visitor);
 	}
 	
+
+	auto add_missing_props=[this](
+		const auto& _blueprint, //int, double or string
+		auto &_properties //int, double or string
+	) {
+		for(const auto& prop : _blueprint) {
+
+			if(!_properties.count(prop.second.name)) {
+
+				_properties[prop.second.name]=prop.second.default_value;
+				lm::log(log, lm::lvl::notice)<<"added missing property '"<<prop.second.name<<"' with value '"<<prop.second.default_value<<"'"<<std::endl;
+			}
+		}
+	};
+
 	//inflate things...
-	for(auto& ptr : visitor.things) {
+	for(auto& ptr : visitor.thing_layers) {
 
 		for(auto& thing : ptr->data) {
 
+
 			const auto blueprint=thingsets.at(ptr->set).table.at(thing.type);
+
+			//Add missing properties...
+			add_missing_props(blueprint.properties.int_properties, thing.properties.int_properties);
+			add_missing_props(blueprint.properties.string_properties, thing.properties.string_properties);
+			add_missing_props(blueprint.properties.double_properties, thing.properties.double_properties);
+
+			//Inflate thing editor stuff with properties.
 			thing.w=blueprint.w;
 			thing.h=blueprint.h;
 			thing.color=blueprint.color;
 		
 			for(const auto& prop : blueprint.properties.int_properties) {
-
-				if(!thing.properties.int_properties.count(prop.second.name)) {
-
-					//TODO: What if the properties are removed from the file????				
-				}
 
 				switch(prop.second.linked_to) {
 
@@ -116,19 +134,21 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 	}
 
 	//inflate polys.
-	for(auto& ptr : visitor.polys) {
+	for(auto& ptr : visitor.poly_layers) {
 
 		for(auto& poly : ptr->data) {
 
+
 			const auto blueprint=polysets.at(ptr->set).table.at(poly.type);
+			//Add missing properties...
+			add_missing_props(blueprint.properties.int_properties, poly.properties.int_properties);
+			add_missing_props(blueprint.properties.string_properties, poly.properties.string_properties);
+			add_missing_props(blueprint.properties.double_properties, poly.properties.double_properties);
+
+			//Inflate thing editor stuff with properties.
 			poly.color=blueprint.color;
 		
 			for(const auto& prop : blueprint.properties.int_properties) {
-
-				if(!poly.properties.int_properties.count(prop.second.name)) {
-
-					//TODO: What if the properties are removed from the file????				
-				}
 
 				switch(prop.second.linked_to) {
 

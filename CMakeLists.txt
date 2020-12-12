@@ -40,20 +40,22 @@ set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldt
 set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
 
 #Virtual library so we don't have to build again and again for all tests...
-add_library(applib OBJECT ${SOURCE})
+add_library(applib STATIC ${SOURCE})
+set_target_properties(applib PROPERTIES OUTPUT_NAME applib)
+
 
 if(${BUILD_TESTS})
 
 	add_executable(config src/tests/config/main.cpp)
-	target_link_libraries(config tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs applib)
+	target_link_libraries(config applib tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 	add_custom_command(TARGET config POST_BUILD COMMAND cp -r ../src/tests/config/data ./)
 
 	add_executable(map src/tests/map/main.cpp)
-	target_link_libraries(map tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs applib)
+	target_link_libraries(map applib tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 	add_custom_command(TARGET map POST_BUILD COMMAND cp -r ../src/tests/map/data ./)
 
 	add_executable(message_manager src/tests/tools/message_manager.cpp)
-	target_link_libraries(message_manager tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs applib)
+	target_link_libraries(message_manager applib tools ldtools dansdl2 dfw lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 endif()
 
 #Configure the executable, we want it into the "build directory" and we want all resources copied
@@ -61,4 +63,4 @@ endif()
 add_executable(tile_editor src/main.cpp)
 set_target_properties(tile_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY build)
 add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ./build)
-target_link_libraries(tile_editor dfw tools dansdl2 ldtools lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs applib)
+target_link_libraries(tile_editor applib dfw tools dansdl2 ldtools lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)

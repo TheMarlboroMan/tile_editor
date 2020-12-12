@@ -2,9 +2,12 @@
 
 ## TODO
 
+- map properties controller, could be reusable :D
+	- read ints, strings, then doubles, have map of index to [type, name]
+	- and that's about it.
 - click to select object
 - move selected object with arrows
-- change properties of object
+- change properties of object (use the properties on the object)
 - delete selected object
 - sort objects on save
 - edit layer properties (set, id, alpha), send a ptr to the layer and be done.
