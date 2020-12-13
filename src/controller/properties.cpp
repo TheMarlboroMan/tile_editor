@@ -14,6 +14,7 @@ properties::properties(
 	ttf_manager{_ttf_manager},
 	exchange_data{_exchange_data} {
 
+	menu.set_wrap(false);
 }
 
 void properties::awake(dfw::input& /*input*/) {
@@ -25,11 +26,41 @@ void properties::awake(dfw::input& /*input*/) {
 
 	exchange_data.recover(state_properties);
 	property_manager=exchange_data.properties;
-		
-	//TODO: Likely we have some kind of menu here...
-	//TODO: load whatever kind of container we have here.
 
-	//TODO: Add the cancel and return options to the menu.
+
+	bool key_set=false;
+
+	auto add_to_menu=[&key_set, this](
+		const auto& _pair,
+		datatypes _type
+	) {
+		if(!key_set) {
+
+			current_key={_type, _pair.first};
+			key_set=true;
+		}
+
+		menu.insert(keytype{_type, _pair.first}, _pair.second);
+	};
+
+	auto add=[add_to_menu](
+		const auto& _container,
+		datatypes _type
+	) {
+		for(const auto& pair : _container) {
+			add_to_menu(pair, _type);
+		}
+	};
+
+	menu.clear();
+
+	//TODO: ints need min-max.
+//	add(property_manager->int_properties, datatypes::t_int);
+	add(property_manager->string_properties, datatypes::t_string);
+	//TODO: doubles need min-max.
+//	add(property_manager->double_properties, datatypes::t_double);
+	menu.insert(keytype{datatypes::t_special, "exit"});
+	menu.insert(keytype{datatypes::t_special, "cancel"});
 }
 
 void properties::slumber(dfw::input& /*input*/) {
@@ -54,6 +85,8 @@ void properties::loop(dfw::input& _input, const dfw::loop_iteration_data& /*lid*
 void properties::draw(ldv::screen& screen, int /*fps*/) {
 
 	screen.clear(ldv::rgba8(0, 0, 0, 255));
+
+	//run through the menu and draw.
 
 	//TODO: Always draw the description for the current thing!
 }

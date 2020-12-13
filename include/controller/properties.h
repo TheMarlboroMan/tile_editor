@@ -7,6 +7,7 @@
 
 #include <dfw/controller_interface.h>
 #include <ldtools/ttf_manager.h>
+#include <tools/options_menu.h>
 #include <lm/logger.h>
 
 namespace controller {
@@ -31,8 +32,20 @@ class properties:
 	ldtools::ttf_manager&       ttf_manager;
 	tile_editor::exchange_data& exchange_data;
 
+	enum class datatypes {
+		t_int, t_string, t_double, t_special
+	};
+
+	struct keytype {
+		datatypes               type;
+		std::string             name;
+	};
+
 	//properties
 	tile_editor::property_manager * property_manager{nullptr};
+	//TODO: will never work, not a valid key!!!
+	tools::options_menu<keytype>    menu;
+	keytype                         current_key{datatypes::t_special, ""};
 };
 
 }
