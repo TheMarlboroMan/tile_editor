@@ -4,6 +4,7 @@
 
 f1 - help.
 f2 - layer settings
+f3 - map settings
 esc - exit, no save checks are done so save often
 s - save current file
 lctrl+s - save to new file
@@ -35,3 +36,5 @@ lalt - snap to grid
 === POLY EDITOR MODE ===
 
 lalt - snap to grid
+
+== LAYER / THING / POLY / MAP PROPERTIES MODE ==

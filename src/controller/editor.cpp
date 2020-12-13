@@ -99,6 +99,12 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	if(_input.is_input_down(input::map_properties)) {
+
+		open_map_properties();
+		return;
+	}
+
 	if(_input.is_input_down(input::layer_settings)) {
 
 		open_layer_settings();
@@ -1276,6 +1282,13 @@ void editor::layer_change_cleanup() {
 	multiclick.engaged=false;
 	tile_delete_mode=false;
 	subgrid_factor=session.grid_data.size;
+}
+
+void editor::open_map_properties() {
+
+	exchange_data.properties=&map.properties;
+	exchange_data.put(state_properties);
+	push_state(state_properties);
 }
 
 void editor::open_layer_settings() {

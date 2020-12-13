@@ -13,6 +13,7 @@
 
 namespace controller {
 
+//!Controller for the tile editor layer properties
 class tile_editor_properties:
 	public dfw::controller_interface {
 

@@ -97,6 +97,7 @@ class editor:
 	void                        save_current();
 	void                        receive_message(tools::message_manager::notify_event_type);
 	void                        open_layer_settings();
+	void                        open_map_properties();
 	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
 	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
 	bool                        dispatch_layer(tile_editor::layer_visitor&);

@@ -2,7 +2,7 @@
 
 ## TODO
 
-- map properties controller, could be reusable :D
+- properties controller, should be reusable for maps, things and polys.
 	- read ints, strings, then doubles, have map of index to [type, name]
 	- and that's about it.
 - click to select object

@@ -118,6 +118,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:lalt")), input::lalt},
 		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
 		{input_description_from_config_token(config.token_from_path("input:layer_settings")), input::layer_settings},
+		{input_description_from_config_token(config.token_from_path("input:map_properties")), input::map_properties},
 		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
 		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
 		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
@@ -194,7 +195,16 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			log,
 			ttf_manager,
 			exchange_data
-			)
+		)
+	);
+	reg(
+		c_properties, 
+		controller::t_states::state_properties, 
+		new controller::properties(
+			log,
+			ttf_manager,
+			exchange_data
+		)
 	);
 	//[new-controller-mark]
 }

@@ -10,6 +10,7 @@ namespace tile_editor {
 
 struct layer;
 struct map_blueprint;
+struct property_manager;
 
 class exchange_data {
 
@@ -30,8 +31,9 @@ class exchange_data {
 	int                     file_browser_invoker_id{0}; //in
 	std::string             file_browser_choice, //out
 	                        file_browser_title; //in
-	tile_editor::layer *    layer{nullptr}; //in
-	const tile_editor::map_blueprint * blueprint{nullptr}; //in;
+	tile_editor::layer *    layer{nullptr}; //in-out
+	tile_editor::property_manager * properties; //in-out
+	const tile_editor::map_blueprint * blueprint{nullptr}; //in
 
 	private:
 
