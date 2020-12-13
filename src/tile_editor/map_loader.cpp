@@ -15,12 +15,14 @@ map_loader::map_loader(
 	lm::logger& _logger,
 	tools::message_manager& _message_manager,
 	const std::map<std::size_t, thing_definition_table>& _thingsets,
-	const std::map<std::size_t, poly_definition_table>& _polysets
+	const std::map<std::size_t, poly_definition_table>& _polysets,
+	const tile_editor::property_table& _map_property_blueprints
 ):
 	log(_logger),
 	message_manager{_message_manager},
 	thingsets{_thingsets},
-	polysets{_polysets} {
+	polysets{_polysets},
+	map_property_blueprints{_map_property_blueprints} {
 
 }
 
@@ -92,6 +94,11 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 			}
 		}
 	};
+
+	//Add missing map properties.
+	add_missing_props(map_property_blueprints.int_properties, _map.properties.int_properties);
+	add_missing_props(map_property_blueprints.string_properties, _map.properties.string_properties);
+	add_missing_props(map_property_blueprints.double_properties, _map.properties.double_properties);
 
 	//inflate things...
 	for(auto& ptr : visitor.thing_layers) {

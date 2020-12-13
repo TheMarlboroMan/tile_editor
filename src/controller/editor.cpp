@@ -1118,7 +1118,8 @@ void editor::load_map(const std::string& _path) {
 		log,
 		message_manager,
 		session.thingsets,
-		session.polysets
+		session.polysets,
+		session.properties
 	};
 	map=ml.load_from_file(_path);
 	current_filename=_path;
