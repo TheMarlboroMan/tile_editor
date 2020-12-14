@@ -1545,7 +1545,12 @@ void editor::open_layer_settings() {
 			controller->exchange_data.blueprint=&controller->session;
 			start(state_tile_editor_properties);
 		}
-		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::thing_layer& _layer) {
+
+			controller->exchange_data.layer=&_layer;
+			controller->exchange_data.blueprint=&controller->session;
+			start(state_thing_editor_properties);
+		}
 		void visit(tile_editor::poly_layer&) {}
 
 		private:

@@ -2,7 +2,6 @@
 
 ## TODO
 
-- edit layer properties (set, id, alpha), duplicate the controller, stuff might change later.
 - poly layers could have winding and allow concave / convex / all properties
 - add poly
 - select poly
