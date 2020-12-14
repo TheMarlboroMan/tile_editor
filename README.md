@@ -2,6 +2,7 @@
 
 ## TODO
 
+- fix thing editor layer
 - poly layers could have winding and allow concave / convex / all properties
 - add poly
 - select poly
