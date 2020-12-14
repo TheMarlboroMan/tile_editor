@@ -2,7 +2,6 @@
 
 ## TODO
 
-- move selected object with arrows (use lalt for fine movement)
 - sort objects on save (as done with the things, of course).
 - show current selected thing info in HUD.
 - edit layer properties (set, id, alpha), duplicate the controller, stuff might change later.

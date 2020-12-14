@@ -37,9 +37,10 @@ class editor:
 	private:
 
 	enum key_modifiers {
-		click_modifier_none=0,
-		click_modifier_lshift=1,
-		click_modifier_lctrl=2
+		key_modifier_none=0,
+		key_modifier_lshift=1,
+		key_modifier_lctrl=2,
+		key_modifier_lalt=4
 	};
 
 	using editor_point=ldt::point_2d<int>;
@@ -57,8 +58,11 @@ class editor:
 	//!returns grid-based position from world position.
 	editor_point                get_grid_position(ldt::point_2d<int>) const;
 	editor_point                snap_to_grid(editor_point) const;
-	void                        arrow_input_set(int, int);
-	void                        arrow_input_map(int, int);
+	void                        arrow_input_set(int, int, int);
+	void                        arrow_input_layer(int, int, int);
+	void                        arrow_input_layer(tile_editor::tile_layer&, int, int, int);
+	void                        arrow_input_layer(tile_editor::thing_layer&, int, int, int);
+	void                        arrow_input_layer(tile_editor::poly_layer&, int, int, int);
 	void                        click_input(int, int);
 	void                        click_input(int, int, tile_editor::tile_layer&);
 	void                        click_input(int, int, tile_editor::thing_layer&);

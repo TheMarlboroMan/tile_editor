@@ -189,9 +189,25 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	int modifiers=key_modifier_none;
+	if(_input.is_input_pressed(input::lshift)) {
+
+		modifiers|=key_modifier_lshift;
+	}
+
+	if(_input.is_input_pressed(input::lctrl)) {
+
+		modifiers|=key_modifier_lctrl;
+	}
+
+	if(_input.is_input_pressed(input::lalt)) {
+
+		modifiers|=key_modifier_lalt;
+	}
+
 	auto mpos=_input().get_mouse_position();
 	mouse_pos={mpos.x, mpos.y};
-	if(_input.is_input_pressed(input::lalt)) {
+	if(modifiers & key_modifier_lalt) {
 
 		struct : tile_editor::const_layer_visitor {
 			bool snappable=true;
@@ -227,31 +243,13 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
-	if(_input.is_input_down(input::left_click)
-		|| _input.is_input_down(input::right_click)) {
+	if(_input.is_input_down(input::left_click)) {
+		click_input(input::left_click, modifiers);
+		return;
+	}
 
-		int click_modifiers=click_modifier_none;
-
-		if(_input.is_input_pressed(input::lshift)) {
-
-			click_modifiers|=click_modifier_lshift;
-		}
-
-		if(_input.is_input_pressed(input::lctrl)) {
-
-			click_modifiers|=click_modifier_lctrl;
-		}
-
-		if(_input.is_input_down(input::left_click)) {
-			click_input(input::left_click, click_modifiers);
-			return;
-		}
-
-		if(_input.is_input_down(input::right_click)) {
-			click_input(input::right_click, click_modifiers);
-			return;
-		}
-
+	if(_input.is_input_down(input::right_click)) {
+		click_input(input::right_click, modifiers);
 		return;
 	}
 
@@ -275,7 +273,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		if(movement_x || movement_y) {
 
-			 arrow_input_set(movement_x, movement_y);
+			 arrow_input_set(movement_x, movement_y, modifiers);
 		}
 
 		return;
@@ -314,7 +312,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		if(movement_x || movement_y) {
 
-			 arrow_input_map(movement_x, movement_y);
+			 arrow_input_layer(movement_x, movement_y, modifiers);
 		}
 
 		return;
@@ -416,7 +414,7 @@ void editor::left_click_input(
 	auto grid=get_grid_position(world_pos);
 
 	//Process multiclick with lshift. Multiclick acts by delimiting a box.
-	if(! (_modifiers & click_modifier_lshift)) {
+	if(! (_modifiers & key_modifier_lshift)) {
 
 		multiclick.engaged=false;
 	}
@@ -599,7 +597,8 @@ void editor::right_click_input(
 
 void editor::arrow_input_set(
 	int _movement_x,
-	int _movement_y
+	int _movement_y,
+	int /*_modifiers*/
 ) {
 
 	struct : tile_editor::const_layer_visitor {
@@ -650,13 +649,96 @@ void editor::arrow_input_set(
 	dispatch_layer(dispatcher);
 }
 
-void editor::arrow_input_map(
+void editor::arrow_input_layer(
 	int _movement_x,
-	int _movement_y
+	int _movement_y,
+	int _modifiers
 ) {
 
+	if(!map.layers.size()) {
+
+		camera.move_by(_movement_x, _movement_y);
+		return;
+	}
+
+	struct : tile_editor::layer_visitor {
+		editor * controller{nullptr};
+		int movement_x, movement_y, modifiers;
+		void visit(tile_editor::tile_layer& _layer) {
+			controller->arrow_input_layer(_layer, movement_x, movement_y, modifiers);
+		};
+		void visit(tile_editor::thing_layer& _layer) {
+			controller->arrow_input_layer(_layer, movement_x, movement_y, modifiers);
+
+		};
+		void visit(tile_editor::poly_layer& _layer) {
+			controller->arrow_input_layer(_layer, movement_x, movement_y, modifiers);
+
+		};
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.movement_x=_movement_x;
+	dispatcher.movement_y=_movement_y;
+	dispatcher.modifiers=_modifiers;
+	dispatch_layer(dispatcher);
+}
+
+void editor::arrow_input_layer(
+	tile_editor::tile_layer&,
+	int _movement_x,
+	int _movement_y,
+	int /*_modifiers*/
+) {
 	camera.move_by(_movement_x, _movement_y);
 }
+
+void editor::arrow_input_layer(
+	tile_editor::thing_layer& /*_layer*/,
+	int _movement_x,
+	int _movement_y,
+	int _modifiers
+) {
+
+	if(nullptr==selected_thing) {
+
+		camera.move_by(_movement_x, _movement_y);
+		return;
+	}
+
+	if(_movement_x) {
+
+		selected_thing->x+=_modifiers & key_modifier_lctrl
+			? _movement_x*subgrid_factor
+			: _movement_x;
+		return;
+	}
+
+	if(_movement_y) {
+
+		selected_thing->y+=_modifiers & key_modifier_lctrl
+			? _movement_y*subgrid_factor
+			: _movement_y;
+		return;
+	}
+}
+
+void editor::arrow_input_layer(
+	tile_editor::poly_layer& /*_layer*/,
+	int _movement_x,
+	int _movement_y,
+	int /*_modifiers*/
+) {
+
+	if(nullptr==selected_poly) {
+
+		camera.move_by(_movement_x, _movement_y);
+		return;
+	}
+
+	//TODO: if there's something selected, move it.
+	//TODO: apply the modifiers.
+}
+
 
 void editor::draw(ldv::screen& _screen, int /*fps*/) {
 

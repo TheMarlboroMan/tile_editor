@@ -34,6 +34,8 @@ lshift + click - between two points, add/change/delete area
 lalt - snap to grid
 click - create new thing / select thing / edit properties on already selected thing
 delete - delete selected thing
+arrows - move selected thing
+arrows + lctrl - move selected thing in fine grid increments
 
 === POLY EDITOR MODE ===
 
