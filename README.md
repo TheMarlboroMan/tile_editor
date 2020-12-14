@@ -2,9 +2,6 @@
 
 ## TODO
 
-- properties controller, should be reusable for maps, things and polys.
-	- read ints, strings, then doubles, have map of index to [type, name]
-	- and that's about it.
 - click to select object
 - move selected object with arrows
 - change properties of object (use the properties on the object)

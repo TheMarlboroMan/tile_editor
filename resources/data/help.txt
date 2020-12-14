@@ -3,8 +3,8 @@
 == COMMON EDITOR MODE ==
 
 f1 - help.
-f2 - layer settings
-f3 - map settings
+f2 - map properties
+f3 - layer settings
 esc - exit, no save checks are done so save often
 s - save current file
 lctrl+s - save to new file
@@ -38,3 +38,6 @@ lalt - snap to grid
 lalt - snap to grid
 
 == LAYER / THING / POLY / MAP PROPERTIES MODE ==
+
+arrows up-down : choose value
+enter : enter/exit edit mode

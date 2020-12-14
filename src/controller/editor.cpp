@@ -1148,27 +1148,27 @@ void editor::load_session(const std::string& _path) {
 
 	//set the thing origin function...
 	switch(session.thing_center) {
-		case tile_editor::map_blueprint::thing_centers::center: 
+		case tile_editor::map_blueprint::thing_centers::center:
 			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
 				return {_x-_w/2, _y-_h/2};
 			};
 		break;
-		case tile_editor::map_blueprint::thing_centers::top_left: 
+		case tile_editor::map_blueprint::thing_centers::top_left:
 			thing_origin_fn=[](int _x, int _y, int, int) -> editor_point {
 				return {_x, _y};
 			};
 		break;
-		case tile_editor::map_blueprint::thing_centers::top_right: 
+		case tile_editor::map_blueprint::thing_centers::top_right:
 			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
 				return {_x+_w, _y};
 			};
 		break;
-		case tile_editor::map_blueprint::thing_centers::bottom_right: 
+		case tile_editor::map_blueprint::thing_centers::bottom_right:
 			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
 				return {_x+_w, _y+_h};
 			};
 		break;
-		case tile_editor::map_blueprint::thing_centers::bottom_left: 
+		case tile_editor::map_blueprint::thing_centers::bottom_left:
 			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
 				return {_x, _y+_w};
 			};
@@ -1287,6 +1287,7 @@ void editor::layer_change_cleanup() {
 void editor::open_map_properties() {
 
 	exchange_data.properties=&map.properties;
+	exchange_data.properties_blueprint=&session.properties;
 	exchange_data.put(state_properties);
 	push_state(state_properties);
 }

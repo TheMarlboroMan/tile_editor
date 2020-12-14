@@ -4,11 +4,14 @@
 #include "states.h"
 #include "app/exchange_data.h"
 #include "editor_types/property_manager.h"
+#include "blueprint_types/property_table.h"
 
 #include <dfw/controller_interface.h>
 #include <ldtools/ttf_manager.h>
-#include <tools/options_menu.h>
 #include <lm/logger.h>
+#include <vector>
+#include <sstream>
+#include <type_traits>
 
 namespace controller {
 
@@ -27,7 +30,64 @@ class properties:
 
 	private:
 
+	void                        input_text(dfw::input&);
+	void                        input_traverse(dfw::input&);
 	void                        save_changes();
+
+	//inner printer class.
+	struct printer {
+
+		const int index{0};
+		const std::string& edit_value;
+		const bool text_mode;
+		std::stringstream ss;
+
+		template<typename B, typename T>
+		void print(const B& _blueprint, const T& _value, const std::string& _type, int _index) {
+
+			ss<<selection(_index)<<_blueprint.name<<" ("<<_type<<"):";
+
+			if(text_mode && is_current(_index)) {
+				ss<<edit_value;
+			}
+			else {
+				ss<<_value;
+			}
+
+			ss<<std::endl
+				<<"\t"<<_blueprint.description<<std::endl;
+
+			switch(_blueprint.linked_to) {
+				case tile_editor::property_links::nothing:break;
+				case tile_editor::property_links::w: ss<<"\tthis property is linked to entity witdh"<<std::endl; break;
+				case tile_editor::property_links::h: ss<<"\tthis property is linked to entity height"<<std::endl; break;
+				case tile_editor::property_links::color_red: ss<<"\tthis property is linked to entity red color component"<<std::endl; break;
+				case tile_editor::property_links::color_green: ss<<"\tthis property is linked to entity green color component"<<std::endl; break;
+				case tile_editor::property_links::color_blue: ss<<"\tthis property is linked to entity blue color component"<<std::endl; break;
+				case tile_editor::property_links::color_alpha: ss<<"\tthis property is linked to entity color alpha"<<std::endl; break;
+			}
+		}
+
+		void special(const std::string& _type, int _index) {
+
+			ss<<selection(_index)<<_type<<std::endl;
+		}
+
+		bool is_current(int _index) const {
+
+			return index==_index;
+		}
+
+		const char * selection(int _index) const {
+
+			return is_current(_index)
+				? (
+					text_mode
+						? "[*] "
+						: "[>] "
+				) : "[ ] ";
+		}
+	};
 
 	//references...
 	lm::logger&                 log;
@@ -35,10 +95,21 @@ class properties:
 	tile_editor::exchange_data& exchange_data;
 
 	//properties
-	tile_editor::property_manager * property_manager{nullptr};
-	tools::options_menu<std::string> menu;
-	std::string                      current_key,
-	                                 input_value;
+	tile_editor::property_manager   property_manager;
+	tile_editor::property_table *   blueprint{nullptr};
+
+	enum class option_types{str, integer, decimal};
+	struct option_lookup {
+		option_types                type;
+		std::string                 key;
+	};
+
+	std::vector<option_lookup>      lookup;
+	int                             current_index{0},
+	                                exit_index{0},
+	                                cancel_index{0};
+	std::string                     current_value;
+	bool                            text_mode{false};
 };
 
 }
