@@ -13,7 +13,8 @@ l - load new file
 - - zoom out
 pagedown - next layer
 pageup - previous layer
-space - change layer drawing mode
+space - unselect
+lctrl + space - change layer view mode
 tab - toggle toolset
 arrows - move / change toolset element (depending on toolset visibility)
 [ - smaller fine grid (only thing and poly layers)
@@ -34,8 +35,8 @@ lshift + click - between two points, add/change/delete area
 lalt - snap to grid
 click - create new thing / select thing / edit properties on already selected thing
 delete - delete selected thing
-arrows - move selected thing
-arrows + lctrl - move selected thing in fine grid increments
+arrows - move selected thing by fine grid size (holdable)
+arrows + lctrl - fine move by fine grid size
 
 === POLY EDITOR MODE ===
 

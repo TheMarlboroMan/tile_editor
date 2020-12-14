@@ -116,6 +116,22 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		return;
 	}
 
+	int modifiers=key_modifier_none;
+	if(_input.is_input_pressed(input::lshift)) {
+
+		modifiers|=key_modifier_lshift;
+	}
+
+	if(_input.is_input_pressed(input::lctrl)) {
+
+		modifiers|=key_modifier_lctrl;
+	}
+
+	if(_input.is_input_pressed(input::lalt)) {
+
+		modifiers|=key_modifier_lalt;
+	}
+
 	if(_input.is_input_down(input::help)) {
 
 		push_state(state_help);
@@ -179,7 +195,14 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::space)) {
 
-		toggle_layer_draw_mode();
+		if(modifiers & key_modifier_lctrl) {
+
+			toggle_layer_draw_mode();
+			return;
+		}
+
+		selected_thing=nullptr;
+		selected_poly=nullptr;
 		return;
 	}
 
@@ -187,22 +210,6 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		show_set=!show_set;
 		return;
-	}
-
-	int modifiers=key_modifier_none;
-	if(_input.is_input_pressed(input::lshift)) {
-
-		modifiers|=key_modifier_lshift;
-	}
-
-	if(_input.is_input_pressed(input::lctrl)) {
-
-		modifiers|=key_modifier_lctrl;
-	}
-
-	if(_input.is_input_pressed(input::lalt)) {
-
-		modifiers|=key_modifier_lalt;
 	}
 
 	auto mpos=_input().get_mouse_position();
@@ -281,33 +288,29 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 	else {
 
 		typedef  bool (dfw::input::*input_fn)(int) const;
+
 		input_fn movement_fn=_input.is_input_pressed(input::lctrl)
 			? &dfw::input::is_input_down
 			: &dfw::input::is_input_pressed;
-
-		const int factor=_input.is_input_pressed(input::lctrl)
-			? session.grid_data.size / 4
-			: session.grid_data.size / 2;
 
 		int movement_x=0,
 			movement_y=0;
 
 		if(std::invoke(movement_fn, _input, input::up)) {
 
-			movement_y=-1*factor;
+			movement_y=-1;
 		}
-		if(std::invoke(movement_fn, _input, input::down)) {
+		else if(std::invoke(movement_fn, _input, input::down)) {
 
-			movement_y=1*factor;
+			movement_y=1;
 		}
 
 		if(std::invoke(movement_fn, _input, input::left)) {
 
-			movement_x=-1*factor;
-		}
-		if(std::invoke(movement_fn, _input, input::right)) {
+			movement_x=-1;
+		} else if(std::invoke(movement_fn, _input, input::right)) {
 
-			movement_x=1*factor;
+			movement_x=1;
 		}
 
 		if(movement_x || movement_y) {
@@ -657,7 +660,7 @@ void editor::arrow_input_layer(
 
 	if(!map.layers.size()) {
 
-		camera.move_by(_movement_x, _movement_y);
+		move_camera(_movement_x, _movement_y);
 		return;
 	}
 
@@ -683,41 +686,44 @@ void editor::arrow_input_layer(
 	dispatch_layer(dispatcher);
 }
 
+void editor::move_camera(
+	int _movement_x,
+	int _movement_y
+) {
+	camera.move_by(_movement_x * session.grid_data.size, _movement_y * session.grid_data.size);
+}
+
 void editor::arrow_input_layer(
 	tile_editor::tile_layer&,
 	int _movement_x,
 	int _movement_y,
 	int /*_modifiers*/
 ) {
-	camera.move_by(_movement_x, _movement_y);
+	move_camera(_movement_x, _movement_y);
 }
 
 void editor::arrow_input_layer(
 	tile_editor::thing_layer& /*_layer*/,
 	int _movement_x,
 	int _movement_y,
-	int _modifiers
+	int /*_modifiers*/
 ) {
 
 	if(nullptr==selected_thing) {
 
-		camera.move_by(_movement_x, _movement_y);
+		move_camera(_movement_x, _movement_y);
 		return;
 	}
 
 	if(_movement_x) {
 
-		selected_thing->x+=_modifiers & key_modifier_lctrl
-			? _movement_x*subgrid_factor
-			: _movement_x;
+		selected_thing->x+=_movement_x*subgrid_factor;
 		return;
 	}
 
 	if(_movement_y) {
 
-		selected_thing->y+=_modifiers & key_modifier_lctrl
-			? _movement_y*subgrid_factor
-			: _movement_y;
+		selected_thing->y+=_movement_y*subgrid_factor;
 		return;
 	}
 }
@@ -731,12 +737,11 @@ void editor::arrow_input_layer(
 
 	if(nullptr==selected_poly) {
 
-		camera.move_by(_movement_x, _movement_y);
+		move_camera(_movement_x, _movement_y);
 		return;
 	}
 
 	//TODO: if there's something selected, move it.
-	//TODO: apply the modifiers.
 }
 
 

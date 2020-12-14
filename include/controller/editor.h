@@ -94,6 +94,7 @@ class editor:
 	void                        make_subgrid_smaller();
 	void                        make_subgrid_larger();
 	void                        next_layer();
+	void                        move_camera(int, int);
 	void                        previous_layer();
 	//!resets all layer sensitive data (selections, polygons in the making...).
 	void                        layer_change_cleanup();
