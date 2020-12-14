@@ -2,15 +2,10 @@
 
 ## TODO
 
-- click to select object
-- move selected object with arrows
-- change properties of object (use the properties on the object)
-- delete selected object
-- sort objects on save
-- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
-- add new layer
-- delete layer
-- reorder layers
+- move selected object with arrows (use lalt for fine movement)
+- sort objects on save (as done with the things, of course).
+- show current selected thing info in HUD.
+- edit layer properties (set, id, alpha), duplicate the controller, stuff might change later.
 - poly layers could have winding and allow concave / convex / all properties
 - add poly
 - select poly
@@ -19,6 +14,9 @@
 - sort polys on save
 - change properties of poly
 - edit layer properties (set, id, alpha), send a ptr to the layer and be done.
+- add new layer
+- delete layer
+- reorder layers
 - console mode (move_by multiple of grid)
 
 ## Building

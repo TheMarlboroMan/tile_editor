@@ -67,6 +67,7 @@ class editor:
 	void                        left_click_input(int, tile_editor::thing_layer&);
 	void                        right_click_input(int, tile_editor::thing_layer&);
 	void                        del_input();
+	void                        del_input(tile_editor::thing_layer&);
 	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
@@ -98,6 +99,7 @@ class editor:
 	void                        receive_message(tools::message_manager::notify_event_type);
 	void                        open_layer_settings();
 	void                        open_map_properties();
+	void                        open_entity_properties(tile_editor::property_manager& _properties, tile_editor::property_table& _blueprint);
 	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
 	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
 	bool                        dispatch_layer(tile_editor::layer_visitor&);

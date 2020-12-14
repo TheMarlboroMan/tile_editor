@@ -1,4 +1,5 @@
 #include "app/map_loader.h"
+#include "app/entity_inflator.h"
 #include "parser/map_parser.h"
 #include "editor_types/thing_layer.h"
 #include "editor_types/poly_layer.h"
@@ -79,7 +80,7 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 	for(auto& layer : _map.layers) {
 		layer->accept(visitor);
 	}
-	
+
 
 	auto add_missing_props=[this](
 		const auto& _blueprint, //int, double or string
@@ -101,10 +102,11 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 	add_missing_props(map_property_blueprints.double_properties, _map.properties.double_properties);
 
 	//inflate things...
+	app::entity_inflator inflator;
+
 	for(auto& ptr : visitor.thing_layers) {
 
 		for(auto& thing : ptr->data) {
-
 
 			const auto blueprint=thingsets.at(ptr->set).table.at(thing.type);
 
@@ -114,29 +116,7 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 			add_missing_props(blueprint.properties.double_properties, thing.properties.double_properties);
 
 			//Inflate thing editor stuff with properties.
-			thing.w=blueprint.w;
-			thing.h=blueprint.h;
-			thing.color=blueprint.color;
-		
-			for(const auto& prop : blueprint.properties.int_properties) {
-
-				switch(prop.second.linked_to) {
-
-					case tile_editor::property_links::w:
-						thing.w=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::h:
-						thing.h=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_red:
-						thing.color.r=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_green:
-						thing.color.g=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_blue:
-						thing.color.b=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_alpha:
-						thing.color.a=thing.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::nothing: break;
-				}
-			}
+			inflator.inflate(thing, blueprint);
 		}
 	}
 
@@ -145,33 +125,13 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 
 		for(auto& poly : ptr->data) {
 
-
 			const auto blueprint=polysets.at(ptr->set).table.at(poly.type);
 			//Add missing properties...
 			add_missing_props(blueprint.properties.int_properties, poly.properties.int_properties);
 			add_missing_props(blueprint.properties.string_properties, poly.properties.string_properties);
 			add_missing_props(blueprint.properties.double_properties, poly.properties.double_properties);
 
-			//Inflate thing editor stuff with properties.
-			poly.color=blueprint.color;
-		
-			for(const auto& prop : blueprint.properties.int_properties) {
-
-				switch(prop.second.linked_to) {
-
-					case tile_editor::property_links::color_red:
-						poly.color.r=poly.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_green:
-						poly.color.g=poly.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_blue:
-						poly.color.b=poly.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::color_alpha:
-						poly.color.a=poly.properties.int_properties.at(prop.second.name); break;
-					case tile_editor::property_links::w:
-					case tile_editor::property_links::h:
-					case tile_editor::property_links::nothing: break;
-				}
-			}
+			inflator.inflate(poly, blueprint);
 		}
 	}
 }

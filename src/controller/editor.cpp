@@ -5,6 +5,7 @@
 #include "app/map_loader.h"
 #include "app/map_saver.h"
 #include "app/map_loader.h"
+#include "app/entity_inflator.h"
 #include "tile_editor/parser/blueprint_parser.h"
 #include "tile_editor/editor_types/tile_layer.h"
 #include "tile_editor/editor_types/thing_layer.h"
@@ -16,6 +17,7 @@
 #include <ldv/bitmap_representation.h>
 #include <ldv/box_representation.h>
 #include <ldv/line_representation.h>
+#include <ldt/box.h>
 
 #include <algorithm>
 
@@ -64,6 +66,7 @@ void editor::awake(dfw::input& /*_input*/) {
 
 	lm::log(log, lm::lvl::info)<<"map editor controller awakens"<<std::endl;
 
+	//Only the load-save controller leaves the signal.
 	if(exchange_data.has(state_editor)) {
 
 		exchange_data.recover(state_editor);
@@ -81,6 +84,26 @@ void editor::awake(dfw::input& /*_input*/) {
 
 				load_map(exchange_data.file_browser_choice);
 			}
+		}
+	}
+
+	//Each time we reload let us just try and adjust selected entities, just
+	//in case we come from the properties controller. This is pure shotgun
+	//surgery, but this tool does not need much finesse.
+	if(map.layers.size()) {
+
+		if(nullptr!=selected_thing) {
+
+			app::entity_inflator inflator;
+			auto layer=map.layers.at(current_layer).get();
+			inflator.inflate(*selected_thing, session.thingsets.at(layer->set).table.at(selected_thing->type));
+		}
+
+		if(nullptr!=selected_poly) {
+
+			app::entity_inflator inflator;
+			auto layer=map.layers.at(current_layer).get();
+			inflator.inflate(*selected_poly, session.polysets.at(layer->set).table.at(selected_poly->type));
 		}
 	}
 }
@@ -300,14 +323,32 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 void editor::del_input() {
 
-	struct : public tile_editor::const_layer_visitor {
+	struct : public tile_editor::layer_visitor {
 		editor * controller{nullptr};
-		void visit(const tile_editor::tile_layer&) {controller->tile_delete_mode=!controller->tile_delete_mode;}
-		void visit(const tile_editor::thing_layer&) {}
-		void visit(const tile_editor::poly_layer&) {}
+		void visit(tile_editor::tile_layer&) {controller->tile_delete_mode=!controller->tile_delete_mode;}
+		void visit(tile_editor::thing_layer& _layer) {controller->del_input(_layer);}
+		void visit(tile_editor::poly_layer&) {}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatch_layer(dispatcher);
+}
+
+void editor::del_input(tile_editor::thing_layer& _layer) {
+
+	if(nullptr==selected_thing) {
+
+		return;
+	}
+
+	auto it=std::remove_if(
+		std::begin(_layer.data),
+		std::end(_layer.data),
+		[this](const tile_editor::thing& _thing) {
+			return &_thing==selected_thing;
+		}
+	);
+	_layer.data.erase(it);
+	selected_thing=nullptr;
 }
 
 void editor::subgrid_input(
@@ -494,10 +535,31 @@ void editor::left_click_input(
 	tile_editor::thing_layer& _layer
 ) {
 
-	//TODO: Try to locate the thing under the cursor to select it.
-	//TODO: This will be funky since the rectangle of the thing does depend on
-	//TODO: the current center mode: I guess we can have a "make rect" and
-	//then go point_in_rectangle.
+	//Try and select...
+	auto world_pos=get_world_position(mouse_pos);
+	for(auto& thing : _layer.data) {
+
+		//The origin is in "screen cordinates" so we must "cartesianify" it
+		//when creating the box...
+		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
+		auto box=ldt::box<int, unsigned>{{origin.x, origin.y}, (unsigned)thing.w, (unsigned)thing.h};
+
+		if(box.point_inside(world_pos)) {
+
+			//If already selected, open its properties!
+			if(nullptr!=selected_thing && &thing==selected_thing) {
+
+				open_entity_properties(
+					thing.properties,
+					session.thingsets.at(_layer.set).table.at(thing.type).properties
+				);
+				return;
+			}
+
+			selected_thing=&thing;
+			return;
+		}
+	}
 
 	//Add the current thing...
 	const auto prototype=thing_list.get();
@@ -972,6 +1034,7 @@ void editor::draw_layer(
 	for(const auto& thing : _layer.data) {
 
 		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
+		box.set_filltype(ldv::polygon_representation::type::fill);
 		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a));
 		box.draw(_screen, camera);
@@ -980,6 +1043,14 @@ void editor::draw_layer(
 		crosshair(thing.x, thing.y, thing.w /4 , thing.h /4, thing.color);
 		vline.draw(_screen, camera);
 		hline.draw(_screen, camera);
+
+		//Additionally, the current box has a specific glow to it.
+		if(selected_thing!=nullptr && selected_thing==&thing) {
+
+			box.set_filltype(ldv::polygon_representation::type::line);
+			box.set_color(ldv::rgba8(255,255,255,255));
+			box.draw(_screen, camera);
+		}
 	}
 }
 
@@ -1282,6 +1353,17 @@ void editor::layer_change_cleanup() {
 	multiclick.engaged=false;
 	tile_delete_mode=false;
 	subgrid_factor=session.grid_data.size;
+}
+
+void editor::open_entity_properties(
+	tile_editor::property_manager& _properties,
+	tile_editor::property_table& _blueprint
+) {
+
+	exchange_data.properties=&_properties;
+	exchange_data.properties_blueprint=&_blueprint;
+	exchange_data.put(state_properties);
+	push_state(state_properties);
 }
 
 void editor::open_map_properties() {
