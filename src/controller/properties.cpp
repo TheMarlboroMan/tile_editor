@@ -1,7 +1,9 @@
 #include "../../include/controller/properties.h"
-
-//local
 #include "../../include/input/input.h"
+
+#include <ldv/ttf_representation.h>
+#include <sstream>
+
 
 using namespace controller;
 
@@ -27,40 +29,37 @@ void properties::awake(dfw::input& /*input*/) {
 	exchange_data.recover(state_properties);
 	property_manager=exchange_data.properties;
 
+	//This is abhorrent, of course, but, enough for this tool: the type of the
+	//value will be contained in the meny key. We might as well go get_type	
+	//for this.
+	
+	auto add_str=[this](const auto& _props) {
 
-	bool key_set=false;
+		std::string key{"str-"};
 
-	auto add_to_menu=[&key_set, this](
-		const auto& _pair,
-		datatypes _type
-	) {
-		if(!key_set) {
+		for(const auto& pair : _props) {
 
-			current_key={_type, _pair.first};
-			key_set=true;
+			menu.insert(key+pair.first, pair.second);
 		}
-
-		menu.insert(keytype{_type, _pair.first}, _pair.second);
 	};
 
-	auto add=[add_to_menu](
-		const auto& _container,
-		datatypes _type
-	) {
-		for(const auto& pair : _container) {
-			add_to_menu(pair, _type);
+	auto add_numeric=[this](const auto& _props, const std::string& _key) {
+
+		for(const auto& pair : _props) {
+
+			auto min=(decltype(pair.second))-99999;
+			auto max=(decltype(pair.second))99999;
+
+			menu.insert(_key+pair.first, pair.second, min, max, false);
 		}
 	};
 
 	menu.clear();
-
-	//TODO: ints need min-max.
-//	add(property_manager->int_properties, datatypes::t_int);
-	add(property_manager->string_properties, datatypes::t_string);
-	//TODO: doubles need min-max.
-//	add(property_manager->double_properties, datatypes::t_double);
-	menu.insert(keytype{datatypes::t_special, "exit"});
-	menu.insert(keytype{datatypes::t_special, "cancel"});
+	add_str(property_manager->string_properties);
+	add_numeric(property_manager->int_properties, "int-");
+	add_numeric(property_manager->double_properties, "double-");
+	menu.insert("exit");
+	menu.insert("cancel");
 }
 
 void properties::slumber(dfw::input& /*input*/) {
@@ -86,7 +85,102 @@ void properties::draw(ldv::screen& screen, int /*fps*/) {
 
 	screen.clear(ldv::rgba8(0, 0, 0, 255));
 
-	//run through the menu and draw.
+/**
+	auto is_current=[]() -> bool {
 
-	//TODO: Always draw the description for the current thing!
+		//TODO:
+		return false;
+	};
+*/
+	auto cursor=[this](const std::string _key) -> std:string {
+
+		return current_key==_key
+			? "[>]"
+			: "[ ]";
+	};
+
+	auto name=[this](const std::string& _key) -> std::string {
+
+		if(_key=="exit" || _key=="cancel") {
+
+			return _key;
+		}
+
+		const auto dash_pos=_key.find("-");
+		const std::string& type=_key.substr(0, dash_posh);
+		const std::string& key=_key.substr(dash_posh+1);
+
+		if(type=="str") {
+
+			return property_manager->string_properties.at(key).name;
+		}
+		else if(type=="int") {
+
+			return property_manager->int_properties.at(key).name;
+		}
+		else if(type=="double") {
+
+			return property_manager->double_properties.at(key).name;
+		}
+		else {
+
+			throw std::runtime_error(std::string{"invalid type '"}+_type+"'");
+		}
+	};
+
+	auto value=[this](
+		std::stringstream& _ss,
+		const std::string& _key
+	) {
+
+		const auto dash_pos=_key.find("-");
+		const std::string& type=_key.substr(0, dash_posh);
+		const std::string& key=_key.substr(dash_posh+1);
+
+		if(type=="str") {
+
+			return property_manager->string_properties.at(key).name;
+		}
+		else if(type=="int") {
+
+			return property_manager->int_properties.at(key).name;
+		}
+		else if(type=="double") {
+
+			return property_manager->double_properties.at(key).name;
+		}
+		else {
+
+			throw std::runtime_error(std::string{"invalid type '"}+_type+"'");
+		}
+	};
+
+	auto help=[this](const std::string& _key) -> std::string {
+	
+		return "";
+	};
+
+	std::stringstream ss;
+	for(const auto& key : menu.get_keys()) {
+
+		ss<<cursor(key)<<" "<<name(key)<<":"<<value(key);
+	}
+
+	ss<<help(current_key);
+
+	//Name...
+	ldv::ttf_representation txt_menu{
+		ttf_manager.get("main", 14),
+		ldv::rgba8(255, 255, 255, 255),
+		ss.str()
+	};
+
+	txt_menu.go_to({0, 0});
+
+	txt_menu.draw(_screen);
+}
+
+void properties::save_changes() {
+
+	//TODO.
 }

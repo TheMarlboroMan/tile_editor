@@ -27,25 +27,18 @@ class properties:
 
 	private:
 
+	void                        save_changes();
+
 	//references...
 	lm::logger&                 log;
 	ldtools::ttf_manager&       ttf_manager;
 	tile_editor::exchange_data& exchange_data;
 
-	enum class datatypes {
-		t_int, t_string, t_double, t_special
-	};
-
-	struct keytype {
-		datatypes               type;
-		std::string             name;
-	};
-
 	//properties
 	tile_editor::property_manager * property_manager{nullptr};
-	//TODO: will never work, not a valid key!!!
-	tools::options_menu<keytype>    menu;
-	keytype                         current_key{datatypes::t_special, ""};
+	tools::options_menu<std::string> menu;
+	std::string                      current_key,
+	                                 input_value;
 };
 
 }
