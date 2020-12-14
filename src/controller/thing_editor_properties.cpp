@@ -41,7 +41,7 @@ void thing_editor_properties::awake(dfw::input&) {
 	sets.clear();
 	menu.clear_choice(menu_layer_set);
 
-	for(const auto& pair : exchange_data.blueprint->tilesets) {
+	for(const auto& pair : exchange_data.blueprint->thingsets) {
 
 		int id=pair.first;
 		sets[id]=pair.second.name;

@@ -2,7 +2,7 @@
 
 ## TODO
 
-- fix thing editor layer
+- check alpha really affects the layers.
 - poly layers could have winding and allow concave / convex / all properties
 - add poly
 - select poly
