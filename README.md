@@ -3,7 +3,9 @@
 ## TODO
 
 - check alpha really affects the layers.
-- poly layers could have winding and allow concave / convex / all properties
+- thing and poly controller could also draw map
+- poly layers could have winding 
+- poly layers could allow concave / convex / all properties
 - add poly
 - select poly
 - move poly
@@ -21,7 +23,6 @@
 TODO:
 
 ## How to use
-
 ./editor.out -c #configfile# [-f #mapfile#] [-w #WxH#]
 
 ## Input files
