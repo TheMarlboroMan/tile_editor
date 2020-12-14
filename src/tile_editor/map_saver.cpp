@@ -79,9 +79,21 @@ void map_saver::pre_save(tile_editor::tile_layer& _layer) {
 	);
 }
 
-void map_saver::pre_save(tile_editor::thing_layer&) {
+void map_saver::pre_save(tile_editor::thing_layer& _layer) {
 
-	//TODO: sort layers.
+	std::sort(
+		std::begin(_layer.data),
+		std::end(_layer.data),
+		[](
+			const tile_editor::thing& _a,
+			const tile_editor::thing& _b
+		) {
+			//Top-down, left to right.
+			if(_a.y < _b.y) {return true;}
+			else if(_a.y > _b.y) {return false;}
+			return _a.x < _b.x;
+		}
+	);
 }
 
 void map_saver::pre_save(tile_editor::poly_layer&) {

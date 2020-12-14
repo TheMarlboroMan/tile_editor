@@ -75,6 +75,9 @@ class editor:
 	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
+	void                        draw_hud_thing_info(std::stringstream&, const tile_editor::thing&, const tile_editor::thing_definition&);
+	void                        draw_hud_poly_info(std::stringstream&, const tile_editor::poly&, const tile_editor::poly_definition&);
+
 	void                        draw_grid(ldv::screen&);
 	void                        draw_layers(ldv::screen&);
 	void                        draw_layer(ldv::screen&, const tile_editor::tile_layer&);

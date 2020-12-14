@@ -11,7 +11,6 @@
 #include "tile_editor/editor_types/thing_layer.h"
 #include "tile_editor/editor_types/poly_layer.h"
 #include "tile_editor/app/set_layer_loader.h"
-
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
 #include <ldv/bitmap_representation.h>
@@ -348,8 +347,10 @@ void editor::del_input(tile_editor::thing_layer& _layer) {
 			return &_thing==selected_thing;
 		}
 	);
+
 	_layer.data.erase(it);
 	selected_thing=nullptr;
+	message_manager.add("thing deleted");
 }
 
 void editor::subgrid_input(
@@ -527,6 +528,7 @@ void editor::right_click_input(
 
 		if(tile_list.none!=index) {
 			tile_list.set_index(index);
+			message_manager.add("tile type selected");
 		}
 	}
 }
@@ -1177,40 +1179,63 @@ void editor::draw_hud(ldv::screen& _screen) {
 
 	std::stringstream ss;
 
+	ss<<" "<<mouse_pos.x<<","<<mouse_pos.y<<" zoom:"<<camera.get_zoom()<<std::endl;
+
 	if(!map.layers.size()) {
 
 		ss<<"no layers";
+		return;
 	}
 	else {
 
 		struct :tile_editor::const_layer_visitor {
 
 			tile_editor::map_blueprint * session{nullptr};
-			std::string contents;
+			std::stringstream * ss{nullptr};
 
 			void visit(const tile_editor::tile_layer& _layer) {
-				contents=std::string{" type: tile, set: "}+session->tilesets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
+				(*ss)<<" tile, set: "<<session->tilesets[_layer.set].name<<" size: "<<_layer.data.size();
 			}
 
 			void visit(const tile_editor::thing_layer& _layer) {
-				contents=std::string{" type: thing, set: "}+session->thingsets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
+				(*ss)<<" thing, set: "<<session->thingsets[_layer.set].name<<" size: "<<_layer.data.size();
 			}
 
 			void visit(const tile_editor::poly_layer& _layer) {
-				contents=std::string{" type: poly, set: "}+session->polysets[_layer.set].name+" size: "+std::to_string(_layer.data.size());
+				(*ss)<<" poly, set: "<<session->polysets[_layer.set].name<<", size: "<<_layer.data.size();
 			}
 		} visitor;
-
 		visitor.session=&session;
+		visitor.ss=&ss;
+
+		ss<<"'"<<map.layers[current_layer]->id<<"', type ";
 		map.layers[current_layer]->accept(visitor);
+		ss	<<", layer "<<(current_layer+1)<<" / "<<map.layers.size()<<std::endl;
 
-		ss<<"layer "
-			<<" '"<<map.layers[current_layer]->id<<"'"
-			<<visitor.contents
-			<<" "<<(current_layer+1)<<" / "<<map.layers.size();
+		//Show currently selected thing...
+		struct :tile_editor::const_layer_visitor {
+
+			editor * controller{nullptr};
+			std::stringstream * ss{nullptr};
+
+			void visit(const tile_editor::tile_layer&) {}
+
+			void visit(const tile_editor::thing_layer& _layer) {
+				if(nullptr!=controller->selected_thing) {
+					controller->draw_hud_thing_info(*ss, *controller->selected_thing, controller->session.thingsets.at(_layer.set).table.at(controller->selected_thing->type));
+				}
+			}
+
+			void visit(const tile_editor::poly_layer& _layer) {
+				if(nullptr!=controller->selected_poly) {
+					controller->draw_hud_poly_info(*ss, *controller->selected_poly, controller->session.polysets.at(_layer.set).table.at(controller->selected_poly->type));
+				}
+			}
+		} dispatcher;
+		dispatcher.controller=this;
+		dispatcher.ss=&ss;
+		map.layers[current_layer]->accept(dispatcher);
 	}
-
-	ss<<" "<<mouse_pos.x<<","<<mouse_pos.y<<" zoom:"<<camera.get_zoom();
 
 	ldv::ttf_representation txt_hud{
 		ttf_manager.get("main", 14),
@@ -1221,6 +1246,55 @@ void editor::draw_hud(ldv::screen& _screen) {
 	txt_hud.go_to({0,0});
 	txt_hud.set_text(ss.str());
 	txt_hud.draw(_screen);
+}
+
+void editor::draw_hud_thing_info(
+	std::stringstream& _ss, 
+	const tile_editor::thing& _thing, 
+	const tile_editor::thing_definition& _blueprint
+) {
+
+	_ss<<_blueprint.name<<" ["<<_blueprint.type_id<<"]"<<std::endl
+		<<"x: "<<_thing.x<<std::endl
+		<<"y: "<<_thing.y<<std::endl
+		<<"w: "<<_thing.w<<std::endl
+		<<"h: "<<_thing.h<<std::endl
+		<<"color: "<<_thing.color.r<<" "<<_thing.color.g<<" "<<_thing.color.b<<" "<<_thing.color.a<<std::endl;
+
+	auto print_properties=[&_ss](const auto& _props, const auto& _protos) {
+
+		for(const auto& pair : _props) {
+
+			_ss<<"["<<_protos.at(pair.first).name<<"]:"<<pair.second<<std::endl;
+		}
+	};
+
+	print_properties(_thing.properties.string_properties, _blueprint.properties.string_properties);
+	print_properties(_thing.properties.int_properties, _blueprint.properties.int_properties);
+	print_properties(_thing.properties.double_properties, _blueprint.properties.double_properties);
+}
+
+
+void editor::draw_hud_poly_info(
+	std::stringstream& _ss, 
+	const tile_editor::poly& _poly, 
+	const tile_editor::poly_definition& _blueprint
+) {
+
+	_ss<<_blueprint.name<<" ["<<_blueprint.poly_id<<"]"<<std::endl
+		<<"color: "<<_poly.color.r<<" "<<_poly.color.g<<" "<<_poly.color.b<<" "<<_poly.color.a<<std::endl;
+
+	auto print_properties=[&_ss](const auto& _props, const auto& _protos) {
+
+		for(const auto& pair : _props) {
+
+			_ss<<"["<<_protos.at(pair.first).name<<"]:"<<pair.second<<std::endl;
+		}
+	};
+
+	print_properties(_poly.properties.string_properties, _blueprint.properties.string_properties);
+	print_properties(_poly.properties.int_properties, _blueprint.properties.int_properties);
+	print_properties(_poly.properties.double_properties, _blueprint.properties.double_properties);
 }
 
 void editor::zoom_in() {
