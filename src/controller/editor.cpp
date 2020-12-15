@@ -392,7 +392,7 @@ void editor::click_input(
 		int modifiers{0};
 		void visit(tile_editor::tile_layer& _layer) {controller->click_input(input, modifiers, _layer);}
 		void visit(tile_editor::thing_layer& _layer) {controller->click_input(input, modifiers, _layer);}
-		void visit(tile_editor::poly_layer&) {}
+		void visit(tile_editor::poly_layer& _layer) {controller->click_input(input, modifiers, _layer);}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatcher.input=_input;
@@ -415,6 +415,17 @@ void editor::click_input(
 	int _input,
 	int _modifiers,
 	tile_editor::tile_layer& _layer
+) {
+	switch(_input) {
+		case input::left_click: left_click_input(_modifiers, _layer); break;
+		case input::right_click: right_click_input(_modifiers, _layer); break;
+	}
+}
+
+void editor::click_input(
+	int _input,
+	int _modifiers,
+	tile_editor::poly_layer& _layer
 ) {
 	switch(_input) {
 		case input::left_click: left_click_input(_modifiers, _layer); break;
@@ -609,8 +620,42 @@ void editor::right_click_input(
 	tile_editor::thing_layer& /*_layer*/
 ) {
 
-	//TODO:
-	//Open the thing editor!!!
+}
+
+void editor::left_click_input(
+	int /*_modifiers*/,
+	tile_editor::poly_layer& /*_layer*/
+) {
+
+	auto world_pos=get_world_position(mouse_pos);
+
+	if(!current_poly_vertices.size()) {
+
+		current_poly_vertices.push_back(world_pos);
+		return;
+	}
+
+	if(current_poly_vertices.size() >= 3 
+		&& world_pos==current_poly_vertices[0]
+	) {
+
+		//TODO: if closed, check winding and curve!
+		//	TODO: add messages if failure.
+		//TODO: create a new default poly
+		//TODO: push it.
+		current_poly_vertices.clear();
+		return;
+	}
+
+	current_poly_vertices.push_back(world_pos);
+}
+
+void editor::right_click_input(
+	int /*_modifiers*/, 
+	tile_editor::poly_layer& /*_layer*/
+) {
+
+	//TODO: Does this do something?
 }
 
 void editor::arrow_input_set(
@@ -1176,12 +1221,12 @@ void editor::draw_layer(
 	shape.set_alpha(_layer.alpha);
 	shape.set_blend(ldv::representation::blends::alpha);
 
-	for(const auto& poly : _layer.data) {
+	auto points_for_poly=[](const tile_editor::poly& _poly) {
 
-		std::vector<ldv::point> points(poly.points.size());
+		std::vector<ldv::point> points(_poly.points.size());
 		std::transform(
-			std::begin(poly.points),
-			std::end(poly.points),
+			std::begin(_poly.points),
+			std::end(_poly.points),
 			std::begin(points),
 			[](const ldv::point& _point) -> tile_editor::poly_point {
 
@@ -1189,9 +1234,85 @@ void editor::draw_layer(
 			}
 		);
 
+		return points;
+	};
+
+	for(const auto& poly : _layer.data) {
+
+		auto points=points_for_poly(poly);
 		shape.set_points(points);
+		shape.set_filltype(ldv::polygon_representation::type::fill);
 		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, blend_alpha(_layer.alpha, poly.color.a)));
 		shape.draw(_screen, camera);
+
+		//Highlight the current shape...
+		if(selected_poly!=nullptr && selected_poly==&poly) {
+
+			shape.set_filltype(ldv::polygon_representation::type::line);
+			//TODO: it would be great if there was a glow to this.
+			shape.set_color(ldv::rgba8(255,255,255, blend_alpha(_layer.alpha, 255)));
+			shape.draw(_screen, camera);
+		}
+	}
+
+	if(current_poly_vertices.size()) {
+
+		auto draw_point=[&_screen, this](
+			const tile_editor::poly_point& _point
+		) {
+
+			ldv::box_representation box(
+				{_point.x-1, -(_point.y)-1, 10, 10},
+				ldv::rgba8(255,255,255,255)
+			);
+
+			box.set_blend(ldv::representation::blends::alpha);
+			box.draw(_screen, camera);
+		};
+
+		auto draw_line=[&_screen, this](
+			const tile_editor::poly_point& _point_a,
+			const tile_editor::poly_point& _point_b
+		) {
+			ldv::line_representation line(
+				{_point_a.x, _point_a.y},
+				{_point_b.x, _point_b.y},
+				ldv::rgba8(255, 255, 255, 64)
+			);
+			line.draw(_screen, camera);
+		};
+
+		//TODO Always try to close the poly with the mouse position!!!
+
+		if(1==current_poly_vertices.size()) {
+
+			draw_point(current_poly_vertices[0]);
+		}
+		else if(2==current_poly_vertices.size()) {
+
+			//TODO: close the current polygon by following the mouse around...
+			//TODO: don't add the vertex! copy???
+			//current_poly_vertices.push_back(get_world_position(mouse_pos));
+
+			draw_point(current_poly_vertices[0]);
+			draw_line(current_poly_vertices[0], current_poly_vertices[1]);
+			draw_point(current_poly_vertices[1]);
+		}
+		else {
+
+			//TODO: close the current polygon by following the mouse around...
+			//TODO: don't add the vertex! copy???
+			//current_poly_vertices.push_back(get_world_position(mouse_pos));
+
+			shape.set_points(current_poly_vertices);
+			shape.set_filltype(ldv::polygon_representation::type::fill);
+			shape.set_color(ldv::rgba8(255, 255, 255, 128));
+			shape.draw(_screen, camera);
+
+			shape.set_filltype(ldv::polygon_representation::type::line);
+			shape.set_color(ldv::rgba8(255, 255, 255, 64));
+			shape.draw(_screen, camera);
+		}
 	}
 }
 
@@ -1535,6 +1656,7 @@ void editor::layer_change_cleanup() {
 	multiclick.engaged=false;
 	tile_delete_mode=false;
 	subgrid_factor=session.grid_data.size;
+	current_poly_vertices.clear();
 }
 
 void editor::open_thing_properties(

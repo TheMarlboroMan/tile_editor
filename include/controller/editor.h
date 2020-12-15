@@ -66,10 +66,13 @@ class editor:
 	void                        click_input(int, int);
 	void                        click_input(int, int, tile_editor::tile_layer&);
 	void                        click_input(int, int, tile_editor::thing_layer&);
+	void                        click_input(int, int, tile_editor::poly_layer&);
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
 	void                        left_click_input(int, tile_editor::thing_layer&);
 	void                        right_click_input(int, tile_editor::thing_layer&);
+	void                        left_click_input(int, tile_editor::poly_layer&);
+	void                        right_click_input(int, tile_editor::poly_layer&);
 	void                        del_input();
 	void                        del_input(tile_editor::thing_layer&);
 	void                        subgrid_input(bool);
@@ -141,9 +144,13 @@ class editor:
 
 	//The sprite_frame does not store its id, so the grid will store the
 	//natural pair id-sprite.
-	tools::grid_list<ldtools::sprite_table::container::value_type> tile_list;
-	tools::vertical_list<tile_editor::thing_definition> thing_list;
-	tools::vertical_list<tile_editor::poly_definition> poly_list;
+	using tilelist_t=tools::grid_list<ldtools::sprite_table::container::value_type>;
+	using thinglist_t=tools::vertical_list<tile_editor::thing_definition>;
+	using polylist_t=tools::vertical_list<tile_editor::poly_definition>;
+
+	tilelist_t                  tile_list;
+	thinglist_t                 thing_list;
+	polylist_t                  poly_list;
 	std::string                 current_filename;
 	std::size_t	                current_layer{0},
 	                            subgrid_factor{0};
@@ -153,6 +160,7 @@ class editor:
 	std::function<editor_point(int, int, int, int)>	thing_origin_fn;
 	bool                        show_set{true},
 	                            tile_delete_mode{false};
+	std::vector<tile_editor::poly_point> current_poly_vertices;
 
 	static const int            grid_list_w{32},
 	                            grid_list_h{32},

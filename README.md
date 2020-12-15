@@ -6,12 +6,17 @@ There are some red flags, like the monstruous "editor" controller (could be sepa
 
 ## TODO
 
+- bug: vertices are not drawn!!!
+- bug: lalt click does not register. Why?
+- vertices should be always drawn, right?
+- perhaps the poly should follow the mouse position and try to close itself???
 - add poly
 	- winding and curve for polys are not prescritive, just used to enforce when drawing a poly
+- todo cancel poly drawing (right click??)
 - select poly
 - delete poly
 - move poly
-- change properties of poly
+- change properties of poly (should be mostly done)
 - edit poly layer properties (set, id, alpha, winding, curve), send a ptr to the layer and be done.
 - sort polys on save
 - v1.0 done :P
