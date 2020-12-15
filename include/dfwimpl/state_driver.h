@@ -14,6 +14,7 @@
 #include "../../include/controller/tile_editor_properties.h"
 #include "../../include/controller/thing_editor_properties.h"
 #include "../../include/controller/properties.h"
+#include "../../include/controller/layer_selector.h"
 //[new-controller-header-mark]
 
 //Specific app_config
@@ -57,6 +58,7 @@ class state_driver:
 	ptr_controller                  c_thing_editor_properties;
 	ptr_controller					c_properties;
 
+	ptr_controller					c_layer_selector;
 	//[new-controller-property-mark]
 
 	ldtools::ttf_manager            ttf_manager;

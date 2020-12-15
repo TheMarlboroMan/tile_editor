@@ -27,12 +27,14 @@ class properties:
 	virtual void 				awake(dfw::input& /*input*/);
 	virtual void 				slumber(dfw::input& /*input*/);
 	virtual bool				can_leave_state() const {return true;}
+	void                        request_draw(dfw::controller_view_manager&);
 
 	private:
 
 	void                        input_text(dfw::input&);
 	void                        input_traverse(dfw::input&);
 	void                        save_changes();
+	void                        cancel_changes();
 
 	//inner printer class.
 	struct printer {
@@ -95,7 +97,8 @@ class properties:
 	tile_editor::exchange_data& exchange_data;
 
 	//properties
-	tile_editor::property_manager   property_manager;
+	tile_editor::property_manager   property_manager_backup; //!<Backup of the input data: changes are made live.
+	tile_editor::property_manager * property_manager{nullptr}; //!<Data changed on real time.
 	tile_editor::property_table *   blueprint{nullptr};
 
 	enum class option_types{str, integer, decimal};

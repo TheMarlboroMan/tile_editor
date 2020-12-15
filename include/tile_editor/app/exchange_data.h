@@ -2,6 +2,7 @@
 #pragma once
 
 #include "controller/states.h"
+#include "editor_types/map.h"
 
 #include <string>
 #include <map>
@@ -12,6 +13,10 @@ struct layer;
 struct map_blueprint;
 struct property_manager;
 struct property_table;
+struct thing_definition;
+struct poly_definition;
+struct thing;
+struct poly;
 
 class exchange_data {
 
@@ -30,12 +35,18 @@ class exchange_data {
 	bool                    file_browser_allow_create{false}, //in
 	                        file_browser_success{false}; //out
 	int                     file_browser_invoker_id{0}; //in
+	std::size_t *           current_layer; //in-out
 	std::string             file_browser_choice, //out
 	                        file_browser_title; //in
 	tile_editor::layer *    layer{nullptr}; //in-out
 	tile_editor::property_manager * properties{nullptr}; //in-out
 	tile_editor::property_table * properties_blueprint{nullptr}; //in
 	const tile_editor::map_blueprint * blueprint{nullptr}; //in
+	std::vector<tile_editor::map::layerptr> * layers{nullptr}; //in-out
+	tile_editor::thing *    edited_thing{nullptr}; //in
+	tile_editor::thing_definition * edited_thing_blueprint{nullptr}; //in
+	tile_editor::poly *    edited_poly{nullptr}; //in
+	tile_editor::poly_definition * edited_poly_blueprint{nullptr}; //in
 
 	private:
 

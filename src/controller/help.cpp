@@ -1,7 +1,6 @@
-#include "../../include/controller/help.h"
-
-//local
-#include "../../include/input/input.h"
+#include "controller/help.h"
+#include "input/input.h"
+#include "app/definitions.h"
 
 #include <tools/file_utils.h>
 
@@ -20,7 +19,7 @@ help::help(
 		{0,0}
 	},
 	help_rep{
-		ttf_manager.get("main", 14),
+		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		ldv::rgba8(255, 255, 255, 255),
 	} {
 

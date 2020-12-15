@@ -107,10 +107,13 @@ class editor:
 	void                        receive_message(tools::message_manager::notify_event_type);
 	void                        open_layer_settings();
 	void                        open_map_properties();
-	void                        open_entity_properties(tile_editor::property_manager& _properties, tile_editor::property_table& _blueprint);
+	void                        open_layer_selector();
+	void                        open_thing_properties(tile_editor::property_manager& _properties, tile_editor::thing_definition& _blueprint);
 	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
 	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
 	bool                        dispatch_layer(tile_editor::layer_visitor&);
+	int                         blend_alpha(int, int) const;
+	void                        toggle_set_gui();
 
 	//references...
 	lm::logger&                 log;

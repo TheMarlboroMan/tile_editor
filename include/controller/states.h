@@ -9,6 +9,7 @@ state_help,
 state_tile_editor_properties,
 state_thing_editor_properties,
 state_properties,
+state_layer_selector,
 //[new-controller-state-mark]
 state_max
 };

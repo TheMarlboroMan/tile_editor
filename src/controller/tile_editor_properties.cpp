@@ -1,5 +1,6 @@
-#include "../../include/controller/tile_editor_properties.h"
-#include "../../include/input/input.h"
+#include "controller/tile_editor_properties.h"
+#include "input/input.h"
+#include "app/definitions.h"
 #include "blueprint_types/map_blueprint.h"
 
 #include <ldv/ttf_representation.h>
@@ -10,8 +11,8 @@
 using namespace controller;
 
 tile_editor_properties::tile_editor_properties(
-	lm::logger& _log, 
-	ldtools::ttf_manager& _ttf_manager, 
+	lm::logger& _log,
+	ldtools::ttf_manager& _ttf_manager,
 	tile_editor::exchange_data& _exchange_data
 ):log(_log),
 	ttf_manager{_ttf_manager},
@@ -66,7 +67,7 @@ void tile_editor_properties::loop(dfw::input& _input, const dfw::loop_iteration_
 		return;
 	}
 
-	text_mode 
+	text_mode
 		? input_text(_input)
 		: input_traverse(_input);
 }
@@ -89,7 +90,7 @@ void tile_editor_properties::input_traverse(dfw::input& _input) {
 	}
 
 	if(_input.is_input_down(input::enter)) {
-	
+
 		switch(current_key) {
 
 			case menu_layer_cancel:
@@ -168,7 +169,7 @@ void tile_editor_properties::input_text(dfw::input& _input) {
 	if(_input.is_input_down(input::backspace)) {
 
 		if(input_value.length()) {
-			input_value.pop_back(); 
+			input_value.pop_back();
 		}
 
 		_input().clear_text_input();
@@ -229,7 +230,7 @@ void tile_editor_properties::draw(ldv::screen& _screen, int /*fps*/) {
 
 	//Name...
 	ldv::ttf_representation txt_menu{
-		ttf_manager.get("main", 14),
+		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		ldv::rgba8(255, 255, 255, 255),
 		ss.str()
 	};

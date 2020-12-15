@@ -2,9 +2,8 @@
 
 ## TODO
 
-- check alpha really affects the layers.
-- thing and poly controller could also draw map
-- poly layers could have winding 
+- add new layer in layer selection controller
+- poly layers could have winding
 - poly layers could allow concave / convex / all properties
 - add poly
 - select poly
@@ -12,11 +11,7 @@
 - delete poly
 - sort polys on save
 - change properties of poly
-- edit layer properties (set, id, alpha), send a ptr to the layer and be done.
-- add new layer
-- delete layer
-- reorder layers
-- console mode (move_by multiple of grid)
+- edit poly layer properties (set, id, alpha), send a ptr to the layer and be done.
 
 ## Building
 
@@ -108,5 +103,6 @@ TODO
 ## Credits
 
 Bebas Neue font by Dharma Type.
+Monofonto and Unispace by Raymond Larabie
 Example tileset 1 by Paulina Riva
 Example tileset 2 by mfburn

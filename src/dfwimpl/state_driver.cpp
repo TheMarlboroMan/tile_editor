@@ -1,5 +1,6 @@
 #include "dfwimpl/state_driver.h"
 #include "input/input.h"
+#include "app/definitions.h"
 #include "controller/states.h"
 #include <lm/sentry.h>
 #include <tools/string_utils.h>
@@ -81,7 +82,9 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	auto& screen=kernel.get_screen();
 	screen.set_fullscreen(config.bool_from_path("video:fullscreen"));
 
-	ttf_manager.insert("main", 14, "assets/ttf/BebasNeue-Regular.ttf");
+	//ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/BebasNeue-Regular.ttf");
+	ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/unispace.ttf");
+	//ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/monofonto.ttf");
 }
 
 void state_driver::prepare_audio(dfw::kernel& kernel) {
@@ -113,6 +116,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
 		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
 		{input_description_from_config_token(config.token_from_path("input:del")), input::del},
+		{input_description_from_config_token(config.token_from_path("input:insert")), input::insert},
 		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
 		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
 		{input_description_from_config_token(config.token_from_path("input:lalt")), input::lalt},
@@ -207,9 +211,18 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		)
 	);
 	reg(
-		c_properties, 
-		controller::t_states::state_properties, 
+		c_properties,
+		controller::t_states::state_properties,
 		new controller::properties(
+			log,
+			ttf_manager,
+			exchange_data
+		)
+	);
+	reg(
+		c_layer_selector,
+		controller::t_states::state_layer_selector,
+		new controller::layer_selector(
 			log,
 			ttf_manager,
 			exchange_data

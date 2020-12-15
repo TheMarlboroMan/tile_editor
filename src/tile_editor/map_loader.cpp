@@ -48,7 +48,7 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 
 		std::string msg=std::string{"loaded map "}
 			+_path+
-			+"with "
+			+" with "
 			+std::to_string(result.layers.size())+" layers and "
 			+std::to_string(result.properties.size())+" properties";
 
@@ -102,7 +102,7 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 	add_missing_props(map_property_blueprints.double_properties, _map.properties.double_properties);
 
 	//inflate things...
-	app::entity_inflator inflator;
+	tile_editor::entity_inflator inflator;
 
 	for(auto& ptr : visitor.thing_layers) {
 

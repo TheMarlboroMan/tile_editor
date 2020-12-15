@@ -2,6 +2,7 @@
 
 //local
 #include "input/input.h"
+#include "app/definitions.h"
 #include "app/map_loader.h"
 #include "app/map_saver.h"
 #include "app/map_loader.h"
@@ -42,7 +43,7 @@ editor::editor(
 		{0,0}           //at 0.0 in the screen...
 	},
 	last_message_rep{
-		ttf_manager.get("main", 14),
+		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		ldv::rgba8(255, 255, 255, 255),
 	},
 	mouse_pos{0,0},
@@ -93,14 +94,14 @@ void editor::awake(dfw::input& /*_input*/) {
 
 		if(nullptr!=selected_thing) {
 
-			app::entity_inflator inflator;
+			tile_editor::entity_inflator inflator;
 			auto layer=map.layers.at(current_layer).get();
 			inflator.inflate(*selected_thing, session.thingsets.at(layer->set).table.at(selected_thing->type));
 		}
 
 		if(nullptr!=selected_poly) {
 
-			app::entity_inflator inflator;
+			tile_editor::entity_inflator inflator;
 			auto layer=map.layers.at(current_layer).get();
 			inflator.inflate(*selected_poly, session.polysets.at(layer->set).table.at(selected_poly->type));
 		}
@@ -207,8 +208,16 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::tab)) {
 
-		show_set=!show_set;
-		return;
+		if(modifiers & key_modifier_lctrl) {
+
+			open_layer_selector();
+			return;
+		}
+
+		if(map.layers.size()) {
+			toggle_set_gui();
+			return;
+		}
 	}
 
 	auto mpos=_input().get_mouse_position();
@@ -552,9 +561,9 @@ void editor::left_click_input(
 			//If already selected, open its properties!
 			if(nullptr!=selected_thing && &thing==selected_thing) {
 
-				open_entity_properties(
+				open_thing_properties(
 					thing.properties,
-					session.thingsets.at(_layer.set).table.at(thing.type).properties
+					session.thingsets.at(_layer.set).table.at(thing.type)
 				);
 				return;
 			}
@@ -928,7 +937,7 @@ void editor::draw_set_text(
 
 	//Name...
 	ldv::ttf_representation txt_name{
-		ttf_manager.get("main", 14),
+		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		_is_current
 			? ldv::rgba8(0, 0, 255, 255)
 			: ldv::rgba8(255, 255, 255, 255),
@@ -1025,6 +1034,11 @@ void editor::draw_grid(
 
 void editor::draw_layers(ldv::screen& _screen) {
 
+	if(!map.layers.size()) {
+
+		return;
+	}
+
 	struct :tile_editor::const_layer_visitor {
 
 		ldv::screen * screen{nullptr};
@@ -1106,13 +1120,14 @@ void editor::draw_layer(
 	box.set_alpha(_layer.alpha);
 	box.set_blend(ldv::representation::blends::alpha);
 
+
+	//Crosshair representations...
 	ldv::line_representation vline({0,0},{0,0}, ldv::rgba8(0,0,0, 128)),
 		hline({0,0},{0,0}, ldv::rgba8(0,0,0, 128));
 
-	//Sets the crosshair position
-	auto crosshair=[&vline, &hline](int _x, int _y, int _w, int _h, tile_editor::color _color) {
+	auto crosshair=[&vline, &hline, &_layer, this](int _x, int _y, int _w, int _h, tile_editor::color _color) {
 
-		auto color=ldv::rgba8(255-_color.r, 255-_color.g, 255-_color.b, 128);
+		auto color=ldv::rgba8(255-_color.r, 255-_color.g, 255-_color.b, blend_alpha(_layer.alpha, 128));
 
 		vline.set_points({_x-(_w/2), _y}, {_x+(_w/2), _y});
 		vline.set_color(color);
@@ -1125,7 +1140,7 @@ void editor::draw_layer(
 		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
 		box.set_filltype(ldv::polygon_representation::type::fill);
 		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
-		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, thing.color.a));
+		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, blend_alpha(_layer.alpha, thing.color.a)));
 		box.draw(_screen, camera);
 
 		//The crosshair indicates where the x and y in the map file reside.
@@ -1133,11 +1148,12 @@ void editor::draw_layer(
 		vline.draw(_screen, camera);
 		hline.draw(_screen, camera);
 
-		//Additionally, the current box has a specific glow to it.
+		//Additionally, the current box has a specific hue to it.
 		if(selected_thing!=nullptr && selected_thing==&thing) {
 
 			box.set_filltype(ldv::polygon_representation::type::line);
-			box.set_color(ldv::rgba8(255,255,255,255));
+			//TODO: it would be great if there was a glow to this.
+			box.set_color(ldv::rgba8(255,255,255, blend_alpha(_layer.alpha, 255)));
 			box.draw(_screen, camera);
 		}
 	}
@@ -1170,7 +1186,7 @@ void editor::draw_layer(
 		);
 
 		shape.set_points(points);
-		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, poly.color.a));
+		shape.set_color(ldv::rgba8(poly.color.r, poly.color.g, poly.color.b, blend_alpha(_layer.alpha, poly.color.a)));
 		shape.draw(_screen, camera);
 	}
 }
@@ -1183,7 +1199,7 @@ void editor::draw_hud(ldv::screen& _screen) {
 
 	if(!map.layers.size()) {
 
-		ss<<"no layers";
+		ss<<"no layers, use lctrl+tab for layer controls";
 		return;
 	}
 	else {
@@ -1210,7 +1226,7 @@ void editor::draw_hud(ldv::screen& _screen) {
 
 		ss<<"'"<<map.layers[current_layer]->id<<"', type ";
 		map.layers[current_layer]->accept(visitor);
-		ss	<<", layer "<<(current_layer+1)<<" / "<<map.layers.size()<<std::endl;
+		ss<<" alpha: "<<map.layers[current_layer]->alpha<<", layer "<<(current_layer+1)<<" / "<<map.layers.size()<<std::endl;
 
 		//Show currently selected thing...
 		struct :tile_editor::const_layer_visitor {
@@ -1232,25 +1248,26 @@ void editor::draw_hud(ldv::screen& _screen) {
 				}
 			}
 		} dispatcher;
+
 		dispatcher.controller=this;
 		dispatcher.ss=&ss;
 		map.layers[current_layer]->accept(dispatcher);
 	}
 
 	ldv::ttf_representation txt_hud{
-		ttf_manager.get("main", 14),
+		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		ldv::rgba8(255, 255, 255, 192),
 		""
 	};
-
+	txt_hud.set_line_height_ratio(tile_editor::definitions::line_height_ratio);
 	txt_hud.go_to({0,0});
 	txt_hud.set_text(ss.str());
 	txt_hud.draw(_screen);
 }
 
 void editor::draw_hud_thing_info(
-	std::stringstream& _ss, 
-	const tile_editor::thing& _thing, 
+	std::stringstream& _ss,
+	const tile_editor::thing& _thing,
 	const tile_editor::thing_definition& _blueprint
 ) {
 
@@ -1276,8 +1293,8 @@ void editor::draw_hud_thing_info(
 
 
 void editor::draw_hud_poly_info(
-	std::stringstream& _ss, 
-	const tile_editor::poly& _poly, 
+	std::stringstream& _ss,
+	const tile_editor::poly& _poly,
 	const tile_editor::poly_definition& _blueprint
 ) {
 
@@ -1516,13 +1533,14 @@ void editor::layer_change_cleanup() {
 	subgrid_factor=session.grid_data.size;
 }
 
-void editor::open_entity_properties(
+void editor::open_thing_properties(
 	tile_editor::property_manager& _properties,
-	tile_editor::property_table& _blueprint
+	tile_editor::thing_definition& _blueprint
 ) {
-
+	exchange_data.edited_thing=selected_thing;
+	exchange_data.edited_thing_blueprint=&_blueprint;
 	exchange_data.properties=&_properties;
-	exchange_data.properties_blueprint=&_blueprint;
+	exchange_data.properties_blueprint=&_blueprint.properties;
 	exchange_data.put(state_properties);
 	push_state(state_properties);
 }
@@ -1533,6 +1551,14 @@ void editor::open_map_properties() {
 	exchange_data.properties_blueprint=&session.properties;
 	exchange_data.put(state_properties);
 	push_state(state_properties);
+}
+
+void editor::open_layer_selector() {
+
+	exchange_data.current_layer=&current_layer;
+	exchange_data.layers=&map.layers;
+	exchange_data.put(state_layer_selector);
+	push_state(state_layer_selector);
 }
 
 void editor::open_layer_settings() {
@@ -1619,4 +1645,22 @@ editor::editor_point editor::snap_to_grid(editor_point _point) const {
 	int py=round(y / factor) * factor;
 
 	return {px, py};
+}
+
+int editor::blend_alpha(
+	int _layer_alpha,
+	int _entity_alpha
+) const {
+
+	return floor( ((double)_layer_alpha / 255.) * _entity_alpha);
+}
+
+void editor::toggle_set_gui() {
+
+	show_set=!show_set;
+	message_manager.add(
+		show_set
+			? "set selector enabled, camera movement disabled"
+			: "set selector disabled, camera movement enabled"
+	);
 }

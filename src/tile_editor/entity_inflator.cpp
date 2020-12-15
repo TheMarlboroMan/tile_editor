@@ -4,7 +4,7 @@
 #include "blueprint_types/thing_definition.h"
 #include "blueprint_types/poly_definition.h"
 
-using namespace app;
+using namespace tile_editor;
 
 void entity_inflator::inflate(
 	tile_editor::thing& _thing,

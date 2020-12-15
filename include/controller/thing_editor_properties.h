@@ -38,7 +38,7 @@ class thing_editor_properties:
 	tile_editor::exchange_data& exchange_data;
 
 	enum menu_types{
-		menu_layer_id, 
+		menu_layer_id,
 		menu_layer_alpha,
 		menu_layer_set,
 		menu_layer_exit,

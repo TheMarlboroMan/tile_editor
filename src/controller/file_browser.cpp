@@ -1,14 +1,11 @@
 #include "controller/file_browser.h"
+#include "app/definitions.h"
+#include "input/input.h"
 
 #include <tools/json.h>
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
-
 #include <ldv/ttf_representation.h>
-
-//local
-#include "input/input.h"
-
 #include <lm/sentry.h>
 
 #include <algorithm>
@@ -29,7 +26,7 @@ current_directory{std::filesystem::current_path()},
 pager{0, 0} {
 
 	//Mount layout...
-	layout.map_font("default_font", ttf_manager.get("main", 14));
+	layout.map_font("default_font", ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size));
 
 	auto root=tools::parse_json_string(
 		tools::dump_file(

@@ -2,13 +2,10 @@
 
 namespace tile_editor {
 
-	struct thing;
-	struct poly;
-	struct thing_definition;
-	struct poly_definition;
-}
-
-namespace app {
+struct thing;
+struct poly;
+struct thing_definition;
+struct poly_definition;
 
 class entity_inflator {
 
