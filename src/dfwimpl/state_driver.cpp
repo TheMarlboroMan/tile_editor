@@ -225,6 +225,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		new controller::layer_selector(
 			log,
 			ttf_manager,
+			message_manager,
 			exchange_data
 		)
 	);

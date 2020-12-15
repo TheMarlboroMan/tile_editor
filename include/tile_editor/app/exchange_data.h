@@ -2,7 +2,6 @@
 #pragma once
 
 #include "controller/states.h"
-#include "editor_types/map.h"
 
 #include <string>
 #include <map>
@@ -17,6 +16,7 @@ struct thing_definition;
 struct poly_definition;
 struct thing;
 struct poly;
+struct map;
 
 class exchange_data {
 
@@ -42,7 +42,7 @@ class exchange_data {
 	tile_editor::property_manager * properties{nullptr}; //in-out
 	tile_editor::property_table * properties_blueprint{nullptr}; //in
 	const tile_editor::map_blueprint * blueprint{nullptr}; //in
-	std::vector<tile_editor::map::layerptr> * layers{nullptr}; //in-out
+	tile_editor::map *      map{nullptr}; //in-out
 	tile_editor::thing *    edited_thing{nullptr}; //in
 	tile_editor::thing_definition * edited_thing_blueprint{nullptr}; //in
 	tile_editor::poly *    edited_poly{nullptr}; //in

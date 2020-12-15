@@ -105,6 +105,10 @@ void editor::awake(dfw::input& /*_input*/) {
 			auto layer=map.layers.at(current_layer).get();
 			inflator.inflate(*selected_poly, session.polysets.at(layer->set).table.at(selected_poly->type));
 		}
+
+		//in case we created new layers or changed layers...
+		load_layer_toolset();
+		layer_change_cleanup();
 	}
 }
 
@@ -1556,7 +1560,8 @@ void editor::open_map_properties() {
 void editor::open_layer_selector() {
 
 	exchange_data.current_layer=&current_layer;
-	exchange_data.layers=&map.layers;
+	exchange_data.map=&map;
+	exchange_data.blueprint=&session;
 	exchange_data.put(state_layer_selector);
 	push_state(state_layer_selector);
 }
