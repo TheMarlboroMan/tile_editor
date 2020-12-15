@@ -6,15 +6,15 @@ There are some red flags, like the monstruous "editor" controller (could be sepa
 
 ## TODO
 
-- poly layers could have winding
-- poly layers could allow concave / convex / all properties
 - add poly
+	- winding and curve for polys are not prescritive, just used to enforce when drawing a poly
 - select poly
-- move poly
 - delete poly
-- sort polys on save
+- move poly
 - change properties of poly
-- edit poly layer properties (set, id, alpha), send a ptr to the layer and be done.
+- edit poly layer properties (set, id, alpha, winding, curve), send a ptr to the layer and be done.
+- sort polys on save
+- v1.0 done :P
 
 ## Building
 
@@ -79,6 +79,14 @@ Contains
 ### Layers
 
 A layer is a homogeneous group of map entities (tiles, objects or polygons). The number and ordering of layers is open.
+
+#### Tile layer
+
+#### Thing layer
+
+#### Poly layer
+
+Concave and convex are not mandatory for pre-exiting data on the layer, they just govern the act of creating new polys.
 
 ### Templates for map properties
 

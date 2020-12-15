@@ -1,7 +1,6 @@
 #include "parser/map_parser.h"
 #include "editor_types/tile_layer.h"
 #include "editor_types/thing_layer.h"
-#include "editor_types/poly_layer.h"
 
 #include <tools/json.h>
 #include <tools/file_utils.h>
@@ -106,7 +105,7 @@ void map_parser::parse_attributes(const jsondoc& _doc, map& _map) {
 }
 
 void map_parser::parse_layers(
-	const jsondoc& _doc, 
+	const jsondoc& _doc,
 	map& _map
 ) {
 
@@ -151,8 +150,8 @@ void map_parser::parse_layers(
 }
 
 void map_parser::parse_tile_layer(
-	const jsonval& _node, 
-	const meta& _meta, 
+	const jsonval& _node,
+	const meta& _meta,
 	map& _map
 ) {
 
@@ -249,7 +248,7 @@ void map_parser::parse_tile_layer(
 }
 
 void map_parser::parse_thing_layer(
-	const jsonval& _node, 
+	const jsonval& _node,
 	const meta& _meta,
 	map& _map
 ) {
@@ -363,7 +362,7 @@ void map_parser::parse_thing_layer(
 }
 
 void map_parser::parse_poly_layer(
-	const jsonval& _node, 
+	const jsonval& _node,
 	const meta& _meta,
 	map& _map
 ) {
@@ -379,7 +378,7 @@ void map_parser::parse_poly_layer(
 		return;
 	}
 
-	poly_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
+	poly_layer layer{_meta.set, _meta.alpha, _meta.id, _meta.winding, _meta.curve, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -515,7 +514,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 
 		if(!_layer["meta"].HasMember(_key.c_str())) {
 
-			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default will be used");
+			errors.push_back(std::string{"meta node in layer has no '"}+_key+"' member, a default may be used if possible");
 			return false;
 		}
 
@@ -531,7 +530,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 
 		if(!_layer["meta"][_key.c_str()].IsInt()) {
 
-			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default will be used");
+			errors.push_back(std::string{"meta:"}+_key+" node is not an integer, a default may be used if possible");
 			return false;
 		}
 
@@ -547,14 +546,14 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 
 		if(!_layer["meta"][_key.c_str()].IsString()) {
 
-			errors.push_back(std::string{"meta:"}+_key+" node is not a string, a default will be used");
+			errors.push_back(std::string{"meta:"}+_key+" node is not a string, a default may be used if possible");
 			return false;
 		}
 
 		std::string val{_layer["meta"][_key.c_str()].GetString()};
 		if(!val.size()) {
 
-			errors.push_back(std::string{"meta:"}+_key+" is an empty string, a default will be used");
+			errors.push_back(std::string{"meta:"}+_key+" is an empty string, a default may be used if possible");
 			return false;
 		}
 
@@ -603,9 +602,63 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 		? _layer["meta"]["id"].GetString()
 		: generate_default_id();
 
-	if(_layer["meta"].MemberCount() > 4) {
+	//Additional meta for poly layers...
+	if(meta::types::polys==type) {
 
-		errors.push_back("meta node in layer has extraneous members which will be ignored");
+		if(!string_can_be_extracted("winding")) {
+
+			errors.push_back("meta node for poly does not contain winding: cannot be parsed");
+			return {0,0, "", meta::types::bad};
+		}
+
+		const std::string winding{_layer["meta"]["winding"].GetString()};
+		if(winding=="clockwise") {
+			result.winding=tile_editor::poly_layer::windings::clockwise;
+		}
+		else if(winding=="counterclockwise") {
+			result.winding=tile_editor::poly_layer::windings::counterclockwise;
+		}
+		else if(winding=="any") {
+			result.winding=tile_editor::poly_layer::windings::any;
+		}
+		else {
+			errors.push_back("meta node for poly contains invalid winding value");
+			return {0,0, "", meta::types::bad};
+		}
+
+		if(!string_can_be_extracted("curve")) {
+
+			errors.push_back("meta node for poly does not contain curve: cannot be parsed");
+			return {0,0, "", meta::types::bad};
+
+		}
+
+		const std::string curve{_layer["meta"]["curve"].GetString()};
+		if(curve=="concave") {
+			result.curve=tile_editor::poly_layer::curves::concave;
+		}
+		else if(curve=="convex") {
+			result.curve=tile_editor::poly_layer::curves::convex;
+		}
+		else if(curve=="any") {
+			result.curve=tile_editor::poly_layer::curves::any;
+		}
+		else {
+			errors.push_back("meta node for poly contains invalid curve value");
+			return {0,0, "", meta::types::bad};
+		}
+
+		if(_layer["meta"].MemberCount() > 6) {
+
+			errors.push_back("meta node in poly layer has extraneous members which will be ignored");
+		}
+	}
+	else {
+
+		if(_layer["meta"].MemberCount() > 4) {
+
+			errors.push_back("meta node in layer has extraneous members which will be ignored");
+		}
 	}
 
 	return result;

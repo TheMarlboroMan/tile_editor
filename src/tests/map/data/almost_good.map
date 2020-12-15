@@ -16,7 +16,7 @@
 				"id":"first",
 				"type":"tiles",
 				"set": 1,
-				"alpha": 0
+				"alpha": 64
 			},
 			"data": [
 				{
@@ -99,7 +99,9 @@
 				"id":"fifth",
 				"type":"polys",
 				"set": 4,
-				"alpha": 64
+				"alpha": 64,
+				"winding":"any",
+				"curve":"any"
 			},
 			"data": [
 				{
@@ -130,7 +132,9 @@
 				"type":"polys",
 				"id":"sixth",
 				"set":5,
-				"alpha": 128
+				"alpha": 128,
+				"winding":"any",
+				"curve":"any"
 			},
 			"data": [
 				{

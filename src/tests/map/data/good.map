@@ -13,7 +13,7 @@
 				"id":"background",
 				"type":"tiles",
 				"set": 1,
-				"alpha": 0
+				"alpha": 64
 			},
 			"data": [
 				{
@@ -99,7 +99,9 @@
 				"id":"polygons",
 				"type":"polys",
 				"set": 1,
-				"alpha": 128
+				"alpha": 128,
+				"winding": "clockwise",
+				"curve": "convex"
 			},
 			"data": [
 				{

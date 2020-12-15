@@ -44,7 +44,7 @@ std::string map_serializer::to_string(
 }
 
 void map_serializer::put_layers(
-	jsondoc& _doc, 
+	jsondoc& _doc,
 	const tile_editor::map& _map
 ) {
 
@@ -53,7 +53,7 @@ void map_serializer::put_layers(
 
 		map_serializer *   serializer{nullptr};
 		jsonval *          layers{nullptr};
-		jsondoc *          doc{nullptr}; 
+		jsondoc *          doc{nullptr};
 		virtual void       visit(tile_layer& _layer) {serializer->put_tile_layer(*doc, *layers, _layer);}
 		virtual void       visit(thing_layer& _layer) {serializer->put_thing_layer(*doc, *layers, _layer);}
 		virtual void       visit(poly_layer& _layer) {serializer->put_poly_layer(*doc, *layers, _layer);}
@@ -239,11 +239,37 @@ void map_serializer::put_poly_layer(
 
 	auto& allocator=_doc.GetAllocator();
 
+	auto translate_winding=[](const tile_editor::poly_layer::windings _winding) -> std::string {
+
+		switch(_winding) {
+
+			case tile_editor::poly_layer::windings::clockwise: return "clockwise";
+			case tile_editor::poly_layer::windings::counterclockwise: return "counterclockwise";
+			case tile_editor::poly_layer::windings::any: return "any";
+		}
+
+		throw std::runtime_error("shut up compiler");
+	};
+
+	auto translate_curve=[](const tile_editor::poly_layer::curves _curve) -> std::string {
+
+		switch(_curve) {
+
+			case tile_editor::poly_layer::curves::concave: return "concave";
+			case tile_editor::poly_layer::curves::convex: return "convex";
+			case tile_editor::poly_layer::curves::any: return "any";
+		}
+
+		throw std::runtime_error("shut up compiler");
+	};
+
 	//Add meta...
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
 	meta.AddMember("type", "polys", allocator);
+	meta.AddMember("winding", tools::json_string(translate_winding(_layer.winding), allocator), allocator);
+	meta.AddMember("curve", tools::json_string(translate_curve(_layer.curve), allocator), allocator);
 	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
 
 	//Add data...

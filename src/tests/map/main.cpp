@@ -163,7 +163,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "meta node in layer has no 'type' member, a default will be used", "node with no type");
+	must_fail(mp.get_errors(), "meta node in layer has no 'type' member, a default may be used if possible", "node with no type");
 
 	//tiles node with no bad type
 	mp.parse_string(R"str(
@@ -206,6 +206,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"layers": [
 		{
 			"meta": {
+				"id":"lol",
 				"type":"tiles",
 				"alpha": 128
 			}
@@ -223,6 +224,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"layers": [
 		{
 			"meta": {
+				"id":"lol",
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 12.44
@@ -249,7 +251,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "meta node in layer has no 'id' member, a default will be used", "tiles node with no id.");
+	must_fail(mp.get_errors(), "meta node in layer has no 'id' member, a default may be used if possible", "tiles node with no id.");
 
 
 	//tiles node with invalid id
@@ -269,7 +271,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "meta:id node is not a string, a default will be used", "tiles node with no id.");
+	must_fail(mp.get_errors(), "meta:id node is not a string, a default may be used if possible", "tiles node with no id.");
 
 	//tiles node with extraneous meta members.
 	mp.parse_string(R"str(
@@ -790,7 +792,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	]
 }
 )str");
-	must_fail(mp.get_errors(), "thing layer item has extraneous members that will be skipped", "thing layer with extraneous members");
+	must_fail(mp.get_errors(), "thing layer item has extraneous members that will be skipped", "thing with extraneous members");
 
 	//thing layer with extraneous members
 	mp.parse_string(R"str(
@@ -830,7 +832,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[1,2,3]
 		}
 	]
@@ -845,7 +847,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{}]
 		}
 	]
@@ -860,7 +862,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":"lala"
 			}]
@@ -877,7 +879,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1
 			}]
@@ -894,7 +896,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p":1
@@ -912,7 +914,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p":[1,2]
@@ -930,7 +932,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [1,2,3]
@@ -948,7 +950,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2,3], 2, 3 ]
@@ -966,7 +968,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ ["a",2], 2, 3 ]
@@ -984,7 +986,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [2, "b"], 2, 3]
@@ -1002,7 +1004,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5, 6] ]
@@ -1020,7 +1022,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1041,7 +1043,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1061,7 +1063,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1078,6 +1080,16 @@ int main(int /*argc*/, char ** /*argv*/) {
 		std::cout<<"testing mostly valid map file"<<std::endl;
 		auto map=mp.parse_file("data/almost_good.map");
 		const auto& errors=mp.get_errors();
+
+		if(errors.size()!=6) {
+
+			std::cout<<errors.size()<<std::endl;
+
+			for(const auto& err : errors) {
+
+				std::cout<<err<<std::endl;
+			}
+		}
 
 		test(errors.size()==6, "there were unexpected errors parsing the mostly good map");
 
@@ -1126,7 +1138,7 @@ OK missing meta node in layer, skipping layer meta
 
 		test(6==map.layers.size(), "invalid parsing of layer size");
 
-		check_layer(*map.layers[0], 1, 0, 2, "first", __LINE__);
+		check_layer(*map.layers[0], 1, 64, 2, "first", __LINE__);
 		check_tile(*map.layers[0], 0, 1, 2, 3, __LINE__);
 		check_tile(*map.layers[0], 1, 2, 4, 5, __LINE__);
 
@@ -1180,7 +1192,7 @@ OK missing meta node in layer, skipping layer meta
 		test(1==map.properties.int_properties["episode"], "invalid episode property");
 		test(1==map.properties.int_properties["map"], "invalid map property");
 
-		check_layer(*map.layers[0], 1, 0, 4, "background", __LINE__);
+		check_layer(*map.layers[0], 1, 64, 4, "background", __LINE__);
 		check_tile(*map.layers[0], 0, 1, 0, 0, __LINE__);
 		check_tile(*map.layers[0], 1, 1, 0, 1, __LINE__);
 		check_tile(*map.layers[0], 2, 1, 0, 2, __LINE__);
@@ -1249,10 +1261,10 @@ void must_fail(
 
 void check_tile(
 	const tile_editor::layer& _layer,
-	std::size_t _index, 
-	std::size_t _type, 
-	int _x, 
-	int _y, 
+	std::size_t _index,
+	std::size_t _type,
+	int _x,
+	int _y,
 	int _line
 ) {
 
@@ -1287,7 +1299,7 @@ void check_tile(
 }
 
 void check_thing(
-	const tile_editor::layer& _layer, 
+	const tile_editor::layer& _layer,
 	std::size_t _index,
 	std::size_t _type,
 	int _x,
@@ -1343,7 +1355,7 @@ void check_thing(
 }
 
 void check_poly(
-	const tile_editor::layer& _layer, 
+	const tile_editor::layer& _layer,
 	std::size_t _index,
 	std::size_t _type,
 	const std::vector<tile_editor::poly_point>& _points,
@@ -1385,10 +1397,10 @@ void check_poly(
 }
 
 void check_layer(
-	const tile_editor::layer& _layer, 
-	std::size_t _set, 
-	int _alpha, 
-	std::size_t _count, 
+	const tile_editor::layer& _layer,
+	std::size_t _set,
+	int _alpha,
+	std::size_t _count,
 	const std::string _id,
 	int _line
 ) {
@@ -1422,7 +1434,7 @@ struct properties_visitor:public tile_editor::const_layer_visitor {
 	const tile_editor::property_manager * pm;
 
 	void                       visit(const tile_editor::tile_layer&) {
-		
+
 		throw std::runtime_error("tile layer had no properties");
 	}
 

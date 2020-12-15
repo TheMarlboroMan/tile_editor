@@ -468,6 +468,8 @@ void layer_selector::insert_layer() {
 				std::begin(exchange_data.blueprint->polysets)->first,
 				alpha,
 				id,
+				tile_editor::poly_layer::windings::clockwise,
+				tile_editor::poly_layer::curves::convex,
 				{}
 			};
 		break;
