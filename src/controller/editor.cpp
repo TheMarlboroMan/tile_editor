@@ -1168,7 +1168,7 @@ void editor::draw_layers(ldv::screen& _screen) {
 	switch(layer_draw_mode) {
 
 		case layer_draw_modes::all: {
-			for(std::size_t index=0; index < map.layers.size(); index++) {
+			for(int index=(int)map.layers.size()-1; index >= 0; index--) {
 				map.layers[index]->accept(visitor);
 			}
 		}
@@ -1176,7 +1176,7 @@ void editor::draw_layers(ldv::screen& _screen) {
 
 		case layer_draw_modes::stack: {
 
-			for(std::size_t index=current_layer; index < map.layers.size(); index++) {
+			for(int index=(int)map.layers.size()-1; index >= (int)current_layer; index--) {
 				map.layers[index]->accept(visitor);
 			}
 		}

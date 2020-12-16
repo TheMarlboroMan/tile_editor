@@ -61,5 +61,5 @@ void help::loop(dfw::input& _input, const dfw::loop_iteration_data& /*lid*/) {
 void help::draw(ldv::screen& _screen, int /*fps*/) {
 
 	_screen.clear(ldv::rgba8(0, 0, 0, 255));
-	help_rep.draw(_screen);
+	help_rep.draw(_screen, camera);
 }

@@ -33,7 +33,7 @@
 		{
 			"type":"define",
 			"key":"y_selection_factor",
-			"value":18
+			"value":24
 		},
 		{
 			"id":"selection",

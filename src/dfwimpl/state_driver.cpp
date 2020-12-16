@@ -287,4 +287,7 @@ void state_driver::read_app_data(tools::arg_manager& _arg_manager) {
 
 		editor.load_map(_arg_manager.get_following("-f"));
 	}
+	else {
+		message_manager.add("application started, f1 for help");
+	}
 }

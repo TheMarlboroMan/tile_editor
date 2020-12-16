@@ -50,7 +50,7 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 			+_path+
 			+" with "
 			+std::to_string(result.layers.size())+" layers and "
-			+std::to_string(result.properties.size())+" properties";
+			+std::to_string(result.properties.size())+" properties. f1 for help";
 
 		lm::log(log, lm::lvl::info)<<msg<<std::endl;
 

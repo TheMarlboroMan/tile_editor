@@ -2,7 +2,7 @@
 
 == COMMON EDITOR MODE ==
 
-f1 - help.
+f1 - help
 f2 - map properties
 f3 - layer settings
 esc - exit, no save checks are done so save often
@@ -13,7 +13,7 @@ l - load new file
 - - zoom out
 pagedown - next layer
 pageup - previous layer
-lctrl + space - change layer view mode
+lctrl + space - change layer view mode (all layers, stacked from the current, only the current)
 tab - toggle toolset
 lctrl + tab - open layer selector
 arrows - move / change toolset element (depending on toolset visibility)
@@ -54,8 +54,7 @@ enter : enter/exit edit mode
 == LAYER SELECTOR MODE ==
 
 arrows up-down - choose current layer
-
-?? pagedown - move layer down
-?? pageup - move layer up
-?? delete - delete layer
-?? insert - new layer
+pagedown - move layer down
+pageup - move layer up
+delete - delete layer
+insert - new layer (with default set, can be changed on editor mode)
