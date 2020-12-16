@@ -211,6 +211,15 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		)
 	);
 	reg(
+		c_thing_editor_properties,
+		controller::t_states::state_poly_editor_properties,
+		new controller::poly_editor_properties(
+			log,
+			ttf_manager,
+			exchange_data
+		)
+	);
+	reg(
 		c_properties,
 		controller::t_states::state_properties,
 		new controller::properties(

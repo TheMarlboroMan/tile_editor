@@ -25,8 +25,6 @@ I would, however, advise against that. Maybe it's fine for tile or tile-thing ba
 
 ## TODO
 
-- edit poly layer properties (set, id, alpha, winding), send a ptr to the layer and be done.
-- sort polys on save
 - v1.0 done :P
 
 ## IDEAS

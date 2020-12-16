@@ -5,6 +5,7 @@
 #include "editor_types/poly_layer.h"
 
 #include <lm/sentry.h>
+#include <ldt/polygon_2d.h>
 #include <iostream>
 
 using namespace tile_editor;
@@ -62,7 +63,9 @@ void map_saver::pre_save(
 	}
 }
 
-void map_saver::pre_save(tile_editor::tile_layer& _layer) {
+void map_saver::pre_save(
+	tile_editor::tile_layer& _layer
+) {
 
 	std::sort(
 		std::begin(_layer.data),
@@ -72,14 +75,16 @@ void map_saver::pre_save(tile_editor::tile_layer& _layer) {
 			const tile_editor::tile& _b
 		) {
 			//Top-down, left to right.
-			if(_a.y < _b.y) {return true;}
-			else if(_a.y > _b.y) {return false;}
+			if(_a.y > _b.y) {return true;}
+			else if(_a.y < _b.y) {return false;}
 			return _a.x < _b.x;
 		}
 	);
 }
 
-void map_saver::pre_save(tile_editor::thing_layer& _layer) {
+void map_saver::pre_save(
+	tile_editor::thing_layer& _layer
+) {
 
 	std::sort(
 		std::begin(_layer.data),
@@ -89,14 +94,31 @@ void map_saver::pre_save(tile_editor::thing_layer& _layer) {
 			const tile_editor::thing& _b
 		) {
 			//Top-down, left to right.
-			if(_a.y < _b.y) {return true;}
-			else if(_a.y > _b.y) {return false;}
+			if(_a.y > _b.y) {return true;}
+			else if(_a.y < _b.y) {return false;}
 			return _a.x < _b.x;
 		}
 	);
 }
 
-void map_saver::pre_save(tile_editor::poly_layer&) {
+void map_saver::pre_save(
+	tile_editor::poly_layer& _layer
+) {
 
-	//TODO: sort layers.
+	std::sort(
+		std::begin(_layer.data),
+		std::end(_layer.data),
+		[](
+			const tile_editor::poly& _a,
+			const tile_editor::poly& _b
+		) {
+			auto ca=ldt::calculate_centroid(_a.points);
+			auto cb=ldt::calculate_centroid(_b.points);
+
+			//Top-down, left to right.
+			if(ca.y > cb.y) {return true;}
+			else if(ca.y < cb.y) {return false;}
+			return ca.x < cb.x;
+		}
+	);
 }

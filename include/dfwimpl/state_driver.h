@@ -13,6 +13,7 @@
 #include "../../include/controller/help.h"
 #include "../../include/controller/tile_editor_properties.h"
 #include "../../include/controller/thing_editor_properties.h"
+#include "../../include/controller/poly_editor_properties.h"
 #include "../../include/controller/properties.h"
 #include "../../include/controller/layer_selector.h"
 //[new-controller-header-mark]
@@ -56,6 +57,7 @@ class state_driver:
 	ptr_controller					c_help;
 	ptr_controller					c_tile_editor_properties;
 	ptr_controller                  c_thing_editor_properties;
+	ptr_controller                  c_poly_editor_properties;
 	ptr_controller					c_properties;
 
 	ptr_controller					c_layer_selector;

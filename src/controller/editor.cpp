@@ -1801,7 +1801,12 @@ void editor::open_layer_settings() {
 			controller->exchange_data.blueprint=&controller->session;
 			start(state_thing_editor_properties);
 		}
-		void visit(tile_editor::poly_layer&) {}
+		void visit(tile_editor::poly_layer& _layer) {
+
+			controller->exchange_data.layer=&_layer;
+			controller->exchange_data.blueprint=&controller->session;
+			start(state_poly_editor_properties);
+		}
 
 		private:
 		void start(int _state) {
