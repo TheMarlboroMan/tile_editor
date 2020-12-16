@@ -251,25 +251,12 @@ void map_serializer::put_poly_layer(
 		throw std::runtime_error("shut up compiler");
 	};
 
-	auto translate_curve=[](const tile_editor::poly_layer::curves _curve) -> std::string {
-
-		switch(_curve) {
-
-			case tile_editor::poly_layer::curves::concave: return "concave";
-			case tile_editor::poly_layer::curves::convex: return "convex";
-			case tile_editor::poly_layer::curves::any: return "any";
-		}
-
-		throw std::runtime_error("shut up compiler");
-	};
-
 	//Add meta...
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
 	meta.AddMember("type", "polys", allocator);
 	meta.AddMember("winding", tools::json_string(translate_winding(_layer.winding), allocator), allocator);
-	meta.AddMember("curve", tools::json_string(translate_curve(_layer.curve), allocator), allocator);
 	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
 
 	//Add data...

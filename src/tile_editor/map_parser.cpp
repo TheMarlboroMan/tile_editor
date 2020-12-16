@@ -378,7 +378,7 @@ void map_parser::parse_poly_layer(
 		return;
 	}
 
-	poly_layer layer{_meta.set, _meta.alpha, _meta.id, _meta.winding, _meta.curve, {}};
+	poly_layer layer{_meta.set, _meta.alpha, _meta.id, _meta.winding, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -626,29 +626,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 			return {0,0, "", meta::types::bad};
 		}
 
-		if(!string_can_be_extracted("curve")) {
-
-			errors.push_back("meta node for poly does not contain curve: cannot be parsed");
-			return {0,0, "", meta::types::bad};
-
-		}
-
-		const std::string curve{_layer["meta"]["curve"].GetString()};
-		if(curve=="concave") {
-			result.curve=tile_editor::poly_layer::curves::concave;
-		}
-		else if(curve=="convex") {
-			result.curve=tile_editor::poly_layer::curves::convex;
-		}
-		else if(curve=="any") {
-			result.curve=tile_editor::poly_layer::curves::any;
-		}
-		else {
-			errors.push_back("meta node for poly contains invalid curve value");
-			return {0,0, "", meta::types::bad};
-		}
-
-		if(_layer["meta"].MemberCount() > 6) {
+		if(_layer["meta"].MemberCount() > 5) {
 
 			errors.push_back("meta node in poly layer has extraneous members which will be ignored");
 		}

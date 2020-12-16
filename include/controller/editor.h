@@ -53,9 +53,9 @@ class editor:
 		}                  rangex, rangey;
 	} multiclick;
 
-	//!returns the world position from the mouse position.
+	//!returns the world position from the screen position (camera considered).
 	editor_point                get_world_position(ldt::point_2d<int>) const;
-	//!returns grid-based position from world position.
+	//!returns grid-based position (for tile layers!) from world position.
 	editor_point                get_grid_position(ldt::point_2d<int>) const;
 	editor_point                snap_to_grid(editor_point) const;
 	void                        arrow_input_set(int, int, int);
@@ -64,9 +64,6 @@ class editor:
 	void                        arrow_input_layer(tile_editor::thing_layer&, int, int, int);
 	void                        arrow_input_layer(tile_editor::poly_layer&, int, int, int);
 	void                        click_input(int, int);
-	void                        click_input(int, int, tile_editor::tile_layer&);
-	void                        click_input(int, int, tile_editor::thing_layer&);
-	void                        click_input(int, int, tile_editor::poly_layer&);
 	void                        left_click_input(int, tile_editor::tile_layer&);
 	void                        right_click_input(int, tile_editor::tile_layer&);
 	void                        left_click_input(int, tile_editor::thing_layer&);
@@ -75,6 +72,7 @@ class editor:
 	void                        right_click_input(int, tile_editor::poly_layer&);
 	void                        del_input();
 	void                        del_input(tile_editor::thing_layer&);
+	void                        del_input(tile_editor::poly_layer&);
 	void                        subgrid_input(bool);
 	void                        draw_messages(ldv::screen&);
 	void                        draw_hud(ldv::screen&);
@@ -112,11 +110,13 @@ class editor:
 	void                        open_map_properties();
 	void                        open_layer_selector();
 	void                        open_thing_properties(tile_editor::property_manager& _properties, tile_editor::thing_definition& _blueprint);
+	void                        open_poly_properties(tile_editor::property_manager& _properties, tile_editor::poly_definition& _blueprint);
 	//!Helpers for layer dispatchers, will do nothing if there are no layers, saving us 100 checks.
 	bool                        dispatch_layer(tile_editor::const_layer_visitor&);
 	bool                        dispatch_layer(tile_editor::layer_visitor&);
 	int                         blend_alpha(int, int) const;
 	void                        toggle_set_gui();
+	void                        close_current_poly(tile_editor::poly_layer&);
 
 	//references...
 	lm::logger&                 log;

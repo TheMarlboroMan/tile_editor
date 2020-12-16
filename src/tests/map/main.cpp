@@ -832,7 +832,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[1,2,3]
 		}
 	]
@@ -847,7 +847,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{}]
 		}
 	]
@@ -862,7 +862,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":"lala"
 			}]
@@ -879,7 +879,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1
 			}]
@@ -896,7 +896,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p":1
@@ -914,7 +914,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p":[1,2]
@@ -932,7 +932,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [1,2,3]
@@ -950,7 +950,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2,3], 2, 3 ]
@@ -968,7 +968,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ ["a",2], 2, 3 ]
@@ -986,7 +986,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [2, "b"], 2, 3]
@@ -1004,7 +1004,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5, 6] ]
@@ -1022,7 +1022,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1043,7 +1043,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1063,7 +1063,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any", "curve":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],

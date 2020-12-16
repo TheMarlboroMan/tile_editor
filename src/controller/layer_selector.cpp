@@ -469,7 +469,6 @@ void layer_selector::insert_layer() {
 				alpha,
 				id,
 				tile_editor::poly_layer::windings::clockwise,
-				tile_editor::poly_layer::curves::convex,
 				{}
 			};
 		break;

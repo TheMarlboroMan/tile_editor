@@ -4,22 +4,35 @@ A new version of the tile editor. Less hacky and much more structured and planne
 
 There are some red flags, like the monstruous "editor" controller (could be separated into smaller pieces) or how creating a new layer will not instantly load its toolset until the editor state is invoked again, but it works in a much more streamlined way I would also say that the config format is also better and more intutive and than the separation of layers (in which each layer can be of its own type) makes for a more generic tool.
 
+## A note about tile layers.
+
+Tile layers are not laid out with their top-left at 0,0, but rather in a cartesian-like way where all four quadrants can be used. This means that tile positions do not grow left-to-right, top-to-botton as one might be accustomed to.
+
+The tile at 0,0 would be the one directly on the top and right of the 0,0 coordinate axis. The tile at -1,0 would be on the top and left, -1,-1 would be on the bottom left
+and 1,-1 on the bottom right.
+
+This particularity means an extra bit of work (and a certain workload for the brain) when converting from tile coordinates to screen ones, but allows for polygon layers to exist too.
+
+Working in traditional mode (0,0 is top-left, there are no negative positions tile-wise) cannot be done in the editor but it can be simulated given that:
+
+- all work in tile_editor is done in the bottom-right layer.
+- when the resulting file is loaded in the target application:
+	- all y coordinates for tiles are to be reversed and substracted 1.
+	- all thing y coordinates are to be reversed.
+	- all polygons are NOT to be reversed in the y axis, but translated.
+
+I would, however, advise against that. Maybe it's fine for tile or tile-thing based applications, but polygons can get messy.
+
 ## TODO
 
-- bug: vertices are not drawn!!!
-- bug: lalt click does not register. Why?
-- vertices should be always drawn, right?
-- perhaps the poly should follow the mouse position and try to close itself???
-- add poly
-	- winding and curve for polys are not prescritive, just used to enforce when drawing a poly
-- todo cancel poly drawing (right click??)
-- select poly
-- delete poly
-- move poly
-- change properties of poly (should be mostly done)
-- edit poly layer properties (set, id, alpha, winding, curve), send a ptr to the layer and be done.
+- edit poly layer properties (set, id, alpha, winding), send a ptr to the layer and be done.
 - sort polys on save
 - v1.0 done :P
+
+## IDEAS
+
+- polys could have some measure of "order" so we can superimpose them
+- thus they could be navigateable
 
 ## Building
 

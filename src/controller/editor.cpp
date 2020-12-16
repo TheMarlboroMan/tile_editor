@@ -18,6 +18,8 @@
 #include <ldv/box_representation.h>
 #include <ldv/line_representation.h>
 #include <ldt/box.h>
+#include <ldt/polygon_2d.h>
+#include <ldt/sat_2d.h>
 
 #include <algorithm>
 
@@ -207,6 +209,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		selected_thing=nullptr;
 		selected_poly=nullptr;
+		current_poly_vertices.clear();
 		return;
 	}
 
@@ -301,7 +304,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 		typedef  bool (dfw::input::*input_fn)(int) const;
 
-		input_fn movement_fn=_input.is_input_pressed(input::lctrl)
+		input_fn movement_fn=_input.is_input_pressed(input::lalt)
 			? &dfw::input::is_input_down
 			: &dfw::input::is_input_pressed;
 
@@ -340,7 +343,7 @@ void editor::del_input() {
 		editor * controller{nullptr};
 		void visit(tile_editor::tile_layer&) {controller->tile_delete_mode=!controller->tile_delete_mode;}
 		void visit(tile_editor::thing_layer& _layer) {controller->del_input(_layer);}
-		void visit(tile_editor::poly_layer&) {}
+		void visit(tile_editor::poly_layer& _layer) {controller->del_input(_layer);}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatch_layer(dispatcher);
@@ -364,6 +367,28 @@ void editor::del_input(tile_editor::thing_layer& _layer) {
 	_layer.data.erase(it);
 	selected_thing=nullptr;
 	message_manager.add("thing deleted");
+}
+
+void editor::del_input(
+	tile_editor::poly_layer& _layer
+) {
+
+	if(nullptr==selected_poly) {
+
+		return;
+	}
+
+	auto it=std::remove_if(
+		std::begin(_layer.data),
+		std::end(_layer.data),
+		[this](const tile_editor::poly& _poly) {
+			return &_poly==selected_poly;
+		}
+	);
+
+	_layer.data.erase(it);
+	selected_poly=nullptr;
+	message_manager.add("poly deleted");
 }
 
 void editor::subgrid_input(
@@ -390,47 +415,30 @@ void editor::click_input(
 		editor * controller{nullptr};
 		int input{0};
 		int modifiers{0};
-		void visit(tile_editor::tile_layer& _layer) {controller->click_input(input, modifiers, _layer);}
-		void visit(tile_editor::thing_layer& _layer) {controller->click_input(input, modifiers, _layer);}
-		void visit(tile_editor::poly_layer& _layer) {controller->click_input(input, modifiers, _layer);}
+		void visit(tile_editor::tile_layer& _layer) {
+
+			switch(input) {
+				case input::left_click: controller->left_click_input(modifiers, _layer); break;
+				case input::right_click: controller->right_click_input(modifiers, _layer); break;
+			}
+		}
+		void visit(tile_editor::thing_layer& _layer) {
+			switch(input) {
+				case input::left_click: controller->left_click_input(modifiers, _layer); break;
+				case input::right_click: controller->right_click_input(modifiers, _layer); break;
+			}
+		}
+		void visit(tile_editor::poly_layer& _layer) {
+			switch(input) {
+				case input::left_click: controller->left_click_input(modifiers, _layer); break;
+				case input::right_click: controller->right_click_input(modifiers, _layer); break;
+			}
+		}
 	} dispatcher;
 	dispatcher.controller=this;
 	dispatcher.input=_input;
 	dispatcher.modifiers=_modifiers;
 	dispatch_layer(dispatcher);
-}
-
-void editor::click_input(
-	int _input,
-	int _modifiers,
-	tile_editor::thing_layer& _layer
-) {
-	switch(_input) {
-		case input::left_click: left_click_input(_modifiers, _layer); break;
-		case input::right_click: right_click_input(_modifiers, _layer); break;
-	}
-}
-
-void editor::click_input(
-	int _input,
-	int _modifiers,
-	tile_editor::tile_layer& _layer
-) {
-	switch(_input) {
-		case input::left_click: left_click_input(_modifiers, _layer); break;
-		case input::right_click: right_click_input(_modifiers, _layer); break;
-	}
-}
-
-void editor::click_input(
-	int _input,
-	int _modifiers,
-	tile_editor::poly_layer& _layer
-) {
-	switch(_input) {
-		case input::left_click: left_click_input(_modifiers, _layer); break;
-		case input::right_click: right_click_input(_modifiers, _layer); break;
-	}
 }
 
 void editor::left_click_input(
@@ -592,8 +600,8 @@ void editor::left_click_input(
 	const auto prototype=thing_list.get();
 
 	tile_editor::thing thing{
-		mouse_pos.x,
-		mouse_pos.y,
+		world_pos.x,
+		world_pos.y,
 		prototype.w,
 		prototype.h,
 		prototype.type_id,
@@ -624,38 +632,77 @@ void editor::right_click_input(
 
 void editor::left_click_input(
 	int /*_modifiers*/,
-	tile_editor::poly_layer& /*_layer*/
+	tile_editor::poly_layer& _layer
 ) {
-
 	auto world_pos=get_world_position(mouse_pos);
 
 	if(!current_poly_vertices.size()) {
 
-		current_poly_vertices.push_back(world_pos);
-		return;
-	}
+		for(auto& poly : _layer.data) {
 
-	if(current_poly_vertices.size() >= 3 
-		&& world_pos==current_poly_vertices[0]
-	) {
+			if(ldt::point_in_polygon(poly.points, world_pos)) {
 
-		//TODO: if closed, check winding and curve!
-		//	TODO: add messages if failure.
-		//TODO: create a new default poly
-		//TODO: push it.
-		current_poly_vertices.clear();
-		return;
+				//If already selected, open its properties!
+				if(nullptr!=selected_poly && &poly==selected_poly) {
+
+					open_poly_properties(
+						poly.properties,
+						session.polysets.at(_layer.set).table.at(poly.type)
+					);
+					return;
+				}
+
+				selected_poly=&poly;
+				return;
+			}
+		}
 	}
 
 	current_poly_vertices.push_back(world_pos);
+
+	//TODO: Perhaps erase duplicates???
+
+	if(current_poly_vertices.size() >= 3) {
+
+		if(ldt::is_concave(current_poly_vertices)) {
+
+			message_manager.add("concave polygons are not allowed");
+			current_poly_vertices.clear();
+			return;
+		}
+
+		if(_layer.winding!=tile_editor::poly_layer::windings::any) {
+
+			bool is_clockwise=ldt::is_clockwise(current_poly_vertices);
+			bool clockwise_allowed=_layer.winding==tile_editor::poly_layer::windings::clockwise;
+
+			if(is_clockwise != clockwise_allowed) {
+
+				message_manager.add("invalid polygon winding");
+				current_poly_vertices.clear();
+				return;
+			}
+		}
+
+		if(world_pos==current_poly_vertices[0]) {
+
+			//TODO: Not if erasing duplicates.
+			current_poly_vertices.pop_back(); //Remove the one we just inserted.
+			close_current_poly(_layer);
+			return;
+		}
+	}
 }
 
 void editor::right_click_input(
-	int /*_modifiers*/, 
-	tile_editor::poly_layer& /*_layer*/
+	int /*_modifiers*/,
+	tile_editor::poly_layer& _layer
 ) {
 
-	//TODO: Does this do something?
+	if(current_poly_vertices.size() >= 3) {
+
+		close_current_poly(_layer);
+	}
 }
 
 void editor::arrow_input_set(
@@ -783,7 +830,7 @@ void editor::arrow_input_layer(
 
 	if(_movement_y) {
 
-		selected_thing->y+=_movement_y*subgrid_factor;
+		selected_thing->y+=-_movement_y*subgrid_factor;
 		return;
 	}
 }
@@ -801,7 +848,21 @@ void editor::arrow_input_layer(
 		return;
 	}
 
-	//TODO: if there's something selected, move it.
+	if(_movement_x) {
+
+		for(auto& vertex : selected_poly->points) {
+			vertex.x+=_movement_x*subgrid_factor;
+		}
+		return;
+	}
+
+	if(_movement_y) {
+
+		for(auto& vertex : selected_poly->points) {
+			vertex.y+=-_movement_y*subgrid_factor;
+		}
+		return;
+	}
 }
 
 
@@ -821,14 +882,18 @@ void editor::draw(ldv::screen& _screen, int /*fps*/) {
 
 void editor::draw_cursor(ldv::screen& _screen) {
 
+	//If we are drawing a poly we don't show the crosshair, for clarity.
+	if(current_poly_vertices.size()) {
+
+		return;
+	}
+
 	ldv::bitmap_representation cursor(cursor_tex);
 	cursor.set_blend(ldv::representation::blends::alpha);
 	const auto rect=cursor_table.get(tile_delete_mode ? 2 : 1).get_rect();
 	cursor.set_clip(rect);
 	int x=mouse_pos.x-(rect.w/2),
 		y=mouse_pos.y-(rect.h/2);
-
-	//TODO: What about snap to grid???
 
 	cursor.set_location({x, y, rect.w, rect.h});
 	cursor.draw(_screen);
@@ -1140,9 +1205,11 @@ void editor::draw_layer(
 
 	for(const auto& tile : _layer.data) {
 
-		//Calculate the world position...
+		//Calculate the world position... Bitmaps are drawn with their origin
+		//at the top left, so we must add some transformation to allow 0,0
+		//to lay at the top right of the origin axes.
 		int x=tile.x * session.grid_data.size,
-		    y=tile.y * session.grid_data.size;
+		    y=((-tile.y)-1) * session.grid_data.size;
 
 		unsigned int size=session.grid_data.size;
 		bmp.set_location({x, y, size, size});
@@ -1170,7 +1237,7 @@ void editor::draw_layer(
 	box.set_blend(ldv::representation::blends::alpha);
 
 
-	//Crosshair representations...
+	//Thing crosshair representations, marking the x,y of the thing.
 	ldv::line_representation vline({0,0},{0,0}, ldv::rgba8(0,0,0, 128)),
 		hline({0,0},{0,0}, ldv::rgba8(0,0,0, 128));
 
@@ -1186,14 +1253,14 @@ void editor::draw_layer(
 
 	for(const auto& thing : _layer.data) {
 
-		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
+		auto origin=thing_origin_fn(thing.x, -thing.y, thing.w, thing.h);
 		box.set_filltype(ldv::polygon_representation::type::fill);
 		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, blend_alpha(_layer.alpha, thing.color.a)));
 		box.draw(_screen, camera);
 
 		//The crosshair indicates where the x and y in the map file reside.
-		crosshair(thing.x, thing.y, thing.w /4 , thing.h /4, thing.color);
+		crosshair(thing.x, -thing.y, thing.w /4 , thing.h /4, thing.color);
 		vline.draw(_screen, camera);
 		hline.draw(_screen, camera);
 
@@ -1221,17 +1288,19 @@ void editor::draw_layer(
 	shape.set_alpha(_layer.alpha);
 	shape.set_blend(ldv::representation::blends::alpha);
 
-	auto points_for_poly=[](const tile_editor::poly& _poly) {
+	auto transform_point=[](const ldv::point& _point) -> tile_editor::poly_point {
+
+		return {_point.x, -_point.y};
+	};
+
+	auto points_for_poly=[transform_point](const tile_editor::poly& _poly) {
 
 		std::vector<ldv::point> points(_poly.points.size());
 		std::transform(
 			std::begin(_poly.points),
 			std::end(_poly.points),
 			std::begin(points),
-			[](const ldv::point& _point) -> tile_editor::poly_point {
-
-				return {_point.x, -_point.y};
-			}
+			transform_point
 		);
 
 		return points;
@@ -1257,13 +1326,26 @@ void editor::draw_layer(
 
 	if(current_poly_vertices.size()) {
 
+		auto screen_vertices=decltype(current_poly_vertices)(current_poly_vertices.size());
+		std::transform(
+			std::begin(current_poly_vertices),
+			std::end(current_poly_vertices),
+			std::begin(screen_vertices),
+			transform_point
+		);
+
 		auto draw_point=[&_screen, this](
-			const tile_editor::poly_point& _point
+			const tile_editor::poly_point& _point,
+			const tile_editor::poly_point& _endpoint
 		) {
 
+			auto color=_point==_endpoint && &_point!=&_endpoint
+				? ldv::rgba8(64,255,64,255)
+				: ldv::rgba8(255,255,255,255);
+
 			ldv::box_representation box(
-				{_point.x-1, -(_point.y)-1, 10, 10},
-				ldv::rgba8(255,255,255,255)
+				{_point.x-3, _point.y-3, 7, 7},
+				color
 			);
 
 			box.set_blend(ldv::representation::blends::alpha);
@@ -1282,36 +1364,29 @@ void editor::draw_layer(
 			line.draw(_screen, camera);
 		};
 
-		//TODO Always try to close the poly with the mouse position!!!
+		//Draw in-progress shape...
+		screen_vertices.push_back(transform_point(get_world_position(mouse_pos)));
 
-		if(1==current_poly_vertices.size()) {
+		if(2==screen_vertices.size()) {
 
-			draw_point(current_poly_vertices[0]);
-		}
-		else if(2==current_poly_vertices.size()) {
-
-			//TODO: close the current polygon by following the mouse around...
-			//TODO: don't add the vertex! copy???
-			//current_poly_vertices.push_back(get_world_position(mouse_pos));
-
-			draw_point(current_poly_vertices[0]);
-			draw_line(current_poly_vertices[0], current_poly_vertices[1]);
-			draw_point(current_poly_vertices[1]);
+			draw_line(screen_vertices[0], screen_vertices[1]);
 		}
 		else {
 
-			//TODO: close the current polygon by following the mouse around...
-			//TODO: don't add the vertex! copy???
-			//current_poly_vertices.push_back(get_world_position(mouse_pos));
-
-			shape.set_points(current_poly_vertices);
+			shape.set_points(screen_vertices);
 			shape.set_filltype(ldv::polygon_representation::type::fill);
-			shape.set_color(ldv::rgba8(255, 255, 255, 128));
+			shape.set_color(ldv::rgba8(255, 255, 255, 64));
 			shape.draw(_screen, camera);
 
 			shape.set_filltype(ldv::polygon_representation::type::line);
-			shape.set_color(ldv::rgba8(255, 255, 255, 64));
+			shape.set_color(ldv::rgba8(255, 255, 255, 255));
 			shape.draw(_screen, camera);
+		}
+
+		//Draw vertices of shape.
+		for(const auto& vertex : screen_vertices) {
+
+			draw_point(vertex, screen_vertices[0]);
 		}
 	}
 }
@@ -1319,8 +1394,8 @@ void editor::draw_layer(
 void editor::draw_hud(ldv::screen& _screen) {
 
 	std::stringstream ss;
-
-	ss<<" "<<mouse_pos.x<<","<<mouse_pos.y<<" zoom:"<<camera.get_zoom()<<std::endl;
+	auto world_pos=get_world_position(mouse_pos);
+	ss<<" "<<world_pos.x<<","<<world_pos.y<<" zoom:"<<camera.get_zoom()<<std::endl;
 
 	if(!map.layers.size()) {
 
@@ -1343,7 +1418,16 @@ void editor::draw_hud(ldv::screen& _screen) {
 			}
 
 			void visit(const tile_editor::poly_layer& _layer) {
-				(*ss)<<" poly, set: "<<session->polysets[_layer.set].name<<", size: "<<_layer.data.size();
+
+				std::string winding="any";
+				if(_layer.winding==tile_editor::poly_layer::windings::clockwise) {
+					winding="clockwise";
+				}
+				else if(_layer.winding==tile_editor::poly_layer::windings::counterclockwise) {
+					winding="counterclockwise";
+				}
+
+				(*ss)<<" poly ["<<winding<<"], set: "<<session->polysets[_layer.set].name<<", size: "<<_layer.data.size();
 			}
 		} visitor;
 		visitor.session=&session;
@@ -1415,7 +1499,6 @@ void editor::draw_hud_thing_info(
 	print_properties(_thing.properties.int_properties, _blueprint.properties.int_properties);
 	print_properties(_thing.properties.double_properties, _blueprint.properties.double_properties);
 }
-
 
 void editor::draw_hud_poly_info(
 	std::stringstream& _ss,
@@ -1505,6 +1588,8 @@ void editor::load_map(const std::string& _path) {
 	current_filename=_path;
 	current_layer=0;
 	load_layer_toolset();
+
+	camera.center_on({-1, 1, 2, 2});
 }
 
 void editor::load_session(const std::string& _path) {
@@ -1636,17 +1721,17 @@ ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
 	_pos.x+=camera.get_x();
 	_pos.y+=camera.get_y();
 
-	return {_pos.x, _pos.y};
+	return {_pos.x, -_pos.y};
 }
 
 ldt::point_2d<int> editor::get_grid_position(ldt::point_2d<int> _point) const {
 
 	double size=session.grid_data.size;
 
-	return {
-		(int)(floor(_point.x / size)) ,
-		(int)(floor(_point.y / size))
-	};
+	int x=floor(_point.x / size),
+		y=floor(_point.y / size);
+
+	return {x, y};
 }
 
 void editor::layer_change_cleanup() {
@@ -1665,6 +1750,18 @@ void editor::open_thing_properties(
 ) {
 	exchange_data.edited_thing=selected_thing;
 	exchange_data.edited_thing_blueprint=&_blueprint;
+	exchange_data.properties=&_properties;
+	exchange_data.properties_blueprint=&_blueprint.properties;
+	exchange_data.put(state_properties);
+	push_state(state_properties);
+}
+
+void editor::open_poly_properties(
+	tile_editor::property_manager& _properties,
+	tile_editor::poly_definition& _blueprint
+) {
+	exchange_data.edited_poly=selected_poly;
+	exchange_data.edited_poly_blueprint=&_blueprint;
 	exchange_data.properties=&_properties;
 	exchange_data.properties_blueprint=&_blueprint.properties;
 	exchange_data.put(state_properties);
@@ -1766,10 +1863,12 @@ editor::editor_point editor::snap_to_grid(editor_point _point) const {
 
 	double  x=_point.x,
 	        y=_point.y,
-	        factor=subgrid_factor;
+	        factor=subgrid_factor,
+	        offset_x=fmod(camera.get_x(), factor),
+	        offset_y=fmod(camera.get_y(), factor);
 
-	int px=round(x / factor) * factor;
-	int py=round(y / factor) * factor;
+	int px=(round(x / factor) * factor)-offset_x;
+	int py=(round(y / factor) * factor)-offset_y;
 
 	return {px, py};
 }
@@ -1787,7 +1886,36 @@ void editor::toggle_set_gui() {
 	show_set=!show_set;
 	message_manager.add(
 		show_set
-			? "set selector enabled, camera movement disabled"
-			: "set selector disabled, camera movement enabled"
+			? "set selector enabled, camera and entity movement disabled"
+			: "set selector disabled, camera and entity movement enabled"
 	);
+}
+
+void editor::close_current_poly(
+	tile_editor::poly_layer& _layer
+) {
+	const auto prototype=poly_list.get();
+
+	tile_editor::poly poly{
+		current_poly_vertices,
+		prototype.poly_id,
+		prototype.color,
+		tile_editor::property_manager{}
+	};
+
+	auto dump_properties=[](auto list, auto& destination){
+
+		for(const auto& prop : list) {
+			destination[prop.first]=prop.second.default_value;
+		}
+	};
+
+	dump_properties(prototype.properties.int_properties, poly.properties.int_properties);
+	dump_properties(prototype.properties.double_properties, poly.properties.double_properties);
+	dump_properties(prototype.properties.string_properties, poly.properties.string_properties);
+
+	_layer.data.push_back(poly);
+	current_poly_vertices.clear();
+	message_manager.add("polygon added");
+	return;
 }

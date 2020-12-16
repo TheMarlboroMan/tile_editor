@@ -38,7 +38,6 @@ class map_parser {
 		//These two are only for poly nodes, still these are short lived objects,
 		//let us forget about the transgression.
 		poly_layer::windings winding{poly_layer::windings::clockwise};
-		poly_layer::curves curve{poly_layer::curves::convex};
 	};
 
 	void                   parse_meta(const jsondoc&);

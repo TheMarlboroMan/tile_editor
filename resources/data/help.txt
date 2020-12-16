@@ -13,7 +13,6 @@ l - load new file
 - - zoom out
 pagedown - next layer
 pageup - previous layer
-space - unselect
 lctrl + space - change layer view mode
 tab - toggle toolset
 lctrl + tab - open layer selector
@@ -31,18 +30,21 @@ lshift + click - between two points, add/change/delete area
 === THING EDITOR MODE ===
 
 lalt - snap to grid
-click - create new thing / select thing / edit properties on already selected thing
+left click - create new thing / select thing / edit properties on already selected thing
+space - unselect
 delete - delete selected thing
 arrows - move selected thing by fine grid size (holdable)
-arrows + lctrl - fine move by fine grid size
+arrows + lalt - fine move by fine grid size
 
 === POLY EDITOR MODE ===
 
 lalt - snap to grid
-?? click - add new node / select poly / edit properties on already selected poly
-?? delete - delete selected poly
-?? arrows - move selected poly by fine grid size (holdable)
-arrows + lctrl - fine move by fine grid size
+space - unselect / cancel currently drawn poly
+left click - add new vertex / close poly (over first vertex) / select poly / edit properties on already selected poly
+right click - close poly (when at least 3 vertices are laid out)
+delete - delete selected poly
+arrows - move selected poly by fine grid size (holdable)
+arrows + lalt - fine move by fine grid size
 
 == LAYER / THING / POLY / MAP PROPERTIES MODE ==
 

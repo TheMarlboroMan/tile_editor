@@ -100,8 +100,7 @@
 				"type":"polys",
 				"set": 4,
 				"alpha": 64,
-				"winding":"any",
-				"curve":"any"
+				"winding":"any"
 			},
 			"data": [
 				{
@@ -133,8 +132,7 @@
 				"id":"sixth",
 				"set":5,
 				"alpha": 128,
-				"winding":"any",
-				"curve":"any"
+				"winding":"any"
 			},
 			"data": [
 				{
