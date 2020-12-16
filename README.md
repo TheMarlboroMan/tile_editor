@@ -23,10 +23,6 @@ Working in traditional mode (0,0 is top-left, there are no negative positions ti
 
 I would, however, advise against that. Maybe it's fine for tile or tile-thing based applications, but polygons can get messy.
 
-## bugs
-
-- camera does not work on help mode.
-
 ## TODO
 
 - v1.0 done :P
