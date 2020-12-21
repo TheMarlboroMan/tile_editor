@@ -82,9 +82,10 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	auto& screen=kernel.get_screen();
 	screen.set_fullscreen(config.bool_from_path("video:fullscreen"));
 
-	//ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/BebasNeue-Regular.ttf");
-	ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/unispace.ttf");
-	//ttf_manager.insert(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size, "assets/ttf/monofonto.ttf");
+	ttf_manager.insert(
+		tile_editor::definitions::main_font_name, 
+		tile_editor::definitions::main_font_size, 
+		env.get_app_path()+"assets/ttf/unispace.ttf");
 }
 
 void state_driver::prepare_audio(dfw::kernel& kernel) {
@@ -166,6 +167,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			ttf_manager,
 			message_manager,
 			exchange_data,
+			env,
 			screen_w,
 			screen_h
 		)
@@ -178,6 +180,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			log,
 			ttf_manager,
 			exchange_data,
+			env,
 			screen_h
 		)
 	);
@@ -188,6 +191,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		new controller::help{
 			log,
 			ttf_manager,
+			env,
 			screen_w,
 			screen_h
 		}

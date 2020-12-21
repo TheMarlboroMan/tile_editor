@@ -16,6 +16,7 @@ file_browser::file_browser(
 	lm::logger& plog,
 	ldtools::ttf_manager& _ttfman,
 	tile_editor::exchange_data& _exchange_data,
+	const tile_editor::env& _env,
 	int _window_height
 ):
 log(plog),
@@ -30,7 +31,7 @@ pager{0, 0} {
 
 	auto root=tools::parse_json_string(
 		tools::dump_file(
-			"data/layouts.json"
+			_env.get_app_path()+"data/layouts.json"
 		)
 	);
 

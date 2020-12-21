@@ -61,6 +61,11 @@ endif()
 #Configure the executable, we want it into the "build directory" and we want all resources copied
 #to the build directory.
 add_executable(tile_editor src/main.cpp)
-set_target_properties(tile_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY build)
-add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ./build)
+#set_target_properties(tile_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY build)
+#add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ./build)
 target_link_libraries(tile_editor applib dfw tools dansdl2 ldtools lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
+
+install(TARGETS tile_editor RUNTIME DESTINATION /usr/local/bin)
+#TODO: Still not cool
+add_custom_command(TARGET tile_editor POST_BUILD COMMAND mkdir -p ~/.tile_editor/logs ~/.tile_editor/resources)
+add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ~/.tile_editor)

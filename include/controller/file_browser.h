@@ -3,6 +3,7 @@
 //local
 #include "states.h"
 #include "app/exchange_data.h"
+#include "app/env.h"
 
 //framework
 #include <dfw/controller_interface.h>
@@ -23,7 +24,7 @@ class file_browser:
 
 	public:
 
-	                            file_browser(lm::logger&, ldtools::ttf_manager&, tile_editor::exchange_data&, int);
+	                            file_browser(lm::logger&, ldtools::ttf_manager&, tile_editor::exchange_data&, const tile_editor::env&, int);
 	virtual void                loop(dfw::input&, const dfw::loop_iteration_data&);
 	virtual void                draw(ldv::screen&, int);
 	virtual void                awake(dfw::input& /*input*/);

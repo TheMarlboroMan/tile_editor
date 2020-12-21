@@ -21,6 +21,7 @@
 //Specific app_config
 #include "tools/message_manager.h"
 #include "app/exchange_data.h"
+#include "app/env.h"
 
 namespace dfwimpl {
 
@@ -66,6 +67,7 @@ class state_driver:
 	ldtools::ttf_manager            ttf_manager;
 	tools::message_manager          message_manager;
 	tile_editor::exchange_data      exchange_data;
+	tile_editor::env                env;
 
 };
 

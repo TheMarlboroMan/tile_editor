@@ -2,6 +2,7 @@
 
 //local
 #include "states.h"
+#include "app/env.h"
 
 #include <dfw/controller_interface.h>
 #include <ldv/ttf_representation.h>
@@ -16,7 +17,7 @@ class help:
 
 	public:
 
-								help(lm::logger&, ldtools::ttf_manager&, unsigned int, unsigned int);
+								help(lm::logger&, ldtools::ttf_manager&, const tile_editor::env&, unsigned int, unsigned int);
 	virtual void 				loop(dfw::input&, const dfw::loop_iteration_data&);
 	virtual void 				draw(ldv::screen&, int);
 	virtual void 				awake(dfw::input& /*input*/);

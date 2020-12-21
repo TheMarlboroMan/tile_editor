@@ -30,6 +30,7 @@ editor::editor(
 	ldtools::ttf_manager& _ttf_manager,
 	tools::message_manager& _message_manager,
 	tile_editor::exchange_data& _exchange_data,
+	const tile_editor::env& _env,
 	unsigned int _screen_w,
 	unsigned int _screen_h
 )
@@ -37,8 +38,8 @@ editor::editor(
 	ttf_manager(_ttf_manager),
 	message_manager{_message_manager},
 	exchange_data{_exchange_data},
-	cursor_tex{ldv::texture(ldv::image("assets/bitmap/cursor.png"))},
-	cursor_table{"data/cursor.dat"},
+	cursor_tex{ldv::texture(ldv::image(_env.get_app_path()+"assets/bitmap/cursor.png"))},
+	cursor_table{_env.get_app_path()+"data/cursor.dat"},
 	screen_rect{0, 0, _screen_w, _screen_h},
 	camera{
 		screen_rect, //pointing at world 0,0.
