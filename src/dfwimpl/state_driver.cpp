@@ -11,11 +11,13 @@ using namespace dfwimpl;
 
 state_driver::state_driver(
 	dfw::kernel& kernel,
-	dfwimpl::config& c
+	dfwimpl::config& c,
+	const tile_editor::env& _env
 )
 	:state_driver_interface(controller::t_states::state_editor),
 	config(c),
 	log(kernel.get_log()),
+	env{_env},
 	message_manager(30)
 {
 

@@ -1,29 +1,29 @@
 beginmapproperties
-	file example/map_properties.txt
+	file map_properties.txt
 endmapproperties
 
 begintileset
-	file example/set_0.dat
+	file set_0.dat
 	id 1
-	image example/set_0.png
+	image set_0.png
 	name Background tiles
 endtileset
 
 begintileset
-	file example/set_1.dat
+	file set_1.dat
 	id 2
-	image example/set_1.png
+	image set_1.png
 	name Foreground tiles
 endtileset
 
 beginobjectset
-	file example/things_01.txt
+	file things_01.txt
 	id 1
 	name Things
 endobjectset
 
 beginpolyset
-	file example/polyset_01.txt
+	file polyset_01.txt
 	id 1
 	name Polygons
 endpolyset

@@ -2,9 +2,13 @@
 
 using namespace dfwimpl;
 
-config::config(): dfw::base_config(get_file_path()) {
-}
+config::config(
+	const tile_editor::env& _env
+)
+	:dfw::base_config(get_file_path()),
+	env{_env} {
 
+}
 
 dfw::input_description dfwimpl::input_description_from_config_token(const rapidjson::Value& tok)
 {

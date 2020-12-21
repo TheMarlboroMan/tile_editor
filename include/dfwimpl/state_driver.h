@@ -29,7 +29,7 @@ class state_driver:
 	public dfw::state_driver_interface {
 
 	public:
-									state_driver(dfw::kernel& kernel, dfwimpl::config& config);
+									state_driver(dfw::kernel& kernel, dfwimpl::config& config, const tile_editor::env&);
 
 	virtual void					common_pre_loop_input(dfw::input& input, float delta);
 	virtual void					common_pre_loop_step(float delta);
@@ -51,6 +51,7 @@ class state_driver:
 	//references
 	dfwimpl::config&                config;
 	lm::logger&                     log;
+	const tile_editor::env&         env;
 
 	typedef std::unique_ptr<dfw::controller_interface>	ptr_controller;
 	ptr_controller                  c_editor;
@@ -67,7 +68,7 @@ class state_driver:
 	ldtools::ttf_manager            ttf_manager;
 	tools::message_manager          message_manager;
 	tile_editor::exchange_data      exchange_data;
-	tile_editor::env                env;
+
 
 };
 

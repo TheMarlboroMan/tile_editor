@@ -45,10 +45,10 @@ int main(int argc, char ** argv)
 		dfw::kernel kernel(log_app, carg);
 
 		lm::log(log_app, lm::lvl::info)<<"init app config..."<<std::endl;
-		dfwimpl::config config;
+		dfwimpl::config config{env};
 
 		lm::log(log_app, lm::lvl::info)<<"create state driver..."<<std::endl;
-		dfwimpl::state_driver sd(kernel, config);
+		dfwimpl::state_driver sd(kernel, config, env);
 
 		lm::log(log_app, lm::lvl::info)<<"init state driver..."<<std::endl;
 		sd.init(kernel);
