@@ -1630,7 +1630,7 @@ void editor::load_session(const std::string& _path) {
 		break;
 		case tile_editor::map_blueprint::thing_centers::bottom_left:
 			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
-				return {_x, _y+_w};
+				return {_x, _y+_h};
 			};
 		break;
 	}
