@@ -829,7 +829,7 @@ void editor::arrow_input_layer(
 	tile_editor::thing_layer& /*_layer*/,
 	int _movement_x,
 	int _movement_y,
-	int /*_modifiers*/
+	int _modifiers
 ) {
 
 	if(nullptr==selected_thing) {
@@ -838,15 +838,19 @@ void editor::arrow_input_layer(
 		return;
 	}
 
+	auto factor=_modifiers & key_modifier_lctrl
+		? 1
+		: subgrid_factor;
+
 	if(_movement_x) {
 
-		selected_thing->x+=_movement_x*subgrid_factor;
+		selected_thing->x+=_movement_x*factor;
 		return;
 	}
 
 	if(_movement_y) {
 
-		selected_thing->y+=-_movement_y*subgrid_factor;
+		selected_thing->y+=-_movement_y*factor;
 		return;
 	}
 }
@@ -855,7 +859,7 @@ void editor::arrow_input_layer(
 	tile_editor::poly_layer& /*_layer*/,
 	int _movement_x,
 	int _movement_y,
-	int /*_modifiers*/
+	int _modifiers
 ) {
 
 	if(nullptr==selected_poly) {
@@ -864,10 +868,14 @@ void editor::arrow_input_layer(
 		return;
 	}
 
+	auto factor=_modifiers & key_modifier_lctrl
+		? 1
+		: subgrid_factor;
+
 	if(_movement_x) {
 
 		for(auto& vertex : selected_poly->points) {
-			vertex.x+=_movement_x*subgrid_factor;
+			vertex.x+=_movement_x*factor;
 		}
 		return;
 	}
@@ -875,7 +883,7 @@ void editor::arrow_input_layer(
 	if(_movement_y) {
 
 		for(auto& vertex : selected_poly->points) {
-			vertex.y+=-_movement_y*subgrid_factor;
+			vertex.y+=-_movement_y*factor;
 		}
 		return;
 	}
