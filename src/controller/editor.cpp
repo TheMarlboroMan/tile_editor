@@ -1479,11 +1479,16 @@ void editor::draw_hud(ldv::screen& _screen) {
 
 	ldv::ttf_representation txt_hud{
 		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
-		ldv::rgba8(255, 255, 255, 192),
+		ldv::rgba8(
+			session.font_color.r,
+			session.font_color.g,
+			session.font_color.b,
+			session.font_color.a
+		),
 		""
 	};
 	txt_hud.set_line_height_ratio(tile_editor::definitions::line_height_ratio);
-	txt_hud.go_to({0,0});
+	txt_hud.go_to({0,4});
 	txt_hud.set_text(ss.str());
 	txt_hud.draw(_screen);
 }
@@ -1667,6 +1672,15 @@ void editor::load_session(const std::string& _path) {
 			};
 		break;
 	}
+
+	last_message_rep.set_color(
+		ldv::rgba8(
+			session.font_color.r,
+			session.font_color.g,
+			session.font_color.b,
+			session.font_color.a
+		)
+	);
 
 	//TODO: I would enjoy if this was another component.
 	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;

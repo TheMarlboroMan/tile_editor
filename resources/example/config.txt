@@ -37,4 +37,5 @@ beginsession
 	gridcolor 64 64 64 255
 	gridrulercolor 128 128 128 255
 	gridorigincolor 255 255 255 255
+	fontcolor 255 255 255 255
 endsession

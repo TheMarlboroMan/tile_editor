@@ -218,6 +218,7 @@ void blueprint_parser::session_mode(
 	auto propmap=generic_first_level(_reader, "endsession", {
 		"thingcenter",
 		"bgcolor",
+		"fontcolor",
 		"gridsize",
 		"gridvruler",
 		"gridhruler",
@@ -260,6 +261,11 @@ void blueprint_parser::session_mode(
 	if(propmap["bgcolor"].size()) {
 
 		_blueprint.bg_color=parse_color(propmap["bgcolor"]);
+	}
+
+	if(propmap["fontcolor"].size()) {
+
+		_blueprint.font_color=parse_color(propmap["fontcolor"]);
 	}
 
 	if(propmap["gridcolor"].size()) {
