@@ -159,12 +159,19 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::load)) {
 
-		exchange_data.file_browser_allow_create=false;
-		exchange_data.file_browser_title="Load map file";
-		exchange_data.file_browser_invoker_id=state_editor;
-		exchange_data.put(state_file_browser);
-		push_state(state_file_browser);
-		return;
+		if(modifiers & key_modifier_lctrl) {
+
+			load_session(current_session_filename);
+			return;
+		}
+		else {
+			exchange_data.file_browser_allow_create=false;
+			exchange_data.file_browser_title="Load map file";
+			exchange_data.file_browser_invoker_id=state_editor;
+			exchange_data.put(state_file_browser);
+			push_state(state_file_browser);
+			return;
+		}
 	}
 
 	if(_input.is_input_down(input::save)) {
@@ -446,9 +453,54 @@ void editor::left_click_input(
 	int _modifiers,
 	tile_editor::tile_layer& _layer
 ) {
+	//Make sure we can't click anywhere on the set.
+	//TODO: Maybe in the future make it selectable.
+	if(show_set) {
+
+		unsigned int w=screen_rect.w * (session.toolbox_width_percent / 100.);
+		int x=screen_rect.w-w;
+		if(mouse_pos.x >= x) {
+
+			return;
+		}
+	}
+
+	auto find_tile_at=[&_layer](editor_point _pt) {
+
+		return std::find_if(
+			std::begin(_layer.data),
+			std::end(_layer.data),
+			[_pt](const tile_editor::tile& _tile) {
+				return _tile.x==_pt.x && _tile.y==_pt.y;
+			}
+		);
+	};
 
 	auto world_pos=get_world_position(mouse_pos);
 	auto grid=get_grid_position(world_pos);
+
+	//Copy type.
+	if(_modifiers & key_modifier_lctrl) {
+
+		auto it=find_tile_at(grid);
+		if(it!=std::end(_layer.data)) {
+
+			//Is there anything in the tile list that matches this id?
+			const auto id=it->type;
+			auto index=tile_list.find([id](const ldtools::sprite_table::container::value_type& _item) -> bool {
+				return id==_item.first;
+			});
+
+			if(tile_list.none!=index) {
+				tile_list.set_index(index);
+				message_manager.add("tile type selected");
+				tile_delete_mode=false;
+				return;
+			}
+		}
+
+		tile_delete_mode=true;
+	}
 
 	//Process multiclick with lshift. Multiclick acts by delimiting a box.
 	if(! (_modifiers & key_modifier_lshift)) {
@@ -464,20 +516,7 @@ void editor::left_click_input(
 			multiclick.rangey={std::min(grid.y, multiclick.point.y), std::max(grid.y, multiclick.point.y)};
 		}
 	}
-
 	multiclick.point=grid;
-
-	//TODO: duplicate.
-	auto find_tile_at=[&_layer](editor_point _pt) {
-
-		return std::find_if(
-			std::begin(_layer.data),
-			std::end(_layer.data),
-			[_pt](const tile_editor::tile& _tile) {
-				return _tile.x==_pt.x && _tile.y==_pt.y;
-			}
-		);
-	};
 
 	if(tile_delete_mode) {
 
@@ -532,38 +571,10 @@ void editor::left_click_input(
 
 void editor::right_click_input(
 	int /*_modifiers*/,
-	tile_editor::tile_layer& _layer
+	tile_editor::tile_layer& /*_layer*/
 ) {
 
-	auto world_pos=get_world_position(mouse_pos);
-	auto grid=get_grid_position(world_pos);
 
-	//TODO: duplicate.
-	auto find_tile_at=[&_layer](editor_point _pt) {
-
-		return std::find_if(
-			std::begin(_layer.data),
-			std::end(_layer.data),
-			[_pt](const tile_editor::tile& _tile) {
-				return _tile.x==_pt.x && _tile.y==_pt.y;
-			}
-		);
-	};
-
-	auto it=find_tile_at(grid);
-	if(it!=std::end(_layer.data)) {
-
-		//Is there anything in the tile list that matches this id?
-		const auto id=it->type;
-		auto index=tile_list.find([id](const ldtools::sprite_table::container::value_type& _item) -> bool {
-			return id==_item.first;
-		});
-
-		if(tile_list.none!=index) {
-			tile_list.set_index(index);
-			message_manager.add("tile type selected");
-		}
-	}
 }
 
 void editor::left_click_input(
@@ -573,13 +584,10 @@ void editor::left_click_input(
 
 	//Try and select...
 	auto world_pos=get_world_position(mouse_pos);
+
 	for(auto& thing : _layer.data) {
 
-		//The origin is in "screen cordinates" so we must "cartesianify" it
-		//when creating the box...
-		auto origin=thing_origin_fn(thing.x, thing.y, thing.w, thing.h);
-		auto box=ldt::box<int, unsigned>{{origin.x, origin.y}, (unsigned)thing.w, (unsigned)thing.h};
-
+		auto box=thing_box_fn({thing.x, thing.y}, thing.w, thing.h);
 		if(box.point_inside(world_pos)) {
 
 			//If already selected, open its properties!
@@ -597,7 +605,12 @@ void editor::left_click_input(
 		}
 	}
 
+	//This is a pointer to a vector element that is about the change... it's a
+	//good idea to nullify it.
+	selected_thing=nullptr;
+
 	//Add the current thing...
+
 	const auto prototype=thing_list.get();
 
 	tile_editor::thing thing{
@@ -659,6 +672,8 @@ void editor::left_click_input(
 		}
 	}
 
+	//view note on left_click for thing layer
+	selected_poly=nullptr;
 	current_poly_vertices.push_back(world_pos);
 
 	//TODO: Perhaps erase duplicates???
@@ -866,9 +881,7 @@ void editor::arrow_input_layer(
 	}
 }
 
-
 void editor::draw(ldv::screen& _screen, int /*fps*/) {
-
 	_screen.clear(ldv::rgba8(session.bg_color.r, session.bg_color.g, session.bg_color.b, session.bg_color.a));
 
 	draw_grid(_screen);
@@ -1595,10 +1608,12 @@ void editor::load_map(const std::string& _path) {
 
 void editor::load_session(const std::string& _path) {
 
-	lm::log(log, lm::lvl::info)<<"map editor will load session data from "<<_path<<std::endl;
+	current_session_filename=_path;
+
+	lm::log(log, lm::lvl::info)<<"map editor will load session data from "<<current_session_filename<<std::endl;
 
 	tile_editor::blueprint_parser cfp;
-	session=cfp.parse_file(_path);
+	session=cfp.parse_file(current_session_filename);
 
 	subgrid_factor=session.grid_data.size;
 
@@ -1612,25 +1627,43 @@ void editor::load_session(const std::string& _path) {
 			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
 				return {_x-_w/2, _y-_h/2};
 			};
+			thing_box_fn=[](editor_point _pt, unsigned _w, unsigned _h) -> ldt::box<int, unsigned> {
+				return {{_pt.x, _pt.y}, _w, _h};
+			};
 		break;
 		case tile_editor::map_blueprint::thing_centers::top_left:
 			thing_origin_fn=[](int _x, int _y, int, int) -> editor_point {
 				return {_x, _y};
 			};
+
+			thing_box_fn=[](editor_point _pt, unsigned _w, unsigned _h) -> ldt::box<int, unsigned> {
+				return {{_pt.x, _pt.y-(int)_h}, _w, _h};
+			};
 		break;
 		case tile_editor::map_blueprint::thing_centers::top_right:
 			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
-				return {_x+_w, _y};
+				return {_x-_w, _y};
+			};
+
+			thing_box_fn=[](editor_point _pt, unsigned _w, unsigned _h) -> ldt::box<int, unsigned> {
+				return {{_pt.x-(int)_w, _pt.y-(int)_h}, _w, _h};
 			};
 		break;
 		case tile_editor::map_blueprint::thing_centers::bottom_right:
 			thing_origin_fn=[](int _x, int _y, int _w, int _h) -> editor_point {
-				return {_x+_w, _y+_h};
+				return {_x-_w, _y-_h};
+			};
+
+			thing_box_fn=[](editor_point _pt, unsigned _w, unsigned _h) -> ldt::box<int, unsigned> {
+				return {{_pt.x-(int)_w, _pt.y}, _w, _h};
 			};
 		break;
 		case tile_editor::map_blueprint::thing_centers::bottom_left:
-			thing_origin_fn=[](int _x, int _y, int _w, int) -> editor_point {
-				return {_x, _y+_w};
+			thing_origin_fn=[](int _x, int _y, int , int _h) -> editor_point {
+				return {_x, _y-_h};
+			};
+			thing_box_fn=[](editor_point _pt, unsigned _w, unsigned _h) -> ldt::box<int, unsigned> {
+				return {{_pt.x, _pt.y}, _w, _h};
 			};
 		break;
 	}

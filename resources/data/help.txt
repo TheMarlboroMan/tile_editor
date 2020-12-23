@@ -9,6 +9,7 @@ esc - exit, no save checks are done so save often
 s - save current file
 lctrl+s - save to new file
 l - load new file
+lctrl+l - reload config file
 + - zoom in
 - - zoom out
 pagedown - next layer
@@ -24,7 +25,7 @@ arrows - move / change toolset element (depending on toolset visibility)
 
 delete - set / unset tile delete mode.
 left click - add/change/delete tile
-right click - select tile type under cursor
+lctrl + left click - select tile type under cursor (enables delete mode if nothing)
 lshift + click - between two points, add/change/delete area
 
 === THING EDITOR MODE ===

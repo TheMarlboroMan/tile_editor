@@ -152,13 +152,18 @@ class editor:
 	tilelist_t                  tile_list;
 	thinglist_t                 thing_list;
 	polylist_t                  poly_list;
-	std::string                 current_filename;
+	std::string                 current_filename,
+	                            current_session_filename;
 	std::size_t	                current_layer{0},
 	                            subgrid_factor{0};
 	tile_editor::thing *        selected_thing{nullptr};
 	tile_editor::poly *         selected_poly{nullptr};
 	//!Function that returns the origin of a "thing" based on the current "thing_center" attribute.
+	//!Such origin is what appears on the thing crosshair.
 	std::function<editor_point(int, int, int, int)>	thing_origin_fn;
+	//!Functions that returns a thing box based on the current "thing_center" attribute.
+	//!This box is on cartesian format, with its origin at bottom left.
+	std::function<ldt::box<int, unsigned>(editor_point, unsigned, unsigned)> thing_box_fn;
 	bool                        show_set{true},
 	                            tile_delete_mode{false};
 	std::vector<tile_editor::poly_point> current_poly_vertices;
