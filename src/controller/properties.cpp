@@ -265,10 +265,12 @@ void properties::draw(ldv::screen& _screen, int /*fps*/) {
 	ldv::ttf_representation txt_menu{
 		ttf_manager.get(tile_editor::definitions::main_font_name, tile_editor::definitions::main_font_size),
 		ldv::rgba8(255, 255, 255, 255),
-		pr.ss.str()
+		"",
 	};
 
+	txt_menu.set_max_width(_screen.get_rect().w / 2);
 	txt_menu.set_line_height_ratio(tile_editor::definitions::line_height_ratio);
+	txt_menu.set_text(pr.ss.str());
 
 	//centered alignment.
 	ldv::representation_alignment center={

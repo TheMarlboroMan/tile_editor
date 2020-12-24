@@ -85,8 +85,8 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	screen.set_fullscreen(config.bool_from_path("video:fullscreen"));
 
 	ttf_manager.insert(
-		tile_editor::definitions::main_font_name, 
-		tile_editor::definitions::main_font_size, 
+		tile_editor::definitions::main_font_name,
+		tile_editor::definitions::main_font_size,
 		env.get_app_path()+"assets/ttf/unispace.ttf");
 }
 
@@ -217,7 +217,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 		)
 	);
 	reg(
-		c_thing_editor_properties,
+		c_poly_editor_properties,
 		controller::t_states::state_poly_editor_properties,
 		new controller::poly_editor_properties(
 			log,

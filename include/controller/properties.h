@@ -57,17 +57,19 @@ class properties:
 			}
 
 			ss<<std::endl
-				<<"\t"<<_blueprint.description<<std::endl;
+				<<"\t"<<_blueprint.description;
 
 			switch(_blueprint.linked_to) {
 				case tile_editor::property_links::nothing:break;
-				case tile_editor::property_links::w: ss<<"\tthis property is linked to entity witdh"<<std::endl; break;
-				case tile_editor::property_links::h: ss<<"\tthis property is linked to entity height"<<std::endl; break;
-				case tile_editor::property_links::color_red: ss<<"\tthis property is linked to entity red color component"<<std::endl; break;
-				case tile_editor::property_links::color_green: ss<<"\tthis property is linked to entity green color component"<<std::endl; break;
-				case tile_editor::property_links::color_blue: ss<<"\tthis property is linked to entity blue color component"<<std::endl; break;
-				case tile_editor::property_links::color_alpha: ss<<"\tthis property is linked to entity color alpha"<<std::endl; break;
+				case tile_editor::property_links::w: ss<<" [this property is linked to entity witdh]"; break;
+				case tile_editor::property_links::h: ss<<" [this property is linked to entity height]"; break;
+				case tile_editor::property_links::color_red: ss<<" [this property is linked to entity red color component]"; break;
+				case tile_editor::property_links::color_green: ss<<" [this property is linked to entity green color component]"; break;
+				case tile_editor::property_links::color_blue: ss<<" [this property is linked to entity blue color component]"; break;
+				case tile_editor::property_links::color_alpha: ss<<" [this property is linked to entity color alpha]"; break;
 			}
+
+			ss<<std::endl;
 		}
 
 		void special(const std::string& _type, int _index) {
