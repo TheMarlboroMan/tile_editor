@@ -1137,6 +1137,8 @@ void editor::draw_grid(
 		return to_color(session.grid_data.subcolor);
 	};
 
+	int factor=dispatcher.show_subgrid && subgrid_factor > 1 ? subgrid_factor : session.grid_data.size;
+
 	while(x < x_max) {
 
 		ldv::line_representation line(
@@ -1147,7 +1149,7 @@ void editor::draw_grid(
 
 		line.draw(_screen, camera);
 
-		x+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
+		x+=factor;
 	}
 
 	//Horizontal lines...
@@ -1164,7 +1166,7 @@ void editor::draw_grid(
 
 		line.draw(_screen, camera);
 
-		y+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
+		y+=factor;
 	}
 }
 
@@ -1876,7 +1878,7 @@ void editor::open_layer_settings() {
 
 void editor::make_subgrid_smaller() {
 
-	if((int)subgrid_factor <= session.grid_data.size / 8) {
+	if((int)subgrid_factor == 1) {
 
 		message_manager.add("fine grid is already at its smallest");
 		return;
