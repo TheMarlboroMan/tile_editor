@@ -1120,13 +1120,13 @@ void editor::draw_grid(
 	int x=focus.origin.x-module;
 	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
 
-	auto choose_color=[to_color, this, ruler_units](int _value) {
+	auto choose_color=[to_color, this](int _value, int _ruler_units) {
 
 		if(0==_value) {
 			return to_color(session.grid_data.origin_color);
 		}
 
-		if(0== (_value % ruler_units)) {
+		if(0== (_value % _ruler_units)) {
 			return to_color(session.grid_data.ruler_color);
 		}
 
@@ -1144,7 +1144,7 @@ void editor::draw_grid(
 		ldv::line_representation line(
 			{x, focus.origin.y},
 			{x, y_max},
-			choose_color(x)
+			choose_color(x, ruler_units)
 		);
 
 		line.draw(_screen, camera);
@@ -1161,7 +1161,7 @@ void editor::draw_grid(
 		ldv::line_representation line(
 			{focus.origin.x, y},
 			{x_max, y},
-			choose_color(y)
+			choose_color(y, ruler_units)
 		);
 
 		line.draw(_screen, camera);
