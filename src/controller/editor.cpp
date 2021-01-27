@@ -829,7 +829,7 @@ void editor::arrow_input_layer(
 	tile_editor::thing_layer& /*_layer*/,
 	int _movement_x,
 	int _movement_y,
-	int /*_modifiers*/
+	int _modifiers
 ) {
 
 	if(nullptr==selected_thing) {
@@ -838,15 +838,19 @@ void editor::arrow_input_layer(
 		return;
 	}
 
+	auto factor=_modifiers & key_modifier_lctrl
+		? 1
+		: subgrid_factor;
+
 	if(_movement_x) {
 
-		selected_thing->x+=_movement_x*subgrid_factor;
+		selected_thing->x+=_movement_x*factor;
 		return;
 	}
 
 	if(_movement_y) {
 
-		selected_thing->y+=-_movement_y*subgrid_factor;
+		selected_thing->y+=-_movement_y*factor;
 		return;
 	}
 }
@@ -855,7 +859,7 @@ void editor::arrow_input_layer(
 	tile_editor::poly_layer& /*_layer*/,
 	int _movement_x,
 	int _movement_y,
-	int /*_modifiers*/
+	int _modifiers
 ) {
 
 	if(nullptr==selected_poly) {
@@ -864,10 +868,14 @@ void editor::arrow_input_layer(
 		return;
 	}
 
+	auto factor=_modifiers & key_modifier_lctrl
+		? 1
+		: subgrid_factor;
+
 	if(_movement_x) {
 
 		for(auto& vertex : selected_poly->points) {
-			vertex.x+=_movement_x*subgrid_factor;
+			vertex.x+=_movement_x*factor;
 		}
 		return;
 	}
@@ -875,7 +883,7 @@ void editor::arrow_input_layer(
 	if(_movement_y) {
 
 		for(auto& vertex : selected_poly->points) {
-			vertex.y+=-_movement_y*subgrid_factor;
+			vertex.y+=-_movement_y*factor;
 		}
 		return;
 	}
@@ -1112,13 +1120,13 @@ void editor::draw_grid(
 	int x=focus.origin.x-module;
 	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
 
-	auto choose_color=[to_color, this, ruler_units](int _value) {
+	auto choose_color=[to_color, this](int _value, int _ruler_units) {
 
 		if(0==_value) {
 			return to_color(session.grid_data.origin_color);
 		}
 
-		if(0== (_value % ruler_units)) {
+		if(0== (_value % _ruler_units)) {
 			return to_color(session.grid_data.ruler_color);
 		}
 
@@ -1129,17 +1137,19 @@ void editor::draw_grid(
 		return to_color(session.grid_data.subcolor);
 	};
 
+	int factor=dispatcher.show_subgrid && subgrid_factor > 1 ? subgrid_factor : session.grid_data.size;
+
 	while(x < x_max) {
 
 		ldv::line_representation line(
 			{x, focus.origin.y},
 			{x, y_max},
-			choose_color(x)
+			choose_color(x, ruler_units)
 		);
 
 		line.draw(_screen, camera);
 
-		x+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
+		x+=factor;
 	}
 
 	//Horizontal lines...
@@ -1151,12 +1161,12 @@ void editor::draw_grid(
 		ldv::line_representation line(
 			{focus.origin.x, y},
 			{x_max, y},
-			choose_color(y)
+			choose_color(y, ruler_units)
 		);
 
 		line.draw(_screen, camera);
 
-		y+=dispatcher.show_subgrid ? subgrid_factor : session.grid_data.size;
+		y+=factor;
 	}
 }
 
@@ -1868,7 +1878,7 @@ void editor::open_layer_settings() {
 
 void editor::make_subgrid_smaller() {
 
-	if((int)subgrid_factor <= session.grid_data.size / 8) {
+	if((int)subgrid_factor == 1) {
 
 		message_manager.add("fine grid is already at its smallest");
 		return;
