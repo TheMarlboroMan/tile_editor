@@ -1620,6 +1620,7 @@ void editor::load_map(const std::string& _path) {
 		session.polysets,
 		session.properties
 	};
+
 	map=ml.load_from_file(_path);
 	current_filename=_path;
 	current_layer=0;
@@ -1805,8 +1806,8 @@ void editor::layer_change_cleanup() {
 	selected_thing=nullptr;
 	multiclick.engaged=false;
 	tile_delete_mode=false;
-	subgrid_factor=get_grid_data_for_layer_index(current_layer).size;
 	current_poly_vertices.clear();
+	subgrid_factor=get_grid_data_for_layer_index(current_layer).size;
 }
 
 void editor::open_thing_properties(

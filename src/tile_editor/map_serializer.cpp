@@ -137,6 +137,7 @@ void map_serializer::put_tile_layer(
 	//Add meta...
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
+	meta.AddMember("gridset", _layer.gridset, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
 	meta.AddMember("type", "tiles", allocator);
 	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
@@ -174,6 +175,7 @@ void map_serializer::put_thing_layer(
 	//Add meta...
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
+	meta.AddMember("gridset", _layer.gridset, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
 	meta.AddMember("type", "things", allocator);
 	meta.AddMember("id", tools::json_string(_layer.id, allocator), allocator);
