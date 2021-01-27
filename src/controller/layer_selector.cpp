@@ -450,6 +450,7 @@ void layer_selector::insert_layer() {
 		case tile:
 			layer=new tile_editor::tile_layer{
 				std::begin(exchange_data.blueprint->tilesets)->first,
+				std::begin(exchange_data.blueprint->gridsets)->first,
 				alpha,
 				id,
 				{}
@@ -458,6 +459,7 @@ void layer_selector::insert_layer() {
 		case thing:
 			layer=new tile_editor::thing_layer{
 				std::begin(exchange_data.blueprint->thingsets)->first,
+				std::begin(exchange_data.blueprint->gridsets)->first,
 				alpha,
 				id,
 				{}
@@ -466,6 +468,7 @@ void layer_selector::insert_layer() {
 		case poly:
 			layer=new tile_editor::poly_layer{
 				std::begin(exchange_data.blueprint->polysets)->first,
+				std::begin(exchange_data.blueprint->gridsets)->first,
 				alpha,
 				id,
 				tile_editor::poly_layer::windings::clockwise,

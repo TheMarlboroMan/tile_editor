@@ -254,6 +254,7 @@ void map_serializer::put_poly_layer(
 	//Add meta...
 	jsonval meta{rapidjson::kObjectType};
 	meta.AddMember("set", _layer.set, allocator);
+	meta.AddMember("gridset", _layer.gridset, allocator);
 	meta.AddMember("alpha", _layer.alpha, allocator);
 	meta.AddMember("type", "polys", allocator);
 	meta.AddMember("winding", tools::json_string(translate_winding(_layer.winding), allocator), allocator);

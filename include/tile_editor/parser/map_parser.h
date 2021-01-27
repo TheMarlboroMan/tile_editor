@@ -31,7 +31,8 @@ class map_parser {
 
 	struct meta {
 		enum class types{tiles, things, polys, bad};
-		std::size_t        set;
+		std::size_t        set,
+		                   gridset;
 		int                alpha;
 		std::string        id;
 		types              type;

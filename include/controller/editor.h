@@ -6,9 +6,11 @@
 #include "app/exchange_data.h"
 #include "app/env.h"
 #include "blueprint_types/map_blueprint.h"
+#include "blueprint_types/grid_data.h"
 #include "editor_types/map.h"
 #include "editor_types/thing.h"
 #include "editor_types/poly.h"
+
 
 #include <ldv/ttf_representation.h>
 #include <dfw/controller_interface.h>
@@ -118,6 +120,8 @@ class editor:
 	int                         blend_alpha(int, int) const;
 	void                        toggle_set_gui();
 	void                        close_current_poly(tile_editor::poly_layer&);
+	const tile_editor::grid_data& get_grid_data_for_layer_index(std::size_t) const;
+	const tile_editor::grid_data& get_grid_data_for_layer(const tile_editor::layer&) const;
 
 	//references...
 	lm::logger&                 log;

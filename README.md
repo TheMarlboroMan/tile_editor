@@ -126,6 +126,8 @@ TODO
 
 ## History
 
+- 27-01-2021
+	- added different grids for each layer.
 - summer - winter 2020: Refactor.
 	- Complete refactor, backwards compatibility breaking.
 - 7-8-2017: Changes.

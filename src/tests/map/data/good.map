@@ -13,6 +13,7 @@
 				"id":"background",
 				"type":"tiles",
 				"set": 1,
+				"gridset": 1,
 				"alpha": 64
 			},
 			"data": [
@@ -39,6 +40,7 @@
 				"id":"foreground",
 				"type":"tiles",
 				"set":2,
+				"gridset": 1,
 				"alpha": 128
 			},
 			"data": [
@@ -61,6 +63,7 @@
 				"id":"objects",
 				"type":"things",
 				"set": 1,
+				"gridset": 2,
 				"alpha": 128
 			},
 			"data": [
@@ -99,6 +102,7 @@
 				"id":"polygons",
 				"type":"polys",
 				"set": 1,
+				"gridset": 2,
 				"alpha": 128,
 				"winding": "clockwise"
 			},

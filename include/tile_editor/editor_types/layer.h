@@ -28,13 +28,15 @@ struct layer {
 
 	layer(
 		std::size_t _set,
+		std::size_t _gridset,
 		int _alpha,
 		const std::string& _name
-	):set{_set}, alpha{_alpha}, id{_name} {
+	):set{_set}, gridset(_gridset), alpha{_alpha}, id{_name} {
 
 	}
 
-	std::size_t         set;
+	std::size_t         set,
+	                    gridset;
 	int                 alpha;
 	std::string         id; //!< Unique identifier for this layer.
 

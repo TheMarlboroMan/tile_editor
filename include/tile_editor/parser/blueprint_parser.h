@@ -26,5 +26,6 @@ class blueprint_parser {
 	void                    thing_mode(tools::string_reader&, map_blueprint&);
 	void                    poly_mode(tools::string_reader&, map_blueprint&);
 	void                    session_mode(tools::string_reader&, map_blueprint&);
+	void                    grid_settings_mode(tools::string_reader&, map_blueprint&);
 };
 }

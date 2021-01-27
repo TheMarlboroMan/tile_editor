@@ -16,11 +16,12 @@ struct poly_layer:
 
 	                   poly_layer(
 		std::size_t _set,
+		std::size_t _gridset,
 		int _alpha,
 		const std::string& _name,
 		windings _winding,
 		const container& _container
-	):layer{_set, _alpha, _name},
+	):layer{_set, _gridset, _alpha, _name},
 		winding{_winding},
 		data{_container} {
 

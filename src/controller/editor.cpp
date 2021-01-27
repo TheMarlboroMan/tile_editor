@@ -63,6 +63,8 @@ editor::editor(
 
 		receive_message(_type);
 	});
+
+	//TODO: load first grid data!
 }
 
 void editor::awake(dfw::input& /*_input*/) {
@@ -813,7 +815,8 @@ void editor::move_camera(
 	int _movement_x,
 	int _movement_y
 ) {
-	camera.move_by(_movement_x * session.grid_data.size, _movement_y * session.grid_data.size);
+	const auto& grid_data=get_grid_data_for_layer_index(current_layer);
+	camera.move_by(_movement_x * grid_data.size, _movement_y * grid_data.size);
 }
 
 void editor::arrow_input_layer(
@@ -1115,29 +1118,31 @@ void editor::draw_grid(
 	int x_max=focus.origin.x + focus.w;
 	int y_max=focus.origin.y + focus.h;
 
-	//Horizontal lines...
-	int module=euclidean_module(focus.origin.x, session.grid_data.size);
-	int x=focus.origin.x-module;
-	int ruler_units=session.grid_data.horizontal_ruler * session.grid_data.size;
+	const auto& grid_data=get_grid_data_for_layer_index(current_layer);
 
-	auto choose_color=[to_color, this](int _value, int _ruler_units) {
+	//Horizontal lines...
+	int module=euclidean_module(focus.origin.x, grid_data.size);
+	int x=focus.origin.x-module;
+	int ruler_units=grid_data.horizontal_ruler * grid_data.size;
+
+	auto choose_color=[&grid_data, to_color, this](int _value, int _ruler_units) {
 
 		if(0==_value) {
-			return to_color(session.grid_data.origin_color);
+			return to_color(grid_data.origin_color);
 		}
 
 		if(0== (_value % _ruler_units)) {
-			return to_color(session.grid_data.ruler_color);
+			return to_color(grid_data.ruler_color);
 		}
 
-		if(0 == (_value % session.grid_data.size)) {
-			return to_color(session.grid_data.color);
+		if(0 == (_value % grid_data.size)) {
+			return to_color(grid_data.color);
 		}
 
-		return to_color(session.grid_data.subcolor);
+		return to_color(grid_data.subcolor);
 	};
 
-	int factor=dispatcher.show_subgrid && subgrid_factor > 1 ? subgrid_factor : session.grid_data.size;
+	int factor=dispatcher.show_subgrid && subgrid_factor > 1 ? subgrid_factor : grid_data.size;
 
 	while(x < x_max) {
 
@@ -1153,9 +1158,9 @@ void editor::draw_grid(
 	}
 
 	//Horizontal lines...
-	module=euclidean_module(focus.origin.y, session.grid_data.size);
+	module=euclidean_module(focus.origin.y, grid_data.size);
 	int y=focus.origin.y-module;
-	ruler_units=session.grid_data.vertical_ruler * session.grid_data.size;
+	ruler_units=grid_data.vertical_ruler * grid_data.size;
 	while(y < y_max) {
 
 		ldv::line_representation line(
@@ -1229,13 +1234,15 @@ void editor::draw_layer(
 
 	for(const auto& tile : _layer.data) {
 
+		const auto& grid_data=get_grid_data_for_layer(_layer);
+
 		//Calculate the world position... Bitmaps are drawn with their origin
 		//at the top left, so we must add some transformation to allow 0,0
 		//to lay at the top right of the origin axes.
-		int x=tile.x * session.grid_data.size,
-		    y=((-tile.y)-1) * session.grid_data.size;
+		int x=tile.x * grid_data.size,
+		    y=((-tile.y)-1) * grid_data.size;
 
-		unsigned int size=session.grid_data.size;
+		unsigned int size=grid_data.size;
 		bmp.set_location({x, y, size, size});
 
 		//TODO: Check errors with "exists"?
@@ -1630,7 +1637,7 @@ void editor::load_session(const std::string& _path) {
 	tile_editor::blueprint_parser cfp;
 	session=cfp.parse_file(current_session_filename);
 
-	subgrid_factor=session.grid_data.size;
+	subgrid_factor=get_grid_data_for_layer_index(current_layer).size;
 
 	//set the toolbox width...
 	int w=screen_rect.w * (session.toolbox_width_percent / 100.);
@@ -1784,7 +1791,7 @@ ldt::point_2d<int> editor::get_world_position(ldt::point_2d<int> _pos) const {
 
 ldt::point_2d<int> editor::get_grid_position(ldt::point_2d<int> _point) const {
 
-	double size=session.grid_data.size;
+	double size=get_grid_data_for_layer_index(current_layer).size;
 
 	int x=floor(_point.x / size),
 		y=floor(_point.y / size);
@@ -1798,7 +1805,7 @@ void editor::layer_change_cleanup() {
 	selected_thing=nullptr;
 	multiclick.engaged=false;
 	tile_delete_mode=false;
-	subgrid_factor=session.grid_data.size;
+	subgrid_factor=get_grid_data_for_layer_index(current_layer).size;
 	current_poly_vertices.clear();
 }
 
@@ -1890,7 +1897,7 @@ void editor::make_subgrid_smaller() {
 
 void editor::make_subgrid_larger() {
 
-	if((int)subgrid_factor==session.grid_data.size) {
+	if((int)subgrid_factor==get_grid_data_for_layer_index(current_layer).size) {
 
 		message_manager.add("fine grid is already at its largest");
 		return;
@@ -1982,3 +1989,39 @@ void editor::close_current_poly(
 	message_manager.add("polygon added");
 	return;
 }
+
+const tile_editor::grid_data& editor::get_grid_data_for_layer_index(
+	std::size_t _index
+) const {
+
+	if(_index >= map.layers.size()) {
+
+		if(!session.gridsets.count(1)) {
+
+			throw std::runtime_error("missing default layer grid settings!!!");
+		}
+
+		return session.gridsets.at(1);
+	}
+
+	return get_grid_data_for_layer(*(map.layers[_index]));
+}
+
+const tile_editor::grid_data& editor::get_grid_data_for_layer(
+	const tile_editor::layer& _layer
+) const {
+
+	if(!session.gridsets.count(_layer.gridset)) {
+
+		if(!session.gridsets.count(1)) {
+
+			throw std::runtime_error("missing default layer grid settings!!!");
+		}
+
+		message_manager.add("could not find grid settings, using defaults");
+		return session.gridsets.at(1);
+	}
+
+	return session.gridsets.at(_layer.gridset);
+}
+

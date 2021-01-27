@@ -167,7 +167,7 @@ void map_parser::parse_tile_layer(
 	}
 
 	//create the layer.
-	tile_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
+	tile_layer layer{_meta.set, _meta.gridset, _meta.alpha, _meta.id, {}};
 	if(0==_meta.alpha) {
 		errors.push_back("warning, zero alpha layer detected, will not be shown!");
 	}
@@ -264,7 +264,7 @@ void map_parser::parse_thing_layer(
 		return;
 	}
 
-	thing_layer layer{_meta.set, _meta.alpha, _meta.id, {}};
+	thing_layer layer{_meta.set, _meta.gridset, _meta.alpha, _meta.id, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -378,7 +378,7 @@ void map_parser::parse_poly_layer(
 		return;
 	}
 
-	poly_layer layer{_meta.set, _meta.alpha, _meta.id, _meta.winding, {}};
+	poly_layer layer{_meta.set, _meta.gridset, _meta.alpha, _meta.id, _meta.winding, {}};
 
 	for(const auto& item : _node["data"].GetArray()) {
 
@@ -501,13 +501,13 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 	if(!_layer.HasMember("meta")) {
 
 		errors.push_back("missing meta node in layer, skipping layer meta");
-		return {0,0, generate_default_id(), meta::types::bad};
+		return {0,0, 0, generate_default_id(), meta::types::bad};
 	}
 
 	if(!_layer["meta"].IsObject()) {
 
 		errors.push_back("meta node in layer must be an object, skipping layer meta");
-		return {0,0, generate_default_id(), meta::types::bad};
+		return {0,0, 0, generate_default_id(), meta::types::bad};
 	}
 
 	auto node_exists=[this, &_layer](const std::string& _key) -> bool {
@@ -563,7 +563,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 	if(!string_can_be_extracted("type")) {
 
 		errors.push_back("meta node does not contain type: cannot be parsed");
-		return {0,0, "", meta::types::bad};
+		return {0,0, 0, "", meta::types::bad};
 	}
 
 	std::string strtype{_layer["meta"]["type"].GetString()};
@@ -584,10 +584,10 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 	else {
 
 		errors.push_back(std::string{"unkown meta node type '"}+strtype+"', cannot be parsed");
-		return {0,0, "", meta::types::bad};
+		return {0,0, 0, "", meta::types::bad};
 	}
 
-	meta result{0,0, "", type};
+	meta result{0,0, 0, "", type};
 	if(int_can_be_extracted("alpha")) {
 
 		result.alpha=_layer["meta"]["alpha"].GetInt();
@@ -596,6 +596,15 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 	if(int_can_be_extracted("set")) {
 
 		result.set=_layer["meta"]["set"].GetInt();
+	}
+
+	if(int_can_be_extracted("gridset")) {
+
+		result.gridset=_layer["meta"]["gridset"].GetInt();
+	}
+	else {
+
+		result.gridset=1; //Setting a default... dangerous.
 	}
 
 	result.id=string_can_be_extracted("id")
@@ -608,7 +617,7 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 		if(!string_can_be_extracted("winding")) {
 
 			errors.push_back("meta node for poly does not contain winding: cannot be parsed");
-			return {0,0, "", meta::types::bad};
+			return {0,0, 0, "", meta::types::bad};
 		}
 
 		const std::string winding{_layer["meta"]["winding"].GetString()};
@@ -623,17 +632,17 @@ map_parser::meta map_parser::parse_meta_node(const jsonval& _layer) {
 		}
 		else {
 			errors.push_back("meta node for poly contains invalid winding value");
-			return {0,0, "", meta::types::bad};
+			return {0,0, 0, "", meta::types::bad};
 		}
 
-		if(_layer["meta"].MemberCount() > 5) {
+		if(_layer["meta"].MemberCount() > 6) {
 
 			errors.push_back("meta node in poly layer has extraneous members which will be ignored");
 		}
 	}
 	else {
 
-		if(_layer["meta"].MemberCount() > 4) {
+		if(_layer["meta"].MemberCount() > 5) {
 
 			errors.push_back("meta node in layer has extraneous members which will be ignored");
 		}

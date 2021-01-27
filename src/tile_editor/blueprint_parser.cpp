@@ -42,7 +42,8 @@ map_blueprint blueprint_parser::parse_string(const std::string& _contents) {
 	                    begintile{"begintileset"},
 	                    beginobj{"beginobjectset"},
 	                    beginpoly{"beginpolyset"},
-	                    beginsession{"beginsession"};
+	                    beginsession{"beginsession"},
+	                    begingridsettings{"begingridsettings"};
 
 	map_blueprint mb;
 	int flags=tools::string_reader::ltrim | tools::string_reader::rtrim | tools::string_reader::ignorewscomment;
@@ -88,11 +89,22 @@ map_blueprint blueprint_parser::parse_string(const std::string& _contents) {
 
 				session_mode(reader, mb);
 			}
+			else if(tag==begingridsettings) {
+
+				grid_settings_mode(reader, mb);
+			}
 			else {
 
 				throw std::runtime_error(std::string{"unexpected '"+tag+"', expected beginmapproperties, begintileset or beginobjectset"});
 			}
 		}
+
+		if(!mb.gridsets.size()) {
+
+			//Add a default gridset!!!
+			mb.gridsets.insert(std::make_pair(1, grid_data{}));
+		}
+
 	}
 	catch(std::exception& e) {
 
@@ -219,13 +231,6 @@ void blueprint_parser::session_mode(
 		"thingcenter",
 		"bgcolor",
 		"fontcolor",
-		"gridsize",
-		"gridvruler",
-		"gridhruler",
-		"gridcolor",
-		"gridrulercolor",
-		"gridorigincolor",
-		"gridsubcolor",
 		"toolboxwidthpercent"
 	}, false);
 
@@ -268,27 +273,6 @@ void blueprint_parser::session_mode(
 		_blueprint.font_color=parse_color(propmap["fontcolor"]);
 	}
 
-	if(propmap["gridcolor"].size()) {
-
-		_blueprint.grid_data.color=parse_color(propmap["gridcolor"]);
-	}
-
-	if(propmap["gridrulercolor"].size()) {
-
-		_blueprint.grid_data.ruler_color=parse_color(propmap["gridrulercolor"]);
-	}
-
-	if(propmap["gridorigincolor"].size()) {
-
-		_blueprint.grid_data.origin_color=parse_color(propmap["gridorigincolor"]);
-	}
-
-	if(propmap["gridsubcolor"].size()) {
-
-		_blueprint.grid_data.subcolor=parse_color(propmap["gridsubcolor"]);
-	}
-
-
 	auto to_int=[](const std::string& _str, const std::string& _key) -> int {
 
 		std::stringstream ss(_str);
@@ -315,20 +299,90 @@ void blueprint_parser::session_mode(
 		_blueprint.toolbox_width_percent=percent;
 
 	}
+}
+
+void blueprint_parser::grid_settings_mode(
+	tools::string_reader& _reader,
+	map_blueprint& _blueprint
+) {
+
+	auto propmap=generic_first_level(_reader, "endgridsettings", {
+		"id",
+		"name",
+		"gridsize",
+		"gridvruler",
+		"gridhruler",
+		"gridcolor",
+		"gridrulercolor",
+		"gridorigincolor",
+		"gridsubcolor",
+
+	}, false);
+
+	auto to_int=[](const std::string& _str, const std::string& _key) -> int {
+
+		std::stringstream ss(_str);
+		int result{};
+		ss>>result;
+
+		if(ss.fail()) {
+
+			throw std::runtime_error(std::string{"invalid int value for '"}+_key+"'");
+		}
+
+		return result;
+	};
+
+	if(!propmap.count("id")) {
+
+		throw std::runtime_error(std::string{"grid settings require the id key to be defined"});
+	}
+
+	if(!propmap.count("name")) {
+
+		throw std::runtime_error(std::string{"grid settings require the name key to be defined"});
+	}
+
+	std::size_t id=to_int(propmap["id"], "id");
+
+	_blueprint.gridsets[id]=grid_data{};
+	auto& current=_blueprint.gridsets.at(id);
+
+	current.name=propmap["name"];
+
+	if(propmap["gridcolor"].size()) {
+
+		current.color=parse_color(propmap["gridcolor"]);
+	}
+
+	if(propmap["gridrulercolor"].size()) {
+
+		current.ruler_color=parse_color(propmap["gridrulercolor"]);
+	}
+
+	if(propmap["gridorigincolor"].size()) {
+
+		current.origin_color=parse_color(propmap["gridorigincolor"]);
+	}
+
+	if(propmap["gridsubcolor"].size()) {
+
+		current.subcolor=parse_color(propmap["gridsubcolor"]);
+	}
 
 	if(propmap["gridsize"].size()) {
 
-		_blueprint.grid_data.size=to_int(propmap["gridsize"], "gridsize");
+		current.size=to_int(propmap["gridsize"], "gridsize");
 	}
 
 	if(propmap["gridvruler"].size()) {
 
-		_blueprint.grid_data.vertical_ruler=to_int(propmap["gridvruler"], "gridvruler");
+		current.vertical_ruler=to_int(propmap["gridvruler"], "gridvruler");
 	}
 
 	if(propmap["gridhruler"].size()) {
 
-		_blueprint.grid_data.horizontal_ruler=to_int(propmap["gridhruler"], "gridhruler");
+		current.horizontal_ruler=to_int(propmap["gridhruler"], "gridhruler");
 	}
 }
 

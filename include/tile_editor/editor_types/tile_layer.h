@@ -14,10 +14,11 @@ struct tile_layer:
 
 	                   tile_layer(
 		std::size_t _set,
+		std::size_t _gridset,
 		int _alpha,
 		const std::string& _name,
 		const container& _container
-	):layer{_set, _alpha, _name}, data{_container} {
+	):layer{_set, _gridset, _alpha, _name}, data{_container} {
 
 	}
 

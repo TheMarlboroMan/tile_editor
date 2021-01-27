@@ -24,6 +24,7 @@ tile_editor_properties::tile_editor_properties(
 	menu.insert(menu_layer_id, "");
 	menu.insert(menu_layer_alpha, 0, 0, 255, false);
 	menu.insert(menu_layer_set, intsets, true);
+	menu.insert(menu_layer_gridset, intsets, true);
 	menu.insert(menu_layer_exit);
 	menu.insert(menu_layer_cancel);
 }
@@ -49,9 +50,20 @@ void tile_editor_properties::awake(dfw::input&) {
 		menu.add(menu_layer_set, id);
 	}
 
+	gridsets.clear();
+	menu.clear_choice(menu_layer_gridset);
+
+	for(const auto& pair : exchange_data.blueprint->gridsets) {
+
+		int id=pair.first;
+		sets[id]=pair.second.name;
+		menu.add(menu_layer_gridset, id);
+	}
+
 	menu.set(menu_layer_id, layer->id);
 	menu.set(menu_layer_alpha, layer->alpha);
 	menu.set(menu_layer_set, (int)layer->set);
+	menu.set(menu_layer_gridset, (int)layer->gridset);
 	current_key=0;
 }
 
@@ -104,6 +116,10 @@ void tile_editor_properties::input_traverse(dfw::input& _input) {
 
 			case menu_layer_set:
 				menu.browse(menu_layer_set, decltype(menu)::browse_dir::next);
+				return;
+
+			case menu_layer_gridset:
+				menu.browse(menu_layer_gridset, decltype(menu)::browse_dir::next);
 				return;
 
 			case menu_layer_alpha:
@@ -219,6 +235,9 @@ void tile_editor_properties::draw(ldv::screen& _screen, int /*fps*/) {
 			case menu_layer_set:
 				ss<<selected(i)<<"set (choice): "<<sets[menu.get_int(i)]<<std::endl;
 			break;
+			case menu_layer_gridset:
+				ss<<selected(i)<<"gridset (choice): "<<sets[menu.get_int(i)]<<std::endl;
+			break;
 			case menu_layer_exit:
 				ss<<selected(i)<<"back"<<std::endl;
 			break;
@@ -244,4 +263,5 @@ void tile_editor_properties::save_changes() {
 	layer->id=menu.get_string(menu_layer_id);
 	layer->alpha=menu.get_int(menu_layer_alpha);
 	layer->set=(std::size_t)menu.get_int(menu_layer_set);
+	layer->gridset=(std::size_t)menu.get_int(menu_layer_gridset);
 }

@@ -41,6 +41,7 @@ class thing_editor_properties:
 		menu_layer_id,
 		menu_layer_alpha,
 		menu_layer_set,
+		menu_layer_gridset,
 		menu_layer_exit,
 		menu_layer_cancel,
 		menu_layer_end
@@ -50,7 +51,8 @@ class thing_editor_properties:
 	tile_editor::thing_layer*   layer{nullptr};
 	tools::options_menu<int>    menu;
 	int                         current_key{0};
-	std::map<int, std::string>  sets;
+	std::map<int, std::string>  sets,
+	                            gridsets;
 	bool                        text_mode{false};
 	std::string                 input_value;
 

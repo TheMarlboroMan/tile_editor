@@ -31,11 +31,27 @@ endpolyset
 beginsession
 	thingcenter center
 	bgcolor 16 16 16 255
+	fontcolor 255 255 255 255
+endsession
+
+begingridsettings
+	id 1
+	name default
 	gridsize 32
 	gridvruler 8
 	gridhruler 8
 	gridcolor 64 64 64 255
 	gridrulercolor 128 128 128 255
 	gridorigincolor 255 255 255 255
-	fontcolor 255 255 255 255
-endsession
+endgridsettings
+
+begingridsettings
+	id 2
+	name background
+	gridsize 16
+	gridvruler 16
+	gridhruler 16
+	gridcolor 64 64 64 255
+	gridrulercolor 128 128 128 255
+	gridorigincolor 255 255 255 255
+endgridsettings

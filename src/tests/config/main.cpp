@@ -227,19 +227,20 @@ int main(int /*argc*/, char ** /*argv*/) {
 		test(2==blueprint.bg_color.g, "failed to assert green component of background color");
 		test(32==blueprint.bg_color.b, "failed to assert blue component of background color");
 		test(0==blueprint.bg_color.a, "failed to assert alpha component of background color");
-		test(4==blueprint.grid_data.vertical_ruler, "failed to assert grid vertical ruler");
-		test(6==blueprint.grid_data.horizontal_ruler, "failed to assert grid horizontal ruler");
-		test(2==blueprint.grid_data.color.r, "failed to assert red component of grid color");
-		test(32==blueprint.grid_data.color.g, "failed to assert green component of grid color");
-		test(1==blueprint.grid_data.color.b, "failed to assert blue component of grid color");
-		test(0==blueprint.grid_data.color.a, "failed to assert alpha component of grid color");
-		test(32==blueprint.grid_data.ruler_color.r, "failed to assert red component of grid ruler color");
-		test(2==blueprint.grid_data.ruler_color.g, "failed to assert green component of grid ruler color");
-		test(1==blueprint.grid_data.ruler_color.b, "failed to assert blue component of grid ruler color");
-		test(0==blueprint.grid_data.ruler_color.a, "failed to assert alpha component of grid ruler color");
+
+		test(4==blueprint.gridsets[1].vertical_ruler, "failed to assert grid vertical ruler");
+		test(6==blueprint.gridsets[1].horizontal_ruler, "failed to assert grid horizontal ruler");
+		test(2==blueprint.gridsets[1].color.r, "failed to assert red component of grid color");
+		test(32==blueprint.gridsets[1].color.g, "failed to assert green component of grid color");
+		test(1==blueprint.gridsets[1].color.b, "failed to assert blue component of grid color");
+		test(0==blueprint.gridsets[1].color.a, "failed to assert alpha component of grid color");
+		test(32==blueprint.gridsets[1].ruler_color.r, "failed to assert red component of grid ruler color");
+		test(2==blueprint.gridsets[1].ruler_color.g, "failed to assert green component of grid ruler color");
+		test(1==blueprint.gridsets[1].ruler_color.b, "failed to assert blue component of grid ruler color");
+		test(0==blueprint.gridsets[1].ruler_color.a, "failed to assert alpha component of grid ruler color");
 
 		//Assert that session data properties are not compulsory
-		test(32==blueprint.grid_data.size, "failed to assert grid size");
+		test(32==blueprint.gridsets[1].size, "failed to assert grid size");
 	}
 	catch(std::exception& e) {
 
@@ -616,11 +617,6 @@ endobjectset
 beginsession
 	thingcenter topright
 	bgcolor 1 2 32 0
-	gridsize 64
-	gridvruler 4
-	gridhruler 6
-	gridcolor 2 32 1 0
-	gridrulercolor 32 2 1 0
 #endsession
 
 )str";
@@ -630,10 +626,6 @@ beginsession
 beginsession
 	thingcenter topright
 	bgcolor 1 2 32 0
-	gridsize 64
-	gridvruler 4
-	gridhruler 6
-	gridcolor 2 32 1 0
 	ouch 32 2 1 0
 endsession
 
@@ -644,10 +636,7 @@ endsession
 beginsession
 	thingcenter topright
 	bgcolor 1 2 32 0
-	gridsize 64
-	gridvruler 4
-	gridhruler
-	gridcolor 2 32 1 0
+	fontcolor
 endsession
 
 )str";
@@ -665,20 +654,21 @@ endsession
 	contents=R"str(
 beginsession
 	thingcenter center
-	gridcolor 1 2 a 0
+	bgcolor 1 2 a 0
 endsession
 
 )str";
-	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid color schema", "bad grid color in session data");
+	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid color schema", "bad grid color in grid data");
 
 	contents=R"str(
-beginsession
-	thingcenter center
+begingridsettings
+	id 1
+	name test
 	gridrulercolor 1 2 a 0
-endsession
+endgridsettings
 
 )str";
-	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid color schema", "bad ruler color in session data");
+	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid color schema", "bad ruler color in grid data");
 
 	contents=R"str(
 beginsession
@@ -689,9 +679,11 @@ endsession
 	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid value for thingcenter, valid values are", "bad thingcenter value");
 
 	contents=R"str(
-beginsession
+begingridsettings
+	id 1
+	name test
 	gridsize ouch
-endsession
+endgridsettings
 
 )str";
 	must_throw([&cfp, contents](){cfp.parse_string(contents);}, "invalid int value for 'gridsize'", "bad gridsize");

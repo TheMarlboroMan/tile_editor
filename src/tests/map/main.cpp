@@ -235,7 +235,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 )str");
 	must_fail(mp.get_errors(), "meta:set node is not an integer", "tiles node with invalid set");
 
-	//tiles node with no id
+	//tiles node with no gridset
 	mp.parse_string(R"str(
 {
 	"meta":{"version":"1.0,0"},
@@ -246,6 +246,26 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1
+			}
+		}
+	]
+}
+)str");
+	must_fail(mp.get_errors(), "meta node in layer has no 'gridset' member, a default may be used if possible", "tiles node with no gridset.");
+
+
+	//tiles node with no id
+	mp.parse_string(R"str(
+{
+	"meta":{"version":"1.0,0"},
+	"attributes": {"hello":12},
+	"layers": [
+		{
+			"meta": {
+				"type":"tiles",
+				"alpha": 128,
+				"set" : 1,
+				"gridset" : 1
 			}
 		}
 	]
@@ -265,6 +285,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id": 12
 			}
 		}
@@ -284,6 +305,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol",
 				"intruder": "yes"
 			}
@@ -304,7 +326,8 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
-				"id":"lol"
+				"gridset" : 1,
+				"id": "lol"
 			}
 		}
 	]
@@ -323,6 +346,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": 12
@@ -343,6 +367,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [1,2,3]
@@ -363,6 +388,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -385,6 +411,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -407,6 +434,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -429,6 +457,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -454,6 +483,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -479,6 +509,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -504,6 +535,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -529,6 +561,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -555,6 +588,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 				"type":"tiles",
 				"alpha": 128,
 				"set" : 1,
+				"gridset" : 1,
 				"id":"lol"
 			},
 			"data": [
@@ -580,6 +614,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -600,6 +635,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -620,6 +656,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -640,6 +677,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -660,6 +698,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -680,6 +719,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -700,6 +740,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -720,6 +761,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -745,6 +787,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -773,6 +816,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -804,6 +848,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 			"meta":{
 				"type":"things",
 				"set":1,
+				"gridset" : 1,
 				"alpha":0,
 				"id":"lol"
 			},
@@ -832,7 +877,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1, "alpha":0, "winding":"any"},
 			"data":[1,2,3]
 		}
 	]
@@ -847,7 +892,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1, "alpha":0, "winding":"any"},
 			"data":[{}]
 		}
 	]
@@ -862,7 +907,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":"lala"
 			}]
@@ -879,7 +924,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1
 			}]
@@ -896,7 +941,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p":1
@@ -914,7 +959,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p":[1,2]
@@ -932,7 +977,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [1,2,3]
@@ -950,7 +995,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2,3], 2, 3 ]
@@ -968,7 +1013,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ ["a",2], 2, 3 ]
@@ -986,7 +1031,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [2, "b"], 2, 3]
@@ -1004,7 +1049,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5, 6] ]
@@ -1022,7 +1067,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1043,7 +1088,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1063,7 +1108,7 @@ int main(int /*argc*/, char ** /*argv*/) {
 	"attributes": {"hello":12},
 	"layers": [
 		{
-			"meta":{"type":"polys", "id":"lol", "set":1, "alpha":0, "winding":"any"},
+			"meta":{"type":"polys", "id":"lol", "set":1, "gridset" : 1,"alpha":0, "winding":"any"},
 			"data":[{
 				"t":1,
 				"p": [ [1,2], [3,4], [5,6] ],
@@ -1244,6 +1289,8 @@ void must_fail(
 	const std::string& _type
 ) {
 
+	std::cout<<"running: "<<_type<<std::endl;
+
 	if(!_errors.size()) {
 
 		std::cerr<<"'"<<_type<<"' should have failed..."<<std::endl;
@@ -1255,8 +1302,6 @@ void must_fail(
 		std::cerr<<"expected '"<<_errmsg<<"', got '"<<_errors[0]<<"'"<<std::endl;
 		std::exit(1);
 	}
-
-	std::cout<<"caught: "<<_type<<std::endl;
 }
 
 void check_tile(
