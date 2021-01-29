@@ -915,7 +915,7 @@ void editor::draw_cursor(ldv::screen& _screen) {
 
 	ldv::bitmap_representation cursor(cursor_tex);
 	cursor.set_blend(ldv::representation::blends::alpha);
-	const auto rect=cursor_table.get(tile_delete_mode ? 2 : 1).get_rect();
+	const auto rect=cursor_table.get(tile_delete_mode ? 2 : 1).box;
 	cursor.set_clip(rect);
 	int x=mouse_pos.x-(rect.w/2),
 		y=mouse_pos.y-(rect.h/2);
@@ -1003,7 +1003,7 @@ void editor::draw_set(
 			current_box.draw(_screen);
 		}
 
-		bmp.set_clip(item.item.second.get_rect());
+		bmp.set_clip(item.item.second.box);
 		bmp.set_location({x, y, w, h});
 		bmp.draw(_screen);
 	}
@@ -1247,7 +1247,7 @@ void editor::draw_layer(
 
 		//TODO: Check errors with "exists"?
 		//TODO: If it fails -> DRAW DEFAULT.
-		const auto& rect=table.get(tile.type).get_rect();
+		const auto& rect=table.get(tile.type).box;
 		bmp.set_clip(rect);
 
 		bmp.draw(_screen, camera);

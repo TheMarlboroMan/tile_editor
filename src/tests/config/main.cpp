@@ -139,12 +139,12 @@ int main(int /*argc*/, char ** /*argv*/) {
 		test(1==blueprint.tilesets.count(1), "failed to assert that tileset 1 exists");
 		test("tileset 1"==blueprint.tilesets[1].name, "failed to assert that tileset 1 has the given name");
 		test(3==blueprint.tilesets[1].table.size(), "failed to assert that tileset 1 has 3 tiles");
-		test(64==blueprint.tilesets[1].table.get(3).x, "failed to assert contents of tileset 1");
+		test(64==blueprint.tilesets[1].table.get(3).box.origin.x, "failed to assert contents of tileset 1");
 
 		test(1==blueprint.tilesets.count(2), "failed to assert that tileset 2 exists");
 		test("tileset 2"==blueprint.tilesets[2].name, "failed to assert that tileset 2 has the given name");
 		test(12==blueprint.tilesets[2].table.size(), "failed to assert that tileset 2 has 12 tiles");
-		test(32==blueprint.tilesets[2].table.get(11).y, "failed to assert contents of tileset 2");
+		test(32==blueprint.tilesets[2].table.get(11).box.origin.y, "failed to assert contents of tileset 2");
 
 		//Thingsets must be thoroughly tested...
 		std::cout<<"testing thingset contents..."<<std::endl;
