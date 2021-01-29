@@ -1616,6 +1616,7 @@ void editor::load_map(const std::string& _path) {
 	tile_editor::map_loader ml{
 		log,
 		message_manager,
+		session.tilesets,
 		session.thingsets,
 		session.polysets,
 		session.properties

@@ -15,12 +15,14 @@ using namespace tile_editor;
 map_loader::map_loader(
 	lm::logger& _logger,
 	tools::message_manager& _message_manager,
+	const std::map<std::size_t, tileset>& _tilesets,
 	const std::map<std::size_t, thing_definition_table>& _thingsets,
 	const std::map<std::size_t, poly_definition_table>& _polysets,
 	const tile_editor::property_table& _map_property_blueprints
 ):
 	log(_logger),
 	message_manager{_message_manager},
+	tilesets{_tilesets},
 	thingsets{_thingsets},
 	polysets{_polysets},
 	map_property_blueprints{_map_property_blueprints} {
@@ -33,6 +35,7 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 	tile_editor::map result=mp.parse_file(_path);
 
 	inflate_properties(result);
+	fix_invalid_indexes(result);
 
 	for(const auto& msg : mp.get_errors()) {
 
@@ -58,6 +61,44 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 	}
 
 	return result;
+}
+
+void map_loader::fix_invalid_indexes(tile_editor::map& _map) {
+
+	//Collector of pointers...
+	struct :layer_visitor {
+
+		std::vector<tile_editor::tile_layer*> tile_layers;
+
+		void visit(tile_editor::tile_layer& _layer) {
+
+			tile_layers.push_back(&_layer);
+		}
+
+		void visit(tile_editor::thing_layer&) {}
+		void visit(tile_editor::poly_layer&) {}
+	} visitor;
+
+	for(auto& layer : _map.layers) {
+		layer->accept(visitor);
+	}
+
+	for(auto& layer : visitor.tile_layers) {
+
+		lm::log(log, lm::lvl::info)<<"reviewing layer "<<layer->id<<"..."<<std::endl;
+
+		const auto& tileset=tilesets.at(layer->set);
+		const auto& first=std::begin(tileset.table);
+
+		for(auto& tile : layer->data) {
+
+			if(!tileset.table.exists(tile.type)) {
+
+				tile.type=std::get<0>(*first);
+				lm::log(log, lm::lvl::notice)<<"fixed missing index "<<tile.type<<std::endl;
+			}
+		}
+	}
 }
 
 void map_loader::inflate_properties(tile_editor::map& _map) {
