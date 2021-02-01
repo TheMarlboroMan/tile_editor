@@ -1439,9 +1439,11 @@ void editor::draw_hud(ldv::screen& _screen) {
 
 			tile_editor::map_blueprint * session{nullptr};
 			std::stringstream * ss{nullptr};
+			editor_point grid_position;
 
 			void visit(const tile_editor::tile_layer& _layer) {
-				(*ss)<<" tile, set: "<<session->tilesets[_layer.set].name<<" size: "<<_layer.data.size();
+
+				(*ss)<<" ["<<grid_position.x<<","<<grid_position.y<<"] tile, set: "<<session->tilesets[_layer.set].name<<" size: "<<_layer.data.size();
 			}
 
 			void visit(const tile_editor::thing_layer& _layer) {
@@ -1463,8 +1465,9 @@ void editor::draw_hud(ldv::screen& _screen) {
 		} visitor;
 		visitor.session=&session;
 		visitor.ss=&ss;
+		visitor.grid_position=get_grid_position(world_pos);
 
-		ss<<"'"<<map.layers[current_layer]->id<<"', type ";
+		ss<<"'"<<map.layers[current_layer]->id<<"', ";
 		map.layers[current_layer]->accept(visitor);
 		ss<<" alpha: "<<map.layers[current_layer]->alpha<<", layer "<<(current_layer+1)<<" / "<<map.layers.size()<<std::endl;
 
