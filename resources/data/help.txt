@@ -25,7 +25,7 @@ arrows - move / change toolset element (depending on toolset visibility)
 
 delete - set / unset tile delete mode.
 left click - add/change/delete tile
-lctrl + left click - select tile type under cursor (enables delete mode if nothing)
+lctrl + left click - select tile type under cursor (toggles delete mode if nothing)
 lshift + click - between two points, add/change/delete area
 
 === THING EDITOR MODE ===

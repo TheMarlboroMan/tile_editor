@@ -255,13 +255,16 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 
 	if(_input.is_input_down(input::pageup)) {
 
-		previous_layer();
+		show_set
+			? page_input_set(-1)
+			: previous_layer();
 		return;
 	}
 	else if(_input.is_input_down(input::pagedown)) {
 
-		next_layer();
-		return;
+		show_set
+			? page_input_set(1)
+			: next_layer();
 	}
 
 	if(_input.is_input_down(input::del)) {
@@ -455,14 +458,14 @@ void editor::left_click_input(
 	int _modifiers,
 	tile_editor::tile_layer& _layer
 ) {
-	//Make sure we can't click anywhere on the set.
-	//TODO: Maybe in the future make it selectable.
+
 	if(show_set) {
 
 		unsigned int w=screen_rect.w * (session.toolbox_width_percent / 100.);
 		int x=screen_rect.w-w;
 		if(mouse_pos.x >= x) {
 
+			tile_list.topological_select(mouse_pos.x-x, mouse_pos.y, [this](const auto& _t) {tile_list.set_index(_t.index);});
 			return;
 		}
 	}
@@ -501,7 +504,9 @@ void editor::left_click_input(
 			}
 		}
 
-		tile_delete_mode=true;
+		tile_delete_mode=!tile_delete_mode;
+		message_manager.add("toggled tile deletion mode");
+		return;
 	}
 
 	//Process multiclick with lshift. Multiclick acts by delimiting a box.
@@ -721,6 +726,38 @@ void editor::right_click_input(
 
 		close_current_poly(_layer);
 	}
+}
+
+void editor::page_input_set(
+	int _direction
+) {
+
+	struct : tile_editor::const_layer_visitor {
+		editor * controller{nullptr};
+		int      direction{0};
+
+		void visit(const tile_editor::tile_layer&) {
+
+			direction < 0
+				? controller->tile_list.previous_page()
+				: controller->tile_list.next_page();
+		}
+		void visit(const tile_editor::thing_layer&) {
+
+			direction < 0
+				? controller->thing_list.previous_page()
+				: controller->thing_list.next_page();
+		}
+		void visit(const tile_editor::poly_layer&) {
+
+			direction < 0
+				? controller->poly_list.previous_page()
+				: controller->poly_list.next_page();
+		}
+	} dispatcher;
+	dispatcher.controller=this;
+	dispatcher.direction=_direction;
+	dispatch_layer(dispatcher);
 }
 
 void editor::arrow_input_set(
@@ -1285,6 +1322,7 @@ void editor::draw_layer(
 	for(const auto& thing : _layer.data) {
 
 		auto origin=thing_origin_fn(thing.x, -thing.y, thing.w, thing.h);
+
 		box.set_filltype(ldv::polygon_representation::type::fill);
 		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
 		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, blend_alpha(_layer.alpha, thing.color.a)));

@@ -62,6 +62,7 @@ class editor:
 	editor_point                get_grid_position(ldt::point_2d<int>) const;
 	editor_point                snap_to_grid(editor_point) const;
 	void                        arrow_input_set(int, int, int);
+	void                        page_input_set(int);
 	void                        arrow_input_layer(int, int, int);
 	void                        arrow_input_layer(tile_editor::tile_layer&, int, int, int);
 	void                        arrow_input_layer(tile_editor::thing_layer&, int, int, int);
