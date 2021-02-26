@@ -233,31 +233,26 @@ void properties::request_draw(
 
 void properties::draw(ldv::screen& _screen, int /*fps*/) {
 
-	properties::printer pr{current_index, current_value, text_mode, std::stringstream{}};
+	properties::printer pr{current_index, cancel_index, current_value, text_mode, std::stringstream{}};
 
-	const auto max=cancel_index+1; //Just alias these as const.
-
-	for(int i=0; i<max; i++) {
-
-		if(i==exit_index) {
-			pr.special("exit", i);
-		}
-		else if(i==cancel_index) {
-			pr.special("cancel", i);
-		}
-		else {
-			auto lookup_data=lookup.at(i);
-			switch(lookup_data.type) {
-				case option_types::str:
-					pr.print(blueprint->string_properties.at(lookup_data.key), property_manager->string_properties.at(lookup_data.key), "string", i);
-				break;
-				case option_types::integer:
-					pr.print(blueprint->int_properties.at(lookup_data.key), property_manager->int_properties.at(lookup_data.key), "int", i);
-				break;
-				case option_types::decimal:
-					pr.print(blueprint->double_properties.at(lookup_data.key), property_manager->double_properties.at(lookup_data.key), "double", i);
-				break;
-			}
+	if(current_index==exit_index) {
+		pr.special("exit");
+	}
+	else if(current_index==cancel_index) {
+		pr.special("cancel");
+	}
+	else {
+		auto lookup_data=lookup.at(current_index);
+		switch(lookup_data.type) {
+			case option_types::str:
+				pr.print(blueprint->string_properties.at(lookup_data.key), property_manager->string_properties.at(lookup_data.key), "string");
+			break;
+			case option_types::integer:
+				pr.print(blueprint->int_properties.at(lookup_data.key), property_manager->int_properties.at(lookup_data.key), "int");
+			break;
+			case option_types::decimal:
+				pr.print(blueprint->double_properties.at(lookup_data.key), property_manager->double_properties.at(lookup_data.key), "double");
+			break;
 		}
 	}
 

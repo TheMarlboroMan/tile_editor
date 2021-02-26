@@ -40,16 +40,17 @@ class properties:
 	struct printer {
 
 		const int index{0};
+		const int max_index{0};
 		const std::string& edit_value;
 		const bool text_mode;
 		std::stringstream ss;
 
 		template<typename B, typename T>
-		void print(const B& _blueprint, const T& _value, const std::string& _type, int _index) {
+		void print(const B& _blueprint, const T& _value, const std::string& _type) {
 
-			ss<<selection(_index)<<_blueprint.name<<" ("<<_type<<"):";
+			ss<<(index+1)<<" / "<<max_index<<": "<<_blueprint.name<<" ("<<_type<<"):";
 
-			if(text_mode && is_current(_index)) {
+			if(text_mode) {
 				ss<<edit_value;
 			}
 			else {
@@ -72,24 +73,9 @@ class properties:
 			ss<<std::endl;
 		}
 
-		void special(const std::string& _type, int _index) {
+		void special(const std::string& _type) {
 
-			ss<<selection(_index)<<_type<<std::endl;
-		}
-
-		bool is_current(int _index) const {
-
-			return index==_index;
-		}
-
-		const char * selection(int _index) const {
-
-			return is_current(_index)
-				? (
-					text_mode
-						? "[*] "
-						: "[>] "
-				) : "[ ] ";
+			ss<<(index+1)<<" / "<<max_index<<": "<<_type<<std::endl;
 		}
 	};
 
