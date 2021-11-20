@@ -79,6 +79,7 @@ Contains:
 - Session data
 
 Can be reused along many map files thast share the same building blocks.
+//TODO: what happens when the config file points to some other files?
 
 ### mapfile
 

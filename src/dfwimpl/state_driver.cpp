@@ -87,7 +87,8 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 	ttf_manager.insert(
 		tile_editor::definitions::main_font_name,
 		tile_editor::definitions::main_font_size,
-		env.get_app_path()+"assets/ttf/unispace.ttf");
+		env.build_assets_path("ttf/unispace.ttf")
+	);
 }
 
 void state_driver::prepare_audio(dfw::kernel& kernel) {

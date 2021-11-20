@@ -31,7 +31,7 @@ pager{0, 0} {
 
 	auto root=tools::parse_json_string(
 		tools::dump_file(
-			_env.get_app_path()+"data/layouts.json"
+			_env.build_data_path("data/layouts.json")
 		)
 	);
 

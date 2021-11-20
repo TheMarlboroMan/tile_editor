@@ -1,5 +1,14 @@
 = HELP =
 
+== COMMAND LINE ==
+
+-v displays version and exits
+-h displays this help and exits
+-c path to config file
+-f filename
+-w WxH starts with a window of W x H (optional)
+
+
 == COMMON EDITOR MODE ==
 
 f1 - help

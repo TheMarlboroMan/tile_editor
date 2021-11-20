@@ -5,6 +5,18 @@ project(tile_editor)
 option(BUILD_TESTS "Build test code" ON)
 option(BUILD_DEBUG "Build a debug release" ON)
 
+if(${CMAKE_VERSION} VERSION_LESS "3.22.0") 
+
+	add_definitions(-DMAJOR_VERSION=1)
+	add_definitions(-DMINOR_VERSION=1)
+	add_definitions(-DPATCH_VERSION=0)
+else()
+
+	add_compile_definitions(MAJOR_VERSION=1)
+	add_compile_definitions(MINOR_VERSION=1)
+	add_compile_definitions(PATCH_VERSION=0)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -63,11 +75,7 @@ endif()
 #Configure the executable, we want it into the "build directory" and we want all resources copied
 #to the build directory.
 add_executable(tile_editor src/main.cpp)
-#set_target_properties(tile_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY build)
-#add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ./build)
+set_target_properties(tile_editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY build)
+add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ./build)
 target_link_libraries(tile_editor applib dfw tools dansdl2 ldtools lm SDL2 SDL2_ttf SDL2_mixer SDL2_image GL stdc++fs)
 
-install(TARGETS tile_editor RUNTIME DESTINATION /usr/local/bin)
-#TODO: Still not cool
-add_custom_command(TARGET tile_editor POST_BUILD COMMAND mkdir -p ~/.tile_editor/logs ~/.tile_editor/resources)
-add_custom_command(TARGET tile_editor POST_BUILD COMMAND cp -r ../resources/* ~/.tile_editor)

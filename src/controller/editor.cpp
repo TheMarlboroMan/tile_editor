@@ -38,8 +38,16 @@ editor::editor(
 	ttf_manager(_ttf_manager),
 	message_manager{_message_manager},
 	exchange_data{_exchange_data},
-	cursor_tex{ldv::texture(ldv::image(_env.get_app_path()+"assets/bitmap/cursor.png"))},
-	cursor_table{_env.get_app_path()+"data/cursor.dat"},
+	cursor_tex{
+		ldv::texture{
+			ldv::image(
+				_env.build_assets_path("bitmap/cursor.png")
+			)
+		}
+	},
+	cursor_table{
+		_env.build_data_path("cursor.dat")
+	},
 	screen_rect{0, 0, _screen_w, _screen_h},
 	camera{
 		screen_rect, //pointing at world 0,0.
