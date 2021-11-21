@@ -1,5 +1,3 @@
-= HELP =
-
 == COMMAND LINE ==
 
 -v displays version and exits
@@ -30,14 +28,14 @@ arrows - move / change toolset element (depending on toolset visibility)
 [ - smaller fine grid (only thing and poly layers)
 ] - larger fine grid (only thing and poly layers)
 
-=== TILE EDITOR MODE ===
+== TILE EDITOR MODE ===
 
 delete - set / unset tile delete mode.
 left click - add/change/delete tile
 lctrl + left click - select tile type under cursor (toggles delete mode if nothing)
 lshift + click - between two points, add/change/delete area
 
-=== THING EDITOR MODE ===
+== THING EDITOR MODE ===
 
 lalt - snap to grid
 left click - create new thing / select thing / edit properties on already selected thing
@@ -47,7 +45,7 @@ arrows - move selected thing by fine grid size (holdable)
 arrows + lalt - fine move by fine grid size
 arrows + lctrl - move by a single unit (hold lalt for fine control)
 
-=== POLY EDITOR MODE ===
+== POLY EDITOR MODE ===
 
 lalt - snap to grid
 space - unselect / cancel currently drawn poly

@@ -7,17 +7,19 @@ The format is based on [Keep a Changelog] and this project attempts to adhere to
 Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or Security headers.
 
 ## Known bugs:
-- Help does not display when hitting f1. A change in the SDL2 lib???
 
 ## Unreleased
 ### Pending
-- Makes secondary config file paths relative to the primary file path
-	Should be easy enough to do with the filesystem lib in the blueprint parser.
-- Automatically creates the log directory in the user dir
 
+## [v1.0.1]: 2021-11-21
 ### Added
+- Makes secondary config file paths relative to the primary file path (id est, no need to run from the config file directory)
+- Automatically creates the log directory in the user dir
 - Added run-from-anywhere support.
 - Added command line help
+
+### Fixed
+- Help may not display because not enough memory is available, so it is now split in sections.
 
 ## [v1.0.0]: Dec 2020
 ### Added

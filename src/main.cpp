@@ -13,7 +13,6 @@
 
 #include <ldt/sdl_tools.h>
 #include <ldt/log.h>
-
 #include <stdexcept>
 #include <unistd.h>
 #include <stdlib.h>
@@ -62,8 +61,15 @@ int main(int argc, char ** argv)
 		ldt::log_lsdl::set_type(ldt::log_lsdl::types::out);
 	}
 
+	//Create user directory if not exists.
+	if(!std::filesystem::exists(env.build_user_path(""))) {
+
+		std::cout<<"will create the .tile_editor directory under user home"<<std::endl;
+		std::filesystem::create_directory(env.build_user_path(""));
+	}
+
 	//Init application log.
-	std::string log_path{env.build_log_path("app.log")};
+	std::string log_path{env.build_user_path("app.log")};
 	lm::file_logger log_app(log_path.c_str());
 	lm::log(log_app, lm::lvl::info)<<"starting main process..."<<std::endl;
 

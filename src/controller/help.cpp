@@ -25,12 +25,14 @@ help::help(
 	} {
 
 	help_rep.set_max_width(_w);
-	help_rep.set_text(tools::dump_file(_env.build_data_path("help.txt")));
-	help_rep.go_to({0,0});
-	camera.set_limits(help_rep.get_view_position());
 
-	camera.go_to({0,0});
+	//My computers don't have enough juice for large textures, so split the
+	//text.
+	std::string helpstr=tools::dump_file(_env.build_data_path("help.txt"));
+	ready_help(helpstr);
+	ready_section(section_index);
 }
+
 
 void help::awake(dfw::input&) {
 
@@ -57,10 +59,119 @@ void help::loop(dfw::input& _input, const dfw::loop_iteration_data& /*lid*/) {
 
 		camera.move_by(0, -5);
 	}
+	else if(_input.is_input_down(input::left)) {
+
+		previous_section();
+	}
+	else if(_input.is_input_down(input::right)) {
+
+		next_section();
+	}
 }
 
 void help::draw(ldv::screen& _screen, int /*fps*/) {
 
 	_screen.clear(ldv::rgba8(0, 0, 0, 255));
 	help_rep.draw(_screen, camera);
+}
+
+void help::ready_help(
+	const std::string& _helpstr
+) {
+
+/**
+help file is formated as such:
+== TITLE ==
+text until another title is found...
+
+So basically we can read each line and do our stuff.
+*/
+
+	std::stringstream ss(_helpstr);
+
+	help_section cursection;
+	std::string line;
+	while(true) {
+
+		if(ss.eof()) {
+
+			break;
+		}
+
+		std::getline(ss, line);
+		if(!line.size()) {
+
+			continue;
+		}
+
+		//a title...
+		if("=="==line.substr(0, 2)) {
+
+			if(cursection.title.size()) {
+
+				sections.push_back(cursection);
+			}
+
+			cursection.clear();
+			cursection.title=line;
+		}
+		//not a title
+		else {
+
+			cursection.text+=line+"\n";
+		}
+	}
+
+	//add the last one
+	sections.push_back(cursection);
+
+
+	//now, insert a generic index at the beginning...
+	cursection.clear();
+	cursection.title="= HELP INDEX =";
+	for(const auto& section: sections) {
+
+		cursection.text+=section.title+"\n";
+	}
+
+	sections.insert(std::begin(sections), cursection);
+}
+
+void help::next_section() {
+
+	++section_index;
+	if(section_index >= sections.size()) {
+
+		section_index=0;
+	}
+
+	ready_section(section_index);
+}
+
+void help::previous_section() {
+
+	if(section_index==0) {
+
+		section_index=sections.size()-1;
+		ready_section(section_index);
+		return;
+	}
+
+	--section_index;
+	ready_section(section_index);
+}
+
+void help::ready_section(
+	std::size_t _index
+) {
+
+	const auto& section=sections.at(_index);
+
+	std::stringstream ss;
+	ss<<section.title<<"\n"<<section.text;
+
+	help_rep.set_text(ss.str());
+	help_rep.go_to({0,0});
+	camera.set_limits(help_rep.get_view_position());
+	camera.go_to({0,0});
 }

@@ -12,6 +12,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <filesystem>
+
+#include <iostream>
 
 using namespace tile_editor;
 
@@ -23,7 +26,13 @@ map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 	}
 
 	try {
-		return parse_string(tools::dump_file(_filename));
+
+		//set the config file directory so any secondary files can be traced
+		//as relative to them.
+		std::filesystem::path path{_filename};
+		path.remove_filename();
+
+		return parse_string(tools::dump_file(_filename), path);
 	}
 	catch(std::exception& e) {
 
@@ -36,7 +45,12 @@ map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 	}
 }
 
-map_blueprint blueprint_parser::parse_string(const std::string& _contents) {
+map_blueprint blueprint_parser::parse_string(
+	const std::string& _contents,
+	const std::string& _file_dir
+) {
+
+	config_file_dir=_file_dir;
 
 	const std::string   beginprop{"beginmapproperties"},
 	                    begintile{"begintileset"},
@@ -125,7 +139,7 @@ void blueprint_parser::map_property_mode(
 	auto propmap=generic_first_level(_reader, "endmapproperties", {"file"});
 
 	property_parser pp(true);
-	_blueprint.properties=pp.read_file(propmap["file"]);
+	_blueprint.properties=pp.read_file(config_file_dir+propmap["file"]);
 }
 
 void blueprint_parser::tile_mode(
@@ -151,8 +165,8 @@ void blueprint_parser::tile_mode(
 	}
 
 	_blueprint.tilesets[index]={
-		ldtools::sprite_table{propmap["file"]},
-		propmap["image"],
+		ldtools::sprite_table{config_file_dir+propmap["file"]},
+		config_file_dir+propmap["image"],
 		propmap["name"]
 	};
 }
@@ -185,7 +199,7 @@ void blueprint_parser::thing_mode(
 	thing_parser tp;
 	_blueprint.thingsets.emplace(
 		index,
-		thing_definition_table{propmap["name"], tp.read_file(propmap["file"])}
+		thing_definition_table{propmap["name"], tp.read_file(config_file_dir+propmap["file"])}
 	);
 }
 
@@ -218,7 +232,7 @@ void blueprint_parser::poly_mode(
 
 	_blueprint.polysets.emplace(
 		index,
-		poly_definition_table{propmap["name"], pp.read_file(propmap["file"])}
+		poly_definition_table{propmap["name"], pp.read_file(config_file_dir+propmap["file"])}
 	);
 }
 

@@ -9,6 +9,7 @@
 #include <ldv/camera.h>
 #include <ldtools/ttf_manager.h>
 #include <lm/logger.h>
+#include <vector>
 
 namespace controller {
 
@@ -33,6 +34,26 @@ class help:
 	//properties
 	ldv::camera                 camera;
 	ldv::ttf_representation     help_rep;
+
+	struct help_section {
+
+		std::string             title,
+		                        text;
+
+		void clear() {
+
+			title="";
+			text="";
+		}
+	};
+
+	std::vector<help_section>   sections;
+	std::size_t                 section_index=0;
+
+	void                        ready_help(const std::string&);
+	void                        next_section();
+	void                        previous_section();
+	void                        ready_section(std::size_t);
 };
 
 }
