@@ -7,7 +7,7 @@
 -c path to config file
 -f filename
 -w WxH starts with a window of W x H (optional)
-
+-d dumps library log to stdout
 
 == COMMON EDITOR MODE ==
 

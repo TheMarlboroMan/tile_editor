@@ -57,6 +57,11 @@ int main(int argc, char ** argv)
 	//Init libdansdl2 log.
 	ldt::log_lsdl::set_type(ldt::log_lsdl::types::null);
 
+	if(carg.exists("-d")) {
+
+		ldt::log_lsdl::set_type(ldt::log_lsdl::types::out);
+	}
+
 	//Init application log.
 	std::string log_path{env.build_log_path("app.log")};
 	lm::file_logger log_app(log_path.c_str());
