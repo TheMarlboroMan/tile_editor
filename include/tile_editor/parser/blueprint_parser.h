@@ -3,6 +3,7 @@
 #include "../blueprint_types/map_blueprint.h"
 
 #include <tools/string_reader.h>
+#include <lm/logger.h>
 
 #include <string>
 
@@ -16,11 +17,13 @@ class blueprint_parser {
 
 	public:
 
+	                        blueprint_parser(lm::logger&);
 	map_blueprint           parse_file(const std::string&);
 	map_blueprint           parse_string(const std::string&, const std::string& = "");
 
 	private:
 
+	lm::logger&             log;
 	std::string             config_file_dir;
 
 	void                    map_property_mode(tools::string_reader&, map_blueprint&);

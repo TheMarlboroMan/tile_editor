@@ -5,6 +5,8 @@ This file test the configuration file parsers.
 #include "parser/blueprint_parser.h"
 #include "../tests.h"
 
+#include <lm/void_logger.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <map>
@@ -124,7 +126,9 @@ template<> void check_property(
 int main(int /*argc*/, char ** /*argv*/) {
 
 	std::cout<<"testing complete valid config file"<<std::endl;
-	tile_editor::blueprint_parser cfp;
+
+	lm::void_logger logger;
+	tile_editor::blueprint_parser cfp{logger};
 
 	try {
 

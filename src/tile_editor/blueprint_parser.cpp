@@ -7,16 +7,22 @@
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
 #include <ldtools/sprite_table.h>
+#include <lm/sentry.h>
 
 #include <stdexcept>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <filesystem>
-
 #include <iostream>
 
 using namespace tile_editor;
+
+blueprint_parser::blueprint_parser(
+	lm::logger& _log
+):
+	log{_log}
+{}
 
 map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 
@@ -31,6 +37,7 @@ map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 		//as relative to them.
 		std::filesystem::path path{_filename};
 		path.remove_filename();
+		lm::log(log, lm::lvl::debug)<<"will use '"<<path<<"' as relative path for the config file"<<std::endl;
 
 		return parse_string(tools::dump_file(_filename), path);
 	}
@@ -136,16 +143,23 @@ void blueprint_parser::map_property_mode(
 	map_blueprint& _blueprint
 ) {
 
+	lm::log(log, lm::lvl::debug)<<"entering map property mode"<<std::endl;
 	auto propmap=generic_first_level(_reader, "endmapproperties", {"file"});
 
 	property_parser pp(true);
-	_blueprint.properties=pp.read_file(config_file_dir+propmap["file"]);
+
+	std::string filename{config_file_dir+propmap["file"]};
+
+	_blueprint.properties=pp.read_file(filename);
+	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.properties.size()<<" map properties from "<<filename<<std::endl;
 }
 
 void blueprint_parser::tile_mode(
 	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
+
+	lm::log(log, lm::lvl::debug)<<"entering tile mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endtileset", {"file", "id", "image", "name"});
 
@@ -164,17 +178,24 @@ void blueprint_parser::tile_mode(
 		throw std::runtime_error("repeated id value");
 	}
 
+	std::string filename{config_file_dir+propmap["file"]};
+	std::string imagefile{config_file_dir+propmap["image"]};
+
 	_blueprint.tilesets[index]={
-		ldtools::sprite_table{config_file_dir+propmap["file"]},
-		config_file_dir+propmap["image"],
+		ldtools::sprite_table{filename},
+		imagefile,
 		propmap["name"]
 	};
+
+	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.tilesets[index].table.size()<<" entries for tileset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::thing_mode(
 	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
+
+	lm::log(log, lm::lvl::debug)<<"entering thing mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endobjectset", {"file", "id", "name"});
 
@@ -195,18 +216,23 @@ void blueprint_parser::thing_mode(
 
 	//TODO: if the alpha for the thing is zero,
 	//should emit a warning.
+	std::string filename{config_file_dir+propmap["file"]};
 
 	thing_parser tp;
 	_blueprint.thingsets.emplace(
 		index,
-		thing_definition_table{propmap["name"], tp.read_file(config_file_dir+propmap["file"])}
+		thing_definition_table{propmap["name"], tp.read_file(filename)}
 	);
+
+	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.thingsets[index].table.size()<<" entries for thingset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::poly_mode(
 	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
+
+	lm::log(log, lm::lvl::debug)<<"entering poly mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id", "name"});
 
@@ -230,16 +256,22 @@ void blueprint_parser::poly_mode(
 
 	poly_parser pp;
 
+	const std::string filename{config_file_dir+propmap["file"]};
+
 	_blueprint.polysets.emplace(
 		index,
-		poly_definition_table{propmap["name"], pp.read_file(config_file_dir+propmap["file"])}
+		poly_definition_table{propmap["name"], pp.read_file(filename)}
 	);
+
+	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.polysets[index].table.size()<<" entries for polyset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::session_mode(
 	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
+
+	lm::log(log, lm::lvl::debug)<<"entering session mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endsession", {
 		"thingcenter",
@@ -319,6 +351,8 @@ void blueprint_parser::grid_settings_mode(
 	tools::string_reader& _reader,
 	map_blueprint& _blueprint
 ) {
+
+	lm::log(log, lm::lvl::debug)<<"entering grid settings mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endgridsettings", {
 		"id",

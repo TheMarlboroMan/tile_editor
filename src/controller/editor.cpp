@@ -1685,7 +1685,7 @@ void editor::load_session(const std::string& _path) {
 
 	lm::log(log, lm::lvl::info)<<"map editor will load session data from "<<current_session_filename<<std::endl;
 
-	tile_editor::blueprint_parser cfp;
+	tile_editor::blueprint_parser cfp{log};
 	session=cfp.parse_file(current_session_filename);
 
 	subgrid_factor=get_grid_data_for_layer_index(current_layer).size;
