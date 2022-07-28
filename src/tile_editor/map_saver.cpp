@@ -7,6 +7,7 @@
 #include <lm/sentry.h>
 #include <ldt/polygon_2d.h>
 #include <iostream>
+#include <sstream>
 
 using namespace tile_editor;
 
@@ -28,9 +29,11 @@ bool map_saver::save(
 	pre_save(_map);
 
 	tile_editor::map_serializer serializer;
-	//TODO: Where does the version reside????
 
-	if(!serializer.to_file(_map, "1.0,0", _filename)) {
+	std::stringstream ss;
+	ss<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION;
+
+	if(!serializer.to_file(_map, ss.str(), _filename)) {
 
 		lm::log(log, lm::lvl::warning)<<"could not save into "<<_filename<<std::endl;
 		return false;

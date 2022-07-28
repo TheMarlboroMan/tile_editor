@@ -8,13 +8,13 @@ option(BUILD_DEBUG "Build a debug release" ON)
 if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
 
 	add_definitions(-DMAJOR_VERSION=1)
-	add_definitions(-DMINOR_VERSION=0)
-	add_definitions(-DPATCH_VERSION=1)
+	add_definitions(-DMINOR_VERSION=1)
+	add_definitions(-DPATCH_VERSION=0)
 else()
 
 	add_compile_definitions(MAJOR_VERSION=1)
-	add_compile_definitions(MINOR_VERSION=0)
-	add_compile_definitions(PATCH_VERSION=1)
+	add_compile_definitions(MINOR_VERSION=1)
+	add_compile_definitions(PATCH_VERSION=0)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)

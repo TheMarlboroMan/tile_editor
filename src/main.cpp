@@ -31,7 +31,7 @@ int main(int argc, char ** argv)
 
 	if(carg.exists("-h")) {
 
-		std::cout<<"sprite_table "
+		std::cout<<"tile_editor "
 			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION
 			<<" built on "<<__DATE__<<" "<<__TIME__
 			<<std::endl<<std::endl
@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
 
 	if(carg.exists("-v")) {
 
-		std::cout<<"sprite_table "
+		std::cout<<"tile_editor "
 			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION
 			<<" built on "<<__DATE__<<" "<<__TIME__<<std::endl;
 		return 0;
