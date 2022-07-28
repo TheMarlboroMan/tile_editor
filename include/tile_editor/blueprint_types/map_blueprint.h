@@ -6,6 +6,7 @@
 #include "property_table.h"
 #include "color.h"
 #include "grid_data.h"
+#include "default_layer.h"
 
 #include <map>
 
@@ -32,6 +33,7 @@ struct map_blueprint {
 	std::map<std::size_t, thing_definition_table>   thingsets;
 	std::map<std::size_t, poly_definition_table>    polysets;
 	property_table                                  properties;
+	std::vector<default_layer>                      default_layers;
 };
 
 }

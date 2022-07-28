@@ -12,6 +12,7 @@
 #include "tile_editor/editor_types/thing_layer.h"
 #include "tile_editor/editor_types/poly_layer.h"
 #include "tile_editor/app/set_layer_loader.h"
+#include "tile_editor/blueprint_types/default_layer.h"
 #include <lm/sentry.h>
 #include <ldv/line_representation.h>
 #include <ldv/bitmap_representation.h>
@@ -1766,6 +1767,28 @@ void editor::load_session(const std::string& _path) {
 
 			lm::log(log, lm::lvl::info)<<"loaded "<<set.second.image_path<<std::endl;
 		}
+	}
+
+	//Add default layers, if any.
+	for(const auto& layer : session.default_layers) {
+
+		tile_editor::map::layerptr newlayer{nullptr};
+
+		switch(layer.type) {
+
+			case tile_editor::default_layer::types::tile:
+				newlayer.reset(new tile_editor::tile_layer{layer.set_id, layer.grid_id, layer.alpha, layer.name, {}});
+			break;
+			case tile_editor::default_layer::types::poly:
+				//shortcutting the windings...
+				newlayer.reset(new tile_editor::poly_layer{layer.set_id, layer.grid_id, layer.alpha, layer.name, tile_editor::poly_layer::windings::any, {}});
+			break;
+			case tile_editor::default_layer::types::thing:
+				newlayer.reset(new tile_editor::thing_layer{layer.set_id, layer.grid_id, layer.alpha, layer.name, {}});
+			break;
+		}
+
+		map.layers.emplace_back(std::move(newlayer));
 	}
 }
 

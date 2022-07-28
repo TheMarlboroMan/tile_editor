@@ -64,7 +64,8 @@ map_blueprint blueprint_parser::parse_string(
 	                    beginobj{"beginobjectset"},
 	                    beginpoly{"beginpolyset"},
 	                    beginsession{"beginsession"},
-	                    begingridsettings{"begingridsettings"};
+	                    begingridsettings{"begingridsettings"},
+	                    begindefaultlayer{"begindefaultlayer"};
 
 	map_blueprint mb;
 	int flags=tools::string_reader::ltrim | tools::string_reader::rtrim | tools::string_reader::ignorewscomment;
@@ -72,6 +73,9 @@ map_blueprint blueprint_parser::parse_string(
 	bool properties_set=false;
 
 	try {
+
+		std::vector<default_layer> default_layers;
+
 		while(true) {
 
 			std::stringstream ss{reader.read_line()};
@@ -114,6 +118,10 @@ map_blueprint blueprint_parser::parse_string(
 
 				grid_settings_mode(reader, mb);
 			}
+			else if(tag==begindefaultlayer) {
+
+				default_layers.push_back(default_layer_mode(reader));
+			}
 			else {
 
 				throw std::runtime_error(std::string{"unexpected '"+tag+"', expected beginmapproperties, begintileset or beginobjectset"});
@@ -126,6 +134,49 @@ map_blueprint blueprint_parser::parse_string(
 			mb.gridsets.insert(std::make_pair(1, grid_data{}));
 		}
 
+		//Check all default layers and add them.
+		for(const auto& layer : default_layers) {
+
+			if(!mb.gridsets.count(layer.grid_id)) {
+
+				throw std::runtime_error(std::string{"non existing grid id for default layer"});
+			}
+
+			if(layer.alpha < 0 || layer.alpha > 255) {
+
+				throw std::runtime_error(std::string{"bad alpha for default layer"});
+			}
+
+			switch(layer.type) {
+
+				case default_layer::types::tile:
+
+					if(!mb.tilesets.count(layer.set_id)) {
+
+						throw std::runtime_error(std::string{"non existing set id for default tile layer"});
+					}
+				break;
+				case default_layer::types::poly:
+
+					if(!mb.polysets.count(layer.set_id)) {
+
+						throw std::runtime_error(std::string{"non existing set id for default polygon layer"});
+					}
+				break;
+				case default_layer::types::thing:
+
+					if(!mb.thingsets.count(layer.set_id)) {
+
+						throw std::runtime_error(std::string{"non existing set id for default thing layer"});
+					}
+				break;
+			}
+		}
+
+		std::swap(mb.default_layers, default_layers);
+
+		return mb;
+
 	}
 	catch(std::exception& e) {
 
@@ -135,7 +186,7 @@ map_blueprint blueprint_parser::parse_string(
 		);
 	}
 
-	return mb;
+
 }
 
 void blueprint_parser::map_property_mode(
@@ -434,3 +485,61 @@ void blueprint_parser::grid_settings_mode(
 	}
 }
 
+default_layer blueprint_parser::default_layer_mode(
+	tools::string_reader& _reader
+) {
+
+	auto propmap=generic_first_level(
+		_reader,
+		"enddefaultlayer", {"name", "type", "setid", "gridid", "alpha"}
+	);
+
+	default_layer::types type{default_layer::types::tile};
+
+	if(propmap["type"]=="tile") {
+
+		type=default_layer::types::tile;
+	}
+	else if(propmap["type"]=="thing") {
+
+		type=default_layer::types::thing;
+	}
+	else if(propmap["type"]=="poly") {
+
+		type=default_layer::types::poly;
+	}
+	else {
+
+		throw std::runtime_error(std::string{"bad default layer type, must be tile, thing or poly"});
+	}
+
+	std::stringstream ss{propmap["setid"]};
+	std::size_t set_id{}, grid_id{};
+	int alpha{};
+
+	ss>>set_id;
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid set id value for default layer");
+	}
+
+	ss.clear();
+	ss.str(propmap["gridid"]);
+	ss>>grid_id;
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid grid id value for default layer");
+	}
+
+	ss.clear();
+	ss.str(propmap["alpha"]);
+	ss>>alpha;
+	if(ss.fail()) {
+
+		throw std::runtime_error("invalid alpha value for default layer");
+	}
+
+	lm::log(log, lm::lvl::debug)<<"read default layer"<<std::endl;
+
+	return default_layer{propmap["name"], type, set_id, grid_id, alpha};
+}

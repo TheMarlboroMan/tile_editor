@@ -55,3 +55,35 @@ begingridsettings
 	gridrulercolor 128 128 128 255
 	gridorigincolor 255 255 255 255
 endgridsettings
+
+begindefaultlayer
+	name Foreground
+	type tile
+	setid 2
+	gridid 2
+	alpha 255
+enddefaultlayer
+
+begindefaultlayer
+	name Background
+	type tile
+	setid 1
+	gridid 2
+	alpha 255
+enddefaultlayer
+
+begindefaultlayer
+	name Things
+	type thing
+	setid 1
+	gridid 1
+	alpha 255
+enddefaultlayer
+
+begindefaultlayer
+	name Shapes
+	type poly
+	setid 1
+	gridid 1
+	alpha 255
+enddefaultlayer

@@ -11,6 +11,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ## Unreleased
 ### Pending
 
+## [v1.1.0]: 2022-07-28
+### Added
+- Adds default layers to config file
+
 ## [v1.0.1]: 2021-11-21
 ### Added
 - Makes secondary config file paths relative to the primary file path (id est, no need to run from the config file directory)
