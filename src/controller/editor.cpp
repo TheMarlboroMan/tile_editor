@@ -13,7 +13,7 @@
 #include "tile_editor/editor_types/poly_layer.h"
 #include "tile_editor/app/set_layer_loader.h"
 #include "tile_editor/blueprint_types/default_layer.h"
-#include <lm/sentry.h>
+#include <lm/log.h>
 #include <ldv/line_representation.h>
 #include <ldv/bitmap_representation.h>
 #include <ldv/box_representation.h>
@@ -78,7 +78,7 @@ editor::editor(
 
 void editor::awake(dfw::input& /*_input*/) {
 
-	lm::log(log, lm::lvl::info)<<"map editor controller awakens"<<std::endl;
+	lm::log(log).info()<<"map editor controller awakens"<<std::endl;
 
 	//Only the load-save controller leaves the signal.
 	if(exchange_data.has(state_editor)) {
@@ -90,7 +90,7 @@ void editor::awake(dfw::input& /*_input*/) {
 			if(exchange_data.file_browser_allow_create) {
 
 				current_filename=exchange_data.file_browser_choice;
-				lm::log(log, lm::lvl::info)<<"map editor changes current filename to "<<current_filename<<std::endl;
+				lm::log(log).info()<<"map editor changes current filename to "<<current_filename<<std::endl;
 				save_current();
 			}
 			//Entry point for when loading of a map was requested...
@@ -1684,7 +1684,7 @@ void editor::load_session(const std::string& _path) {
 
 	current_session_filename=_path;
 
-	lm::log(log, lm::lvl::info)<<"map editor will load session data from "<<current_session_filename<<std::endl;
+	lm::log(log).info()<<"map editor will load session data from "<<current_session_filename<<std::endl;
 
 	tile_editor::blueprint_parser cfp{log};
 	session=cfp.parse_file(current_session_filename);
@@ -1752,7 +1752,7 @@ void editor::load_session(const std::string& _path) {
 	);
 
 	//TODO: I would enjoy if this was another component.
-	lm::log(log, lm::lvl::info)<<"map editor will load textures..."<<std::endl;
+	lm::log(log).info()<<"map editor will load textures..."<<std::endl;
 	tileset_textures.clear();
 	for(const auto& set : session.tilesets) {
 
@@ -1765,7 +1765,7 @@ void editor::load_session(const std::string& _path) {
 				std::unique_ptr<ldv::texture>(new ldv::texture(img))
 			);
 
-			lm::log(log, lm::lvl::info)<<"loaded "<<set.second.image_path<<std::endl;
+			lm::log(log).info()<<"loaded "<<set.second.image_path<<std::endl;
 		}
 	}
 

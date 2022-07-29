@@ -4,7 +4,7 @@
 #include "editor_types/thing_layer.h"
 #include "editor_types/poly_layer.h"
 
-#include <lm/sentry.h>
+#include <lm/log.h>
 #include <ldt/polygon_2d.h>
 #include <iostream>
 #include <sstream>
@@ -24,7 +24,7 @@ bool map_saver::save(
 	const std::string& _filename
 ) {
 
-	lm::log(log, lm::lvl::info)<<"saving map into "<<_filename<<std::endl;
+	lm::log(log).info()<<"saving map into "<<_filename<<std::endl;
 
 	pre_save(_map);
 
@@ -35,12 +35,12 @@ bool map_saver::save(
 
 	if(!serializer.to_file(_map, ss.str(), _filename)) {
 
-		lm::log(log, lm::lvl::warning)<<"could not save into "<<_filename<<std::endl;
+		lm::log(log).warning()<<"could not save into "<<_filename<<std::endl;
 		return false;
 	}
 
 	//TODO: Errors and shit, log dem?
-	lm::log(log, lm::lvl::info)<<"map saved into "<<_filename<<std::endl;
+	lm::log(log).info()<<"map saved into "<<_filename<<std::endl;
 	return true;
 }
 
@@ -48,7 +48,7 @@ void map_saver::pre_save(
 	tile_editor::map& _map
 ) {
 
-	lm::log(log, lm::lvl::info)<<"starting pre-save process..."<<std::endl;
+	lm::log(log).info()<<"starting pre-save process..."<<std::endl;
 
 	struct : public tile_editor::layer_visitor {
 		map_saver * saver{nullptr};

@@ -2,7 +2,7 @@
 #include "input/input.h"
 #include "app/definitions.h"
 #include "controller/states.h"
-#include <lm/sentry.h>
+#include <lm/log.h>
 #include <tools/string_utils.h>
 
 #include <algorithm>
@@ -21,34 +21,34 @@ state_driver::state_driver(
 	message_manager(30)
 {
 
-	lm::log(log, lm::lvl::info)<<"setting state check function..."<<std::endl;
+	lm::log(log).info()<<"setting state check function..."<<std::endl;
 
 	states.set_function([](int v){
 		return v > controller::state_min && v < controller::state_max;
 	});
 
-	lm::log(log, lm::lvl::info)<<"init state driver building: preparing video..."<<std::endl;
+	lm::log(log).info()<<"init state driver building: preparing video..."<<std::endl;
 	prepare_video(kernel);
 
-	lm::log(log, lm::lvl::info)<<"preparing audio..."<<std::endl;
+	lm::log(log).info()<<"preparing audio..."<<std::endl;
 	prepare_audio(kernel);
 
-	lm::log(log, lm::lvl::info)<<"preparing input..."<<std::endl;
+	lm::log(log).info()<<"preparing input..."<<std::endl;
 	prepare_input(kernel);
 
-	lm::log(log, lm::lvl::info)<<"preparing resources..."<<std::endl;
+	lm::log(log).info()<<"preparing resources..."<<std::endl;
 	prepare_resources(kernel);
 
-	lm::log(log, lm::lvl::info)<<"registering controllers..."<<std::endl;
+	lm::log(log).info()<<"registering controllers..."<<std::endl;
 	register_controllers(kernel);
 
-	lm::log(log, lm::lvl::info)<<"virtualizing input..."<<std::endl;
+	lm::log(log).info()<<"virtualizing input..."<<std::endl;
 	virtualize_input(kernel.get_input());
 
-	lm::log(log, lm::lvl::info)<<"reading application data..."<<std::endl;
+	lm::log(log).info()<<"reading application data..."<<std::endl;
 	read_app_data(kernel.get_arg_manager());
 
-	lm::log(log, lm::lvl::info)<<"state driver fully constructed"<<std::endl;
+	lm::log(log).info()<<"state driver fully constructed"<<std::endl;
 }
 
 void state_driver::prepare_video(dfw::kernel& kernel) {
@@ -70,7 +70,7 @@ void state_driver::prepare_video(dfw::kernel& kernel) {
 		w=std::stoi(window_size_str.substr(0, xpos));
 		h=std::stoi(window_size_str.substr(xpos+1));
 
-		lm::log(log, lm::lvl::info)<<"window size specified by command line as "<<window_size_str<<" ["<<w<<"x"<<h<<"]"<<std::endl;
+		lm::log(log).info()<<"window size specified by command line as "<<window_size_str<<" ["<<w<<"x"<<h<<"]"<<std::endl;
 	}
 
 	kernel.init_video_system({
@@ -255,7 +255,7 @@ void state_driver::prepare_state(int /*_next*/, int /*_current*/) {
 void state_driver::common_pre_loop_input(dfw::input& input, float _delta) {
 
 	if(input().is_event_joystick_connected()) {
-		lm::log(log, lm::lvl::info)<<"New joystick detected..."<<std::endl;
+		lm::log(log).info()<<"New joystick detected..."<<std::endl;
 		virtualize_input(input);
 	}
 
@@ -276,12 +276,12 @@ void state_driver::common_loop_step(float /*delta*/) {
 
 void state_driver::virtualize_input(dfw::input& input) {
 
-	lm::log(log, lm::lvl::info)<<"trying to virtualize "<<input().get_joysticks_size()<<" controllers..."<<std::endl;
+	lm::log(log).info()<<"trying to virtualize "<<input().get_joysticks_size()<<" controllers..."<<std::endl;
 
 	for(size_t i=0; i < input().get_joysticks_size(); ++i) {
 		input().virtualize_joystick_hats(i);
 		input().virtualize_joystick_axis(i, 15000);
-		lm::log(log, lm::lvl::info)<<"Joystick virtualized "<<i<<std::endl;
+		lm::log(log).info()<<"Joystick virtualized "<<i<<std::endl;
 	}
 }
 

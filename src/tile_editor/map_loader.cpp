@@ -5,7 +5,7 @@
 #include "editor_types/poly_layer.h"
 #include "editor_types/tile_layer.h"
 
-#include <lm/sentry.h>
+#include <lm/log.h>
 
 //TODO:
 #include <iostream>
@@ -39,7 +39,7 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 
 	for(const auto& msg : mp.get_errors()) {
 
-		lm::log(log, lm::lvl::notice)<<msg<<std::endl;
+		lm::log(log).notice()<<msg<<std::endl;
 		message_manager.add(msg);
 	}
 
@@ -55,7 +55,7 @@ tile_editor::map map_loader::load_from_file(const std::string& _path) {
 			+std::to_string(result.layers.size())+" layers and "
 			+std::to_string(result.properties.size())+" properties. f1 for help";
 
-		lm::log(log, lm::lvl::info)<<msg<<std::endl;
+		lm::log(log).info()<<msg<<std::endl;
 
 		message_manager.add(msg);
 	}
@@ -85,7 +85,7 @@ void map_loader::fix_invalid_indexes(tile_editor::map& _map) {
 
 	for(auto& layer : visitor.tile_layers) {
 
-		lm::log(log, lm::lvl::info)<<"reviewing layer "<<layer->id<<"..."<<std::endl;
+		lm::log(log).info()<<"reviewing layer "<<layer->id<<"..."<<std::endl;
 
 		const auto& tileset=tilesets.at(layer->set);
 		const auto& first=std::begin(tileset.table);
@@ -95,7 +95,7 @@ void map_loader::fix_invalid_indexes(tile_editor::map& _map) {
 			if(!tileset.table.exists(tile.type)) {
 
 				tile.type=std::get<0>(*first);
-				lm::log(log, lm::lvl::notice)<<"fixed missing index "<<tile.type<<std::endl;
+				lm::log(log).notice()<<"fixed missing index "<<tile.type<<std::endl;
 			}
 		}
 	}
@@ -132,7 +132,7 @@ void map_loader::inflate_properties(tile_editor::map& _map) {
 			if(!_properties.count(prop.second.name)) {
 
 				_properties[prop.second.name]=prop.second.default_value;
-				lm::log(log, lm::lvl::notice)<<"added missing property '"<<prop.second.name<<"' with value '"<<prop.second.default_value<<"'"<<std::endl;
+				lm::log(log).notice()<<"added missing property '"<<prop.second.name<<"' with value '"<<prop.second.default_value<<"'"<<std::endl;
 			}
 		}
 	};

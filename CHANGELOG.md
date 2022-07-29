@@ -11,6 +11,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ## Unreleased
 ### Pending
 
+## [v1.1.1]: 2022-07-29
+### Added
+- Log compatibility
+
 ## [v1.1.0]: 2022-07-28
 ### Added
 - Adds default layers to config file

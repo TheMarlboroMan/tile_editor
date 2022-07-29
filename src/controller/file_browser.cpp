@@ -6,7 +6,7 @@
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
 #include <ldv/ttf_representation.h>
-#include <lm/sentry.h>
+#include <lm/log.h>
 
 #include <algorithm>
 
@@ -53,7 +53,7 @@ pager{0, 0} {
 
 void file_browser::awake(dfw::input& /*_input*/) {
 
-	lm::log(log, lm::lvl::info)<<"file browser controller awakens from invoker "<<exchange_data.file_browser_invoker_id<<"..."<<std::endl;
+	lm::log(log).info()<<"file browser controller awakens from invoker "<<exchange_data.file_browser_invoker_id<<"..."<<std::endl;
 
 	//On awake there must always be something for this controller.
 	exchange_data.recover(state_file_browser);
@@ -61,7 +61,7 @@ void file_browser::awake(dfw::input& /*_input*/) {
 	if(exchange_data.file_browser_allow_create != allow_create) {
 
 		allow_create=exchange_data.file_browser_allow_create;
-		lm::log(log, lm::lvl::info)<<"file browser changes allow_create to "<<allow_create<<std::endl;
+		lm::log(log).info()<<"file browser changes allow_create to "<<allow_create<<std::endl;
 
 		extract_entries();
 		refresh_list_view();
@@ -80,7 +80,7 @@ void file_browser::solve(bool _result, const std::string& _choice) {
 	exchange_data.file_browser_success=_result;
 	exchange_data.file_browser_choice=_choice;
 
-	lm::log(log, lm::lvl::info)<<"file browser solves to ["
+	lm::log(log).info()<<"file browser solves to ["
 		<<exchange_data.file_browser_success
 		<<", "<<exchange_data.file_browser_choice
 		<<"] back to "<<invoker_id<<std::endl;

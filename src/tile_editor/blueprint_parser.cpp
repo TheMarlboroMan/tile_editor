@@ -7,7 +7,7 @@
 #include <tools/file_utils.h>
 #include <tools/string_utils.h>
 #include <ldtools/sprite_table.h>
-#include <lm/sentry.h>
+#include <lm/log.h>
 
 #include <stdexcept>
 #include <fstream>
@@ -37,7 +37,7 @@ map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 		//as relative to them.
 		std::filesystem::path path{_filename};
 		path.remove_filename();
-		lm::log(log, lm::lvl::debug)<<"will use '"<<path<<"' as relative path for the config file"<<std::endl;
+		lm::log(log).debug()<<"will use '"<<path<<"' as relative path for the config file"<<std::endl;
 
 		return parse_string(tools::dump_file(_filename), path);
 	}
@@ -194,7 +194,7 @@ void blueprint_parser::map_property_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering map property mode"<<std::endl;
+	lm::log(log).debug()<<"entering map property mode"<<std::endl;
 	auto propmap=generic_first_level(_reader, "endmapproperties", {"file"});
 
 	property_parser pp(true);
@@ -202,7 +202,7 @@ void blueprint_parser::map_property_mode(
 	std::string filename{config_file_dir+propmap["file"]};
 
 	_blueprint.properties=pp.read_file(filename);
-	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.properties.size()<<" map properties from "<<filename<<std::endl;
+	lm::log(log).debug()<<"read "<<_blueprint.properties.size()<<" map properties from "<<filename<<std::endl;
 }
 
 void blueprint_parser::tile_mode(
@@ -210,7 +210,7 @@ void blueprint_parser::tile_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering tile mode"<<std::endl;
+	lm::log(log).debug()<<"entering tile mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endtileset", {"file", "id", "image", "name"});
 
@@ -238,7 +238,7 @@ void blueprint_parser::tile_mode(
 		propmap["name"]
 	};
 
-	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.tilesets[index].table.size()<<" entries for tileset with index "<<index<<" from "<<filename<<std::endl;
+	lm::log(log).debug()<<"read "<<_blueprint.tilesets[index].table.size()<<" entries for tileset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::thing_mode(
@@ -246,7 +246,7 @@ void blueprint_parser::thing_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering thing mode"<<std::endl;
+	lm::log(log).debug()<<"entering thing mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endobjectset", {"file", "id", "name"});
 
@@ -275,7 +275,7 @@ void blueprint_parser::thing_mode(
 		thing_definition_table{propmap["name"], tp.read_file(filename)}
 	);
 
-	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.thingsets[index].table.size()<<" entries for thingset with index "<<index<<" from "<<filename<<std::endl;
+	lm::log(log).debug()<<"read "<<_blueprint.thingsets[index].table.size()<<" entries for thingset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::poly_mode(
@@ -283,7 +283,7 @@ void blueprint_parser::poly_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering poly mode"<<std::endl;
+	lm::log(log).debug()<<"entering poly mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endpolyset", {"file", "id", "name"});
 
@@ -314,7 +314,7 @@ void blueprint_parser::poly_mode(
 		poly_definition_table{propmap["name"], pp.read_file(filename)}
 	);
 
-	lm::log(log, lm::lvl::debug)<<"read "<<_blueprint.polysets[index].table.size()<<" entries for polyset with index "<<index<<" from "<<filename<<std::endl;
+	lm::log(log).debug()<<"read "<<_blueprint.polysets[index].table.size()<<" entries for polyset with index "<<index<<" from "<<filename<<std::endl;
 }
 
 void blueprint_parser::session_mode(
@@ -322,7 +322,7 @@ void blueprint_parser::session_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering session mode"<<std::endl;
+	lm::log(log).debug()<<"entering session mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endsession", {
 		"thingcenter",
@@ -403,7 +403,7 @@ void blueprint_parser::grid_settings_mode(
 	map_blueprint& _blueprint
 ) {
 
-	lm::log(log, lm::lvl::debug)<<"entering grid settings mode"<<std::endl;
+	lm::log(log).debug()<<"entering grid settings mode"<<std::endl;
 
 	auto propmap=generic_first_level(_reader, "endgridsettings", {
 		"id",
@@ -539,7 +539,7 @@ default_layer blueprint_parser::default_layer_mode(
 		throw std::runtime_error("invalid alpha value for default layer");
 	}
 
-	lm::log(log, lm::lvl::debug)<<"read default layer"<<std::endl;
+	lm::log(log).debug()<<"read default layer"<<std::endl;
 
 	return default_layer{propmap["name"], type, set_id, grid_id, alpha};
 }
