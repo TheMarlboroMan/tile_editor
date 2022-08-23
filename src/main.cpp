@@ -124,5 +124,16 @@ tile_editor::env setup_env() {
 	auto last_slash=executable_path.find_last_of("/");
 	executable_dir=executable_path.substr(0, last_slash)+"/";
 
+#ifdef AS_APPIMAGE
+
+	executable_dir="../share/"+executable_dir;
+#else
+	#ifdef AS_REGULAR
+
+	#else
+		#error "AS_APPIMAGE or AS_REGULAR must be defined"
+	#endif
+#endif
+
 	return tile_editor::env(executable_dir, getenv("HOME"));
 }

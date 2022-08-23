@@ -5,3 +5,5 @@ data/logs/*
 *.o
 *.a
 build/*
+*.AppImage
+AppDir

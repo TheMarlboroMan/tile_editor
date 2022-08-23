@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>net.caballorenoir.tile_editor</id>
+
+  <name>Tile Editor</name>
+  <summary>2d tile editor"</summary>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>Beerware</project_license>
+
+  <description>
+    <p>
+	Homebrew tile editor.
+    </p>
+    <p>
+	Supports tile, object and polygon layers.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">tile_editor.desktop</launchable>
+  <screenshots>
+	<!--
+    <screenshot type="default">
+      <image>http://caballorenoir.net/hosted/games/images/pigsncows-title.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://caballorenoir.net/hosted/games/images/pigsncows-gameplay1.png</image>
+    </screenshot>
+    <screenshot>
+      <image>http://caballorenoir.net/hosted/games/images/pigsncows-gameplay2.png</image>
+    </screenshot>
+  </screenshots>
+	-->
+</component>

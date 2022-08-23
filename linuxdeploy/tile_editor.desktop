@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Game;
+Icon=tile_editor
+Name=Tile Editor
+Type=Application
+Exec=tile_editor
+
+Name[en_US]=tile_editor.desktop

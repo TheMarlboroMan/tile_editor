@@ -4,26 +4,64 @@ project(tile_editor)
 
 option(BUILD_TESTS "Build test code" ON)
 option(BUILD_DEBUG "Build a debug release" ON)
+option(BUILD_APPIMAGE "Build for appimage" OFF)
+option(BUILD_REGULAR "Regular build" OFF)
+
+set(MAJOR_VERSION 1)
+set(MINOR_VERSION 1)
+set(PATCH_VERSION 1)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
 
-	add_definitions(-DMAJOR_VERSION=1)
-	add_definitions(-DMINOR_VERSION=1)
-	add_definitions(-DPATCH_VERSION=0)
+	add_definitions(-DMAJOR_VERSION=${MAJOR_VERSION})
+	add_definitions(-DMINOR_VERSION=${MINOR_VERSION})
+	add_definitions(-DPATCH_VERSION=${PATCH_VERSION})
 else()
 
-	add_compile_definitions(MAJOR_VERSION=1)
-	add_compile_definitions(MINOR_VERSION=1)
-	add_compile_definitions(PATCH_VERSION=0)
+	add_compile_definitions(MAJOR_VERSION=${MAJOR_VERSION})
+	add_compile_definitions(MINOR_VERSION=${MINOR_VERSION})
+	add_compile_definitions(PATCH_VERSION=${PATCH_VERSION})
+endif()
+
+if(${BUILD_APPIMAGE})
+
+	message("will build as AppImage")
+
+	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+
+		add_definitions(-DAS_APPIMAGE=1)
+	else()
+
+		add_compile_definitions(AS_APPIMAGE=1)
+	endif()
+endif()
+
+if(${BUILD_REGULAR})
+
+	message("will build as regular app")
+
+	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+
+		add_definitions(-DAS_REGULAR=1)
+	else()
+
+		add_compile_definitions(AS_REGULAR=1)
+	endif()
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 if(${BUILD_DEBUG})
+
 	message("DEBUG BUILD")
 	set(CMAKE_BUILD_TYPE Debug)
-	add_compile_definitions(LIBDANSDL2_DEBUG)
+	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+		add_definitions(-DMAJOR_VERSION=1)
+	else()
+		add_compile_definitions(LIBDANSDL2_DEBUG)
+	endif()
 else()
 	message("RELEASE BUILD")
 	set(CMAKE_BUILD_TYPE Release)
