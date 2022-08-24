@@ -32,7 +32,7 @@ int main(int argc, char ** argv)
 	if(carg.exists("-h")) {
 
 		std::cout<<"tile_editor "
-			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION
+			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<" ("<<BUILD_VERSION<<")"
 			<<" built on "<<__DATE__<<" "<<__TIME__
 			<<std::endl<<std::endl
 			<<tools::dump_file(env.build_data_path("help.txt"))<<std::endl;
@@ -42,7 +42,7 @@ int main(int argc, char ** argv)
 	if(carg.exists("-v")) {
 
 		std::cout<<"tile_editor "
-			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION
+			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<" ("<<BUILD_VERSION<<")"
 			<<" built on "<<__DATE__<<" "<<__TIME__<<std::endl;
 		return 0;
 	}
@@ -61,15 +61,8 @@ int main(int argc, char ** argv)
 		ldt::log_lsdl::set_type(ldt::log_lsdl::types::out);
 	}
 
-	//Create user directory if not exists.
-	if(!std::filesystem::exists(env.build_user_path(""))) {
-
-		std::cout<<"will create the .tile_editor directory under user home"<<std::endl;
-		std::filesystem::create_directory(env.build_user_path(""));
-	}
-
 	//Init application log.
-	std::string log_path{env.build_user_path("app.log")};
+	std::string log_path{env.build_user_path("log.log")};
 	lm::file_logger log_app(log_path.c_str());
 	lm::log(log_app).info()<<"starting main process..."<<std::endl;
 
@@ -126,7 +119,8 @@ tile_editor::env setup_env() {
 
 #ifdef AS_APPIMAGE
 
-	executable_dir="../share/"+executable_dir;
+	executable_dir+="/../share/";
+
 #else
 	#ifdef AS_REGULAR
 
@@ -135,5 +129,33 @@ tile_editor::env setup_env() {
 	#endif
 #endif
 
-	return tile_editor::env(executable_dir, getenv("HOME"));
+
+	std::cout<<"starting file setup with "<<executable_dir<<" and "<<getenv("HOME")<<std::endl;
+	tile_editor::env result{executable_dir, getenv("HOME")};
+
+	//Create user directory if not exists.
+	if(!std::filesystem::exists(result.build_user_path(""))) {
+
+		std::cout<<"will create the .tile_editor directory under user home"<<std::endl;
+		std::filesystem::create_directory(result.build_user_path(""));
+	}
+	else {
+
+		std::cout<<".tile editor at home directory already exists"<<std::endl;
+	}
+
+	if(!std::filesystem::exists(result.build_user_path("config.json"))) {
+
+		std::cout<<"will create the .tile_editor/config.json file"<<std::endl;
+		std::filesystem::copy(
+			result.build_data_path("config/config.json"),
+			result.build_user_path("config.json")
+		);
+	}
+	else {
+
+		std::cout<<"using existing .tile_editor/config.json file"<<std::endl;
+	}
+
+	return result;
 }

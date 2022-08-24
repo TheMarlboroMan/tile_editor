@@ -31,7 +31,7 @@ bool map_saver::save(
 	tile_editor::map_serializer serializer;
 
 	std::stringstream ss;
-	ss<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION;
+	ss<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"-"<<BUILD_VERSION;
 
 	if(!serializer.to_file(_map, ss.str(), _filename)) {
 

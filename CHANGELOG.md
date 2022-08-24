@@ -10,6 +10,12 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 
 ## Unreleased
 ### Pending
+- Confirm before exiting?
+
+## [v1.1.2]: 2022-07-29
+### Added
+- AppImage build mode
+- Log files reside now in the user home .tile_editor directory
 
 ## [v1.1.1]: 2022-07-29
 ### Added

@@ -7,25 +7,10 @@ option(BUILD_DEBUG "Build a debug release" ON)
 option(BUILD_APPIMAGE "Build for appimage" OFF)
 option(BUILD_REGULAR "Regular build" OFF)
 
-set(MAJOR_VERSION 1)
-set(MINOR_VERSION 1)
-set(PATCH_VERSION 1)
-
-if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
-
-	add_definitions(-DMAJOR_VERSION=${MAJOR_VERSION})
-	add_definitions(-DMINOR_VERSION=${MINOR_VERSION})
-	add_definitions(-DPATCH_VERSION=${PATCH_VERSION})
-else()
-
-	add_compile_definitions(MAJOR_VERSION=${MAJOR_VERSION})
-	add_compile_definitions(MINOR_VERSION=${MINOR_VERSION})
-	add_compile_definitions(PATCH_VERSION=${PATCH_VERSION})
-endif()
-
+#bin type
 if(${BUILD_APPIMAGE})
 
-	message("will build as AppImage")
+	set(BUILD_VERSION "AppImage")
 
 	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
 
@@ -38,7 +23,7 @@ endif()
 
 if(${BUILD_REGULAR})
 
-	message("will build as regular app")
+	set(BUILD_VERSION "bin")
 
 	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
 
@@ -49,23 +34,46 @@ if(${BUILD_REGULAR})
 	endif()
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
+#release status
 if(${BUILD_DEBUG})
 
-	message("DEBUG BUILD")
 	set(CMAKE_BUILD_TYPE Debug)
+	set(BUILD_VERSION "${BUILD_VERSION}.debug")
+
 	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-		add_definitions(-DMAJOR_VERSION=1)
+		add_definitions(-DLIBDANSDL2_DEBUG)
 	else()
 		add_compile_definitions(LIBDANSDL2_DEBUG)
 	endif()
 else()
-	message("RELEASE BUILD")
 	set(CMAKE_BUILD_TYPE Release)
 endif()
+
+#application version
+set(MAJOR_VERSION 1)
+set(MINOR_VERSION 1)
+set(PATCH_VERSION 2)
+set(BUILD_VERSION "\"${BUILD_VERSION}\"") #add some quotes to pacify the macro preprocessor
+
+if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+
+	add_definitions(-DMAJOR_VERSION=${MAJOR_VERSION})
+	add_definitions(-DMINOR_VERSION=${MINOR_VERSION})
+	add_definitions(-DPATCH_VERSION=${PATCH_VERSION})
+	add_definitions(-DBUILD_VERSION=${BUILD_VERSION})
+else()
+
+	add_compile_definitions(MAJOR_VERSION=${MAJOR_VERSION})
+	add_compile_definitions(MINOR_VERSION=${MINOR_VERSION})
+	add_compile_definitions(PATCH_VERSION=${PATCH_VERSION})
+	add_compile_definitions(BUILD_VERSION=${BUILD_VERSION})
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+message("will build ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}-${BUILD_VERSION}")
 
 #-Werror
 add_compile_options(-Wall -Wextra -Wundef -Wcast-align -Wwrite-strings -Wlogical-op -Wmissing-declarations -Wredundant-decls -Wshadow -Woverloaded-virtual -Wno-deprecated -ansi -pedantic -fno-rtti)
