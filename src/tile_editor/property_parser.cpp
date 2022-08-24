@@ -14,7 +14,7 @@ property_parser::property_parser(
 
 property_table property_parser::read_file(const std::string& _path) {
 
-	if(!tools::file_exists(_path)) {
+	if(!tools::filesystem::exists(_path)) {
 
 		throw std::runtime_error(std::string{"cannot find properties file '"}+_path+"'");
 	}
@@ -46,7 +46,7 @@ property_table property_parser::read_file(const std::string& _path) {
 }
 
 void property_parser::read(
-	tools::text_reader& _reader, 
+	tools::text_reader& _reader,
 	property_table& _table
 ) {
 

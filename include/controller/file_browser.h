@@ -15,7 +15,7 @@
 #include <tools/pager.h>
 
 //std
-#include <filesystem>
+#include <tools/file_utils.h>
 
 namespace controller {
 
@@ -87,7 +87,7 @@ class file_browser:
 
 	//properties
 	working_modes				mode;
-	std::filesystem::path       current_directory;
+	tools::filesystem::path     current_directory;
 	std::string                 title;
 	std::vector<entry>          contents;
 	int                         first_selection_y{0},

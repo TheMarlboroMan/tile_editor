@@ -13,7 +13,7 @@ map map_parser::parse_file(const std::string& _filename) {
 	errors.clear();
 	version.clear();
 
-	if(!tools::file_exists(_filename)) {
+	if(!tools::filesystem::exists(_filename)) {
 
 		errors.push_back("map file does not exist");
 		return map{};

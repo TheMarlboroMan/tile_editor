@@ -13,7 +13,7 @@ using namespace tile_editor;
 
 poly_definition_table::table_type poly_parser::read_file(const std::string& _filename) {
 
-	if(!tools::file_exists(_filename)) {
+	if(!tools::filesystem::exists(_filename)) {
 
 		throw std::runtime_error(std::string{"cannot find file '"}+_filename+"'");
 	}

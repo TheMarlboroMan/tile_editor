@@ -138,16 +138,16 @@ tile_editor::env setup_env() {
 	tile_editor::env result{executable_dir, getenv("HOME")};
 
 	//Create user directory if not exists.
-	if(!std::filesystem::exists(result.build_user_path(""))) {
+	if(!tools::filesystem::exists(result.build_user_path(""))) {
 
 		std::cout<<"will create the .tile_editor directory under user home"<<std::endl;
-		std::filesystem::create_directory(result.build_user_path(""));
+		tools::filesystem::create_directory(result.build_user_path(""));
 	}
 
-	if(!std::filesystem::exists(result.build_user_path("config.json"))) {
+	if(!tools::filesystem::exists(result.build_user_path("config.json"))) {
 
 		std::cout<<"will create the .tile_editor/config.json file"<<std::endl;
-		std::filesystem::copy(
+		tools::filesystem::copy(
 			result.build_data_path("config/config.json"),
 			result.build_user_path("config.json")
 		);

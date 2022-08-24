@@ -26,7 +26,7 @@ blueprint_parser::blueprint_parser(
 
 map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 
-	if(!tools::file_exists(_filename)) {
+	if(!tools::filesystem::exists(_filename)) {
 
 		throw std::runtime_error(std::string{"cannot find file '"}+_filename+"'");
 	}
@@ -35,7 +35,7 @@ map_blueprint blueprint_parser::parse_file(const std::string& _filename) {
 
 		//set the config file directory so any secondary files can be traced
 		//as relative to them.
-		std::filesystem::path path{_filename};
+		tools::filesystem::path path{_filename};
 		path.remove_filename();
 		lm::log(log).debug()<<"will use '"<<path<<"' as relative path for the config file"<<std::endl;
 

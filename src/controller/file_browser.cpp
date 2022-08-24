@@ -23,7 +23,7 @@ log(plog),
 ttf_manager{_ttfman},
 exchange_data{_exchange_data},
 mode{working_modes::navigate},
-current_directory{std::filesystem::current_path()},
+current_directory{tools::filesystem::current_path()},
 pager{0, 0} {
 
 	//Mount layout...
@@ -140,19 +140,19 @@ void file_browser::extract_entries() {
 		});
 	}
 
-	for(const auto& dir_entry : std::filesystem::directory_iterator(current_directory)) {
+	for(const auto& dir_entry : tools::filesystem::directory_iterator(current_directory)) {
 
 		const auto& path=dir_entry.path();
 		std::string filename=path.filename();
 
-		if(std::filesystem::is_directory(path)) {
+		if(tools::filesystem::is_directory(path)) {
 
 			contents.push_back({
 				filename,
 				entry::entry_type::dir
 			});
 		}
-		else if(std::filesystem::is_regular_file(path)){
+		else if(tools::filesystem::is_regular_file(path)){
 
 			contents.push_back({
 				filename,
