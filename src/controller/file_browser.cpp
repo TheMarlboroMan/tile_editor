@@ -10,6 +10,10 @@
 
 #include <algorithm>
 
+#ifndef WITH_FILESYSTEM
+#include <cstdlib>
+#endif
+
 using namespace controller;
 
 file_browser::file_browser(
@@ -272,7 +276,20 @@ void file_browser::input_navigation(dfw::input& _input) {
 		if(item.is_dir()) {
 
 			current_directory/={item.path_name};
+#ifdef WITH_FILESYSTEM
 			current_directory=current_directory.lexically_normal();
+#else
+		//with gcc7.5 we don't have lexically_normal, so we hack something
+		//together and look the other way...
+			char buffer[PATH_MAX];
+			char * rpath=realpath(current_directory.c_str(), buffer);
+			if(nullptr==rpath) {
+
+				throw std::runtime_error("unable to normalize path");
+			}
+
+			current_directory=rpath;
+#endif
 
 			extract_entries();
 			refresh_list_view();

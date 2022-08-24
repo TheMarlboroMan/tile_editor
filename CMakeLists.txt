@@ -6,6 +6,7 @@ option(BUILD_TESTS "Build test code" ON)
 option(BUILD_DEBUG "Build a debug release" ON)
 option(BUILD_APPIMAGE "Build for appimage" OFF)
 option(BUILD_REGULAR "Regular build" OFF)
+option(WITH_C++FILESYSTEM "If true, std::filesystem::lexically_normal() will be used in the file browser. Else, an approximation with realpath will be tried" TRUE)
 
 #bin type
 if(${BUILD_APPIMAGE})
@@ -114,6 +115,17 @@ else()
 	set_target_properties(dansdl2 PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdansdl2.so)
 	set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldtools.so)
 	set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
+endif()
+
+#extra flag...
+if(${WITH_C++FILESYSTEM})
+	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+
+		add_definitions(-DWITH_FILESYSTEM)
+	else()
+
+		add_compile_definitions(WITH_FILESYSTEM)
+	endif()
 endif()
 
 #Virtual library so we don't have to build again and again for all tests...
