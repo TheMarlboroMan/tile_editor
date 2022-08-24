@@ -11,27 +11,12 @@ option(BUILD_REGULAR "Regular build" OFF)
 if(${BUILD_APPIMAGE})
 
 	set(BUILD_VERSION "AppImage")
-
-	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
-
-		add_definitions(-DAS_APPIMAGE=1)
-	else()
-
-		add_compile_definitions(AS_APPIMAGE=1)
-	endif()
-endif()
-
-if(${BUILD_REGULAR})
+elseif(${BUILD_REGULAR})
 
 	set(BUILD_VERSION "bin")
+else()
 
-	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
-
-		add_definitions(-DAS_REGULAR=1)
-	else()
-
-		add_compile_definitions(AS_REGULAR=1)
-	endif()
+	message(FATAL_ERROR "A build type (AppImage or regular) must be defined")
 endif()
 
 #release status
@@ -39,12 +24,6 @@ if(${BUILD_DEBUG})
 
 	set(CMAKE_BUILD_TYPE Debug)
 	set(BUILD_VERSION "${BUILD_VERSION}.debug")
-
-	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-		add_definitions(-DLIBDANSDL2_DEBUG)
-	else()
-		add_compile_definitions(LIBDANSDL2_DEBUG)
-	endif()
 else()
 	set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -86,24 +65,60 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src")
 
-#add the framework dependencies
+#bin type
+if(${BUILD_APPIMAGE})
+
+	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+
+		add_definitions(-DAS_APPIMAGE=1)
+	else()
+
+		add_compile_definitions(AS_APPIMAGE=1)
+	endif()
+elseif(${BUILD_REGULAR})
+
+	if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+
+		add_definitions(-DAS_REGULAR=1)
+	else()
+
+		add_compile_definitions(AS_REGULAR=1)
+	endif()
+endif()
+
+#add the framework dependencies according to release status
 add_library(lm SHARED IMPORTED)
 add_library(tools SHARED IMPORTED)
 add_library(ldtools SHARED IMPORTED)
 add_library(dansdl2 SHARED IMPORTED)
 add_library(dfw SHARED IMPORTED)
 
-#If the libraries are not installed, tell them where they are.
 set_target_properties(lm PROPERTIES IMPORTED_LOCATION /usr/local/lib/liblm.so)
 set_target_properties(tools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libtools.so)
-set_target_properties(dansdl2 PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdansdl2.so)
-set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldtools.so)
-set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
+
+if(${BUILD_DEBUG})
+
+	if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+
+		add_definitions(-DLIBDANSDL2_DEBUG)
+	else()
+
+		add_compile_definitions(LIBDANSDL2_DEBUG)
+	endif()
+
+	set_target_properties(dansdl2 PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdansdl2_debug.so)
+	set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldtools_debug.so)
+	set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw_debug.so)
+else()
+
+	set_target_properties(dansdl2 PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdansdl2.so)
+	set_target_properties(ldtools PROPERTIES IMPORTED_LOCATION /usr/local/lib/libldtools.so)
+	set_target_properties(dfw PROPERTIES IMPORTED_LOCATION /usr/local/lib/libdfw.so)
+endif()
 
 #Virtual library so we don't have to build again and again for all tests...
 add_library(applib STATIC ${SOURCE})
 set_target_properties(applib PROPERTIES OUTPUT_NAME applib)
-
 
 if(${BUILD_TESTS})
 

@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <filesystem>
 
+#include <ldt/lib.h>
+#include <ldtools/lib.h>
+#include <dfw/lib.h>
 
 tile_editor::env setup_env();
 
@@ -32,7 +35,7 @@ int main(int argc, char ** argv)
 	if(carg.exists("-h")) {
 
 		std::cout<<"tile_editor "
-			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<" ("<<BUILD_VERSION<<")"
+			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"-"<<BUILD_VERSION
 			<<" built on "<<__DATE__<<" "<<__TIME__
 			<<std::endl<<std::endl
 			<<tools::dump_file(env.build_data_path("help.txt"))<<std::endl;
@@ -42,8 +45,11 @@ int main(int argc, char ** argv)
 	if(carg.exists("-v")) {
 
 		std::cout<<"tile_editor "
-			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<" ("<<BUILD_VERSION<<")"
-			<<" built on "<<__DATE__<<" "<<__TIME__<<std::endl;
+			<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"-"<<BUILD_VERSION
+			<<" built on "<<__DATE__<<" "<<__TIME__<<std::endl
+			<<"libdansdl2 version: "<<ldt::get_lib_version()<<std::endl
+			<<"ldtools version: "<<ldtools::get_lib_version()<<std::endl
+			<<"dfw version: "<<dfw::get_lib_version()<<std::endl;
 		return 0;
 	}
 
@@ -129,8 +135,6 @@ tile_editor::env setup_env() {
 	#endif
 #endif
 
-
-	std::cout<<"starting file setup with "<<executable_dir<<" and "<<getenv("HOME")<<std::endl;
 	tile_editor::env result{executable_dir, getenv("HOME")};
 
 	//Create user directory if not exists.
@@ -138,10 +142,6 @@ tile_editor::env setup_env() {
 
 		std::cout<<"will create the .tile_editor directory under user home"<<std::endl;
 		std::filesystem::create_directory(result.build_user_path(""));
-	}
-	else {
-
-		std::cout<<".tile editor at home directory already exists"<<std::endl;
 	}
 
 	if(!std::filesystem::exists(result.build_user_path("config.json"))) {
@@ -151,10 +151,6 @@ tile_editor::env setup_env() {
 			result.build_data_path("config/config.json"),
 			result.build_user_path("config.json")
 		);
-	}
-	else {
-
-		std::cout<<"using existing .tile_editor/config.json file"<<std::endl;
 	}
 
 	return result;
