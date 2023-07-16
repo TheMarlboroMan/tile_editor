@@ -5,6 +5,7 @@
 #include <deque>
 #include <map>
 #include <functional>
+#include <stdexcept>
 
 namespace tools {
 
