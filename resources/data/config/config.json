@@ -31,6 +31,7 @@
 		"load":[0,0,15],
 		"del":[0,0,76],
 		"insert":[0,0,73],
+		"insert_alt":[0,0,12],
 		"zoom_in":[0,0,86],
 		"zoom_out":[0,0,87],
 		"smaller_subgrid":[0,0,47],

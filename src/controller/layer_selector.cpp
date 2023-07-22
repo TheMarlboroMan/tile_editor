@@ -129,7 +129,9 @@ void layer_selector::input_traverse(
 		return;
 	}
 
-	if(_input.is_input_down(input::insert)) {
+	if(_input.is_input_down(input::insert)
+		|| _input.is_input_down(input::insert_alt)
+	) {
 
 		new_mode=true;
 		return;
@@ -294,7 +296,7 @@ void layer_selector::draw_traverse(
 
 	if(!layers->size()) {
 
-		ss<<"no layers, press insert to create"<<std::endl;
+		ss<<"no layers, press insert/i to create"<<std::endl;
 	}
 	else {
 		std::size_t index=0;

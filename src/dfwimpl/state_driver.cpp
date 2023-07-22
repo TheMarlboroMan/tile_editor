@@ -126,6 +126,7 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
 		{input_description_from_config_token(config.token_from_path("input:del")), input::del},
 		{input_description_from_config_token(config.token_from_path("input:insert")), input::insert},
+		{input_description_from_config_token(config.token_from_path("input:insert_alt")), input::insert},
 		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
 		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
 		{input_description_from_config_token(config.token_from_path("input:lalt")), input::lalt},
