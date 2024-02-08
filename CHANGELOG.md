@@ -12,6 +12,11 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.3]: 2024-02-08
+### Changed
+- Adapts to dfw library changes.
+- Build system updated: will not be able to specify an invalid executable type
+
 ## [v1.1.2]: 2022-07-29
 ### Added
 - AppImage build mode

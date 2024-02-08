@@ -11,6 +11,11 @@ option(WITH_C++FILESYSTEM "If true, std::filesystem::lexically_normal() will be 
 #bin type
 if(${BUILD_APPIMAGE})
 
+	if(${BUILD_REGULAR})
+
+		message(FATAL_ERROR "Only one build type (AppImage or regular) can be defined")
+	endif()
+
 	set(BUILD_VERSION "AppImage")
 elseif(${BUILD_REGULAR})
 
@@ -32,7 +37,7 @@ endif()
 #application version
 set(MAJOR_VERSION 1)
 set(MINOR_VERSION 1)
-set(PATCH_VERSION 2)
+set(PATCH_VERSION 3)
 set(BUILD_VERSION "\"${BUILD_VERSION}\"") #add some quotes to pacify the macro preprocessor
 
 if(${CMAKE_VERSION} VERSION_LESS "3.22.0")

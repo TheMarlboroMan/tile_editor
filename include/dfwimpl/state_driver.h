@@ -31,6 +31,7 @@ class state_driver:
 	public:
 									state_driver(dfw::kernel& kernel, dfwimpl::config& config, const tile_editor::env&);
 
+	virtual void                    init(dfw::kernel&);
 	virtual void					common_pre_loop_input(dfw::input& input, float delta);
 	virtual void					common_pre_loop_step(float delta);
 	virtual void					common_loop_input(dfw::input& input, float delta);

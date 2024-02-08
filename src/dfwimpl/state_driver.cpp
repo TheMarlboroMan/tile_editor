@@ -53,6 +53,11 @@ state_driver::state_driver(
 	lm::log(log).info()<<"state driver fully constructed"<<std::endl;
 }
 
+void state_driver::init(dfw::kernel& ) {
+
+	//NOOP... lots of the constructor could go here.
+}
+
 void state_driver::prepare_video(dfw::kernel& kernel) {
 
 	const auto& argman=kernel.get_arg_manager();
