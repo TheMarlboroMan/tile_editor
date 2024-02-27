@@ -1049,8 +1049,15 @@ void editor::draw_set(
 			current_box.draw(_screen);
 		}
 
-		bmp.set_clip(item.item.second.box);
+		const auto& node=item.item.second;
+
+		bmp.set_clip(node.box);
+
+		bmp.set_invert_horizontal(node.flags & 1);
+		bmp.set_invert_vertical(node.flags & 2);
+
 		bmp.set_location({x, y, w, h});
+
 		bmp.draw(_screen);
 	}
 }
@@ -1293,8 +1300,10 @@ void editor::draw_layer(
 
 		//TODO: Check errors with "exists"?
 		//TODO: If it fails -> DRAW DEFAULT.
-		const auto& rect=table.get(tile.type).box;
-		bmp.set_clip(rect);
+		const auto sprite=table.get(tile.type);
+		bmp.set_clip(sprite.box);
+		bmp.set_invert_horizontal(sprite.flags & 1);
+		bmp.set_invert_vertical(sprite.flags & 2);
 
 		bmp.draw(_screen, camera);
 	}
@@ -1608,7 +1617,7 @@ void editor::draw_hud_poly_info(
 	print_properties(_poly.properties.double_properties, _blueprint.properties.double_properties);
 }
 
-void editor::zoom_in() {
+void editor::zoom_out() {
 
 	auto zoom=camera.get_zoom();
 
@@ -1618,11 +1627,11 @@ void editor::zoom_in() {
 	}
 }
 
-void editor::zoom_out() {
+void editor::zoom_in() {
 
 	auto zoom=camera.get_zoom();
 
-	if(zoom < 4) {
+	if(zoom < 8) {
 
 		camera.set_zoom(zoom*2.);
 	}

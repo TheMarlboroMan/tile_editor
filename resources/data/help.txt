@@ -67,4 +67,4 @@ arrows up-down - choose current layer
 pagedown - move layer down
 pageup - move layer up
 delete - delete layer
-insert - new layer (with default set, can be changed on editor mode)
+insert / i - new layer (with default set, can be changed on editor mode)
