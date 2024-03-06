@@ -129,9 +129,7 @@ void layer_selector::input_traverse(
 		return;
 	}
 
-	if(_input.is_input_down(input::insert)
-		|| _input.is_input_down(input::insert_alt)
-	) {
+	if(_input.is_input_down(input::insert)) {
 
 		new_mode=true;
 		return;

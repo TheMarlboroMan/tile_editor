@@ -118,35 +118,45 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 	using namespace dfw;
 
 	std::vector<input_pair> pairs{
-		{{input_description::types::keyboard, SDL_SCANCODE_ESCAPE, 0}, input::escape},
-		{input_description_from_config_token(config.token_from_path("input:left")), input::left},
-		{input_description_from_config_token(config.token_from_path("input:right")), input::right},
-		{input_description_from_config_token(config.token_from_path("input:up")), input::up},
-		{input_description_from_config_token(config.token_from_path("input:down")), input::down},
-		{input_description_from_config_token(config.token_from_path("input:enter")), input::enter},
-		{input_description_from_config_token(config.token_from_path("input:space")), input::space},
-		{input_description_from_config_token(config.token_from_path("input:backspace")), input::backspace},
-		{input_description_from_config_token(config.token_from_path("input:tab")), input::tab},
-		{input_description_from_config_token(config.token_from_path("input:save")), input::save},
-		{input_description_from_config_token(config.token_from_path("input:load")), input::load},
-		{input_description_from_config_token(config.token_from_path("input:del")), input::del},
-		{input_description_from_config_token(config.token_from_path("input:insert")), input::insert},
-		{input_description_from_config_token(config.token_from_path("input:insert_alt")), input::insert},
-		{input_description_from_config_token(config.token_from_path("input:lctrl")), input::lctrl},
-		{input_description_from_config_token(config.token_from_path("input:lshift")), input::lshift},
-		{input_description_from_config_token(config.token_from_path("input:lalt")), input::lalt},
-		{input_description_from_config_token(config.token_from_path("input:help")), input::help},
-		{input_description_from_config_token(config.token_from_path("input:layer_settings")), input::layer_settings},
-		{input_description_from_config_token(config.token_from_path("input:map_properties")), input::map_properties},
-		{input_description_from_config_token(config.token_from_path("input:pageup")), input::pageup},
-		{input_description_from_config_token(config.token_from_path("input:pagedown")), input::pagedown},
-		{input_description_from_config_token(config.token_from_path("input:zoom_in")), input::zoom_in},
-		{input_description_from_config_token(config.token_from_path("input:zoom_out")), input::zoom_out},
-		{input_description_from_config_token(config.token_from_path("input:smaller_subgrid")), input::smaller_subgrid},
-		{input_description_from_config_token(config.token_from_path("input:larger_subgrid")), input::larger_subgrid},
-		{input_description_from_config_token(config.token_from_path("input:left_click")), input::left_click},
-		{input_description_from_config_token(config.token_from_path("input:right_click")), input::right_click}
+		{{input_description::types::keyboard, SDL_SCANCODE_ESCAPE, 0}, input::escape}
 	};
+
+	auto add=[&](std::string _token, int _input_type) {
+
+		for(const auto desc : input_description_from_config_token(config.token_from_path(_token))) {
+
+			pairs.push_back({desc, _input_type});
+		}
+	};
+
+	add("input:left", input::left);
+
+	add("input:left", input::left);
+	add("input:right", input::right);
+	add("input:up", input::up);
+	add("input:down", input::down);
+	add("input:enter", input::enter);
+	add("input:space", input::space);
+	add("input:backspace", input::backspace);
+	add("input:tab", input::tab);
+	add("input:save", input::save);
+	add("input:load", input::load);
+	add("input:del", input::del);
+	add("input:insert", input::insert);
+	add("input:lctrl", input::lctrl);
+	add("input:lshift", input::lshift);
+	add("input:lalt", input::lalt);
+	add("input:help", input::help);
+	add("input:layer_settings", input::layer_settings);
+	add("input:map_properties", input::map_properties);
+	add("input:pageup", input::pageup);
+	add("input:pagedown", input::pagedown);
+	add("input:zoom_in", input::zoom_in);
+	add("input:zoom_out", input::zoom_out);
+	add("input:smaller_subgrid", input::smaller_subgrid);
+	add("input:larger_subgrid", input::larger_subgrid);
+	add("input:left_click", input::left_click);
+	add("input:right_click", input::right_click);
 
 	kernel.init_input_system(pairs);
 }

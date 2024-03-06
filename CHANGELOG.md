@@ -12,6 +12,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.5]: 2024-03-06
+### Added
+- Changes to adapt to dfw.
+
 ## [v1.1.4]: 2024-02-27
 ### Added
 - Changed help to reflect that "i" can be used to insert new stuff.

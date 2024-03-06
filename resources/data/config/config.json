@@ -11,33 +11,85 @@
 		"sound_volume":127
 	},
 	"input":{
-		"down":[0, 0, 81],
-		"left":[0, 0, 80],
-		"right":[0, 0, 79],
-		"up":[0, 0, 82],
-		"enter":[0, 0, 40],
-		"space":[0, 0, 44],
-		"backspace":[0, 0, 42],
-		"tab":[0, 0, 43],
-		"lctrl":[0, 0, 224],
-		"lshift":[0, 0, 225],
-		"lalt":[0, 0, 226],
-		"pageup":[0, 0, 75],
-		"pagedown":[0, 0, 78],
-		"help":[0,0, 58],
-		"map_properties":[0,0,59],
-		"layer_settings":[0,0,60],
-		"save":[0,0,22],
-		"load":[0,0,15],
-		"del":[0,0,76],
-		"insert":[0,0,73],
-		"insert_alt":[0,0,12],
-		"zoom_in":[0,0,87],
-		"zoom_out":[0,0,86],
-		"smaller_subgrid":[0,0,47],
-		"larger_subgrid":[0,0,48],
-		"left_click":[1,0,1],
-		"right_click":[1,0,3]
+		"down":[
+			{"type":0, "device":0, "code":81}
+		],
+		"left":[
+			{"type":0, "device":0, "code":80}
+		],
+		"right":[
+			{"type":0, "device":0, "code":79}
+		],
+		"up":[
+			{"type":0, "device":0, "code":82}
+		],
+		"enter":[
+			{"type":0, "device":0, "code":40}
+		],
+		"space":[
+			{"type":0, "device":0, "code":44}
+		],
+		"backspace":[
+			{"type":0, "device":0, "code":42}
+		],
+		"tab":[
+			{"type":0, "device":0, "code":43}
+		],
+		"lctrl":[
+			{"type":0, "device":0, "code":224}
+		],
+		"lshift":[
+			{"type":0, "device":0, "code":225}
+		],
+		"lalt":[
+			{"type":0, "device":0, "code":226}
+		],
+		"pageup":[
+			{"type":0, "device":0, "code":76}
+		],
+		"pagedown":[
+			{"type":0, "device":0, "code":78}
+		],
+		"help":[
+			{"type":0, "device":0, "code":58}
+		],
+		"map_properties":[
+			{"type":0, "device":0, "code":59}
+		],
+		"layer_settings":[
+			{"type":0, "device":0, "code":60}
+		],
+		"save":[
+			{"type":0, "device":0, "code":22}
+		],
+		"load":[
+			{"type":0, "device":0, "code":15}
+		],
+		"del":[
+			{"type":0, "device":0, "code":76}
+		],
+		"insert":[
+			{"type":0, "device":0, "code":73},
+			{"type":0, "device":0, "code":12}
+		],
+		"zoom_in":[
+			{"type":0, "device":0, "code":87}
+		],
+		"zoom_out":[
+			{"type":0, "device":0, "code":86}
+		],
+		"smaller_subgrid":[
+			{"type":0, "device":0, "code":47}
+		],
+		"larger_subgrid":[
+			{"type":0, "device":0, "code":48}
+		],
+		"left_click":[
+			{"type":1, "device":0, "code":1}
+		],
+		"right_click":[
+			{"type":1, "device":0, "code":3}
+		]
 	},
 	"meta":{
 		"v":1
