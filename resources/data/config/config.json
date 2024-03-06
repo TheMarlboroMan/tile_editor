@@ -45,7 +45,7 @@
 			{"type":0, "device":0, "code":226}
 		],
 		"pageup":[
-			{"type":0, "device":0, "code":76}
+			{"type":0, "device":0, "code":77}
 		],
 		"pagedown":[
 			{"type":0, "device":0, "code":78}
