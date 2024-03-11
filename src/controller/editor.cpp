@@ -1055,6 +1055,8 @@ void editor::draw_set(
 
 		bmp.set_invert_horizontal(node.flags & 1);
 		bmp.set_invert_vertical(node.flags & 2);
+		bmp.center_rotation_center();
+		bmp.set_rotation(node.get_rotation());
 
 		bmp.set_location({x, y, w, h});
 
@@ -1304,6 +1306,8 @@ void editor::draw_layer(
 		bmp.set_clip(sprite.box);
 		bmp.set_invert_horizontal(sprite.flags & 1);
 		bmp.set_invert_vertical(sprite.flags & 2);
+		bmp.center_rotation_center();
+		bmp.set_rotation(sprite.get_rotation());
 
 		bmp.draw(_screen, camera);
 	}
