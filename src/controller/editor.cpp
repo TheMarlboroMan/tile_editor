@@ -1326,7 +1326,6 @@ void editor::draw_layer(
 	box.set_alpha(_layer.alpha);
 	box.set_blend(ldv::representation::blends::alpha);
 
-
 	//Thing crosshair representations, marking the x,y of the thing.
 	ldv::line_representation vline({0,0},{0,0}, ldv::rgba8(0,0,0, 128)),
 		hline({0,0},{0,0}, ldv::rgba8(0,0,0, 128));
@@ -1345,9 +1344,11 @@ void editor::draw_layer(
 
 		auto origin=thing_origin_fn(thing.x, -thing.y, thing.w, thing.h);
 
+		int alpha=blend_alpha(_layer.alpha, thing.color.a);
+
 		box.set_filltype(ldv::polygon_representation::type::fill);
 		box.set_location({origin.x, origin.y, (unsigned)thing.w, (unsigned)thing.h});
-		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, blend_alpha(_layer.alpha, thing.color.a)));
+		box.set_color(ldv::rgba8(thing.color.r, thing.color.g, thing.color.b, alpha));
 		box.draw(_screen, camera);
 
 		//The crosshair indicates where the x and y in the map file reside.
