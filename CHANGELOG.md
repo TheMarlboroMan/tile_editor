@@ -12,6 +12,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.6]: 2024-03-06
+### Fixed
+- Allows negative numbers to be entered on numeric properties.
+
 ## [v1.1.5]: 2024-03-06
 ### Added
 - Changes to adapt to dfw.

@@ -125,7 +125,16 @@ void properties::input_traverse(dfw::input& _input) {
 
 		auto is_numeric=[](const SDL_Event& _event) -> bool {
 			try {
-				int val=std::stoi(_event.text.text);
+
+				const std::string str=_event.text.text;
+
+				//Allows idiot stuff like -134-23 but hey..
+				if(str=="-") {
+
+					return true;
+				}
+
+				int val=std::stoi(str);
 				return val >= 0 && val <= 9;
 			}
 			catch(std::invalid_argument&) {
@@ -145,7 +154,7 @@ void properties::input_traverse(dfw::input& _input) {
 			case option_types::decimal:
 				_input().set_text_filter([is_numeric](const SDL_Event& _event) -> bool {
 
-					std::string txt{_event.text.text}; //_event.text.text is const char *, with no ==
+					const std::string txt{_event.text.text}; //_event.text.text is const char *, with no ==
 					if(txt==".") {
 						return true;
 					}
