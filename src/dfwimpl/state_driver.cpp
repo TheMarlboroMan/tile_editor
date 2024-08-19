@@ -161,8 +161,10 @@ void state_driver::prepare_input(dfw::kernel& kernel) {
 	kernel.init_input_system(pairs);
 }
 
-void state_driver::prepare_resources(dfw::kernel& /*kernel*/) {
+void state_driver::prepare_resources(dfw::kernel& _kernel) {
 
+	auto& screen=_kernel.get_screen();
+	screen_titler.set_screen(&screen);
 /*
 	dfw::resource_loader r_loader(kernel.get_video_resource_manager(), kernel.get_audio_resource_manager());
 
@@ -192,6 +194,7 @@ void state_driver::register_controllers(dfw::kernel& _kernel) {
 			message_manager,
 			exchange_data,
 			env,
+			screen_titler,
 			screen_w,
 			screen_h
 		)

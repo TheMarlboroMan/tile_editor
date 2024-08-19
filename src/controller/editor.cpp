@@ -23,6 +23,7 @@
 #include <ldt/sat_2d.h>
 
 #include <algorithm>
+#include <sstream>
 
 using namespace controller;
 
@@ -32,6 +33,7 @@ editor::editor(
 	tools::message_manager& _message_manager,
 	tile_editor::exchange_data& _exchange_data,
 	const tile_editor::env& _env,
+	tile_editor::screen_titler& _screen_titler,
 	unsigned int _screen_w,
 	unsigned int _screen_h
 )
@@ -39,6 +41,7 @@ editor::editor(
 	ttf_manager(_ttf_manager),
 	message_manager{_message_manager},
 	exchange_data{_exchange_data},
+	screen_titler{_screen_titler},
 	cursor_tex{
 		ldv::texture{
 			ldv::image(
@@ -1672,6 +1675,10 @@ void editor::save_current() {
 	else {
 
 		message_manager.add("map saved");
+
+		std::stringstream ss;
+		ss<<"tile_editor v"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"-"<<BUILD_VERSION<<" : "<<current_filename;
+		screen_titler.set_title(ss.str());
 	}
 }
 
@@ -1692,6 +1699,11 @@ void editor::load_map(const std::string& _path) {
 	load_layer_toolset();
 
 	camera.center_on({-1, 1, 2, 2});
+
+	std::stringstream ss;
+
+	ss<<"tile_editor v"<<MAJOR_VERSION<<"."<<MINOR_VERSION<<"."<<PATCH_VERSION<<"-"<<BUILD_VERSION<<" : "<<current_filename;
+	screen_titler.set_title(ss.str());
 }
 
 void editor::load_session(const std::string& _path) {

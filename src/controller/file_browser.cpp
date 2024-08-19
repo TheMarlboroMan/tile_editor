@@ -244,12 +244,16 @@ void file_browser::input_navigation(dfw::input& _input) {
 		pager.cycle_item(decltype(pager)::dir::previous);
 		check_change=true;
 	}
-	else if(_input.is_input_down(input::pagedown)) {
+	else if(_input.is_input_down(input::pagedown)
+		|| _input.is_input_down(input::right)
+	) {
 
 		pager.turn_page(decltype(pager)::dir::next);
 		check_change=true;
 	}
-	else if(_input.is_input_down(input::pageup)) {
+	else if(_input.is_input_down(input::pageup)
+		|| _input.is_input_down(input::right)
+	) {
 
 		pager.turn_page(decltype(pager)::dir::previous);
 		check_change=true;

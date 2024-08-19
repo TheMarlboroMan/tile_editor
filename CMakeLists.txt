@@ -37,7 +37,7 @@ endif()
 #application version
 set(MAJOR_VERSION 1)
 set(MINOR_VERSION 1)
-set(PATCH_VERSION 6)
+set(PATCH_VERSION 7)
 set(BUILD_VERSION "\"${BUILD_VERSION}\"") #add some quotes to pacify the macro preprocessor
 
 if(${CMAKE_VERSION} VERSION_LESS "3.22.0")

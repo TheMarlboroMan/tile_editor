@@ -5,6 +5,7 @@
 #include "tools/message_manager.h"
 #include "app/exchange_data.h"
 #include "app/env.h"
+#include "app/screen_titler.h"
 #include "blueprint_types/map_blueprint.h"
 #include "blueprint_types/grid_data.h"
 #include "editor_types/map.h"
@@ -28,7 +29,16 @@ class editor:
 
 	public:
 
-								editor(lm::logger&, ldtools::ttf_manager&, tools::message_manager&, tile_editor::exchange_data&, const tile_editor::env&, unsigned int, unsigned int);
+								editor(
+									lm::logger&, 
+									ldtools::ttf_manager&, 
+									tools::message_manager&, 
+									tile_editor::exchange_data&, 
+									const tile_editor::env&, 
+									tile_editor::screen_titler&, 
+									unsigned int, 
+									unsigned int
+								);
 	virtual void 				loop(dfw::input&, const dfw::loop_iteration_data&);
 	virtual void 				draw(ldv::screen&, int);
 	virtual void 				awake(dfw::input& /*input*/);
@@ -129,6 +139,7 @@ class editor:
 	ldtools::ttf_manager&       ttf_manager;
 	tools::message_manager&     message_manager;
 	tile_editor::exchange_data& exchange_data;
+	tile_editor::screen_titler& screen_titler;
 
 	//TODO: These should likely go somewhere else...
 	ldv::texture                cursor_tex;

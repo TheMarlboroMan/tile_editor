@@ -16,6 +16,7 @@ set(SOURCE
 	${CMAKE_CURRENT_SOURCE_DIR}/map_serializer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/set_layer_loader.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/entity_inflator.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/screen_titler.cpp
 	PARENT_SCOPE
 )
 

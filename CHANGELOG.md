@@ -12,6 +12,12 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+
+## [v1.1.7]: 2024-08-19
+### Added
+- Added left/right for file browser as alternatives to pageup/down.
+- Window name now includes filename
+
 ## [v1.1.6]: 2024-03-06
 ### Fixed
 - Allows negative numbers to be entered on numeric properties.
