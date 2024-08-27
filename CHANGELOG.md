@@ -12,6 +12,11 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.8]: 2024-08-27
+### Fixed
+- Property indexes are now correct when browsing them.
+### Changed
+- Properties now appear in the order they are declared.
 
 ## [v1.1.7]: 2024-08-19
 ### Added

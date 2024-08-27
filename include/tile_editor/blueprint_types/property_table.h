@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace tile_editor {
 
@@ -19,6 +20,8 @@ struct property_table {
 	std::map<std::string, property_definition<int>>         int_properties;
 	std::map<std::string, property_definition<double>>      double_properties;
 	std::map<std::string, property_definition<std::string>> string_properties;
+	//Vector of names AS THEY appear declared in the config files.
+	std::vector<std::string>                                property_names;
 };
 
 }

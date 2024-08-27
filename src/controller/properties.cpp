@@ -6,6 +6,8 @@
 #include <ldv/ttf_representation.h>
 #include <ldv/box_representation.h>
 
+#include <algorithm>
+
 using namespace controller;
 
 properties::properties(
@@ -37,7 +39,9 @@ void properties::awake(dfw::input& /*input*/) {
 	auto add=[this](const auto& _props, option_types _type) {
 
 		for(const auto& pair : _props) {
+
 			lookup.push_back({_type, pair.first});
+			lm::log(log).info()<<"lookup added: "<<pair.first<<std::endl;
 		}
 	};
 
@@ -45,6 +49,32 @@ void properties::awake(dfw::input& /*input*/) {
 	add(property_manager->string_properties, option_types::str);
 	add(property_manager->int_properties, option_types::integer);
 	add(property_manager->double_properties, option_types::decimal);
+
+	lm::log(log).info()<<"lookup size: "<<lookup.size()<<std::endl;
+
+	//Now we could sort them by key, I guess... TODO: But that is bull,
+	//what we would really want is for them to appear in the SAME ORDER.
+	const auto& names=blueprint->property_names;
+	
+	std::sort(
+		std::begin(lookup),
+		std::end(lookup),
+		[&names](const auto& _a, const auto& _b) {
+
+			auto a_it=std::distance(
+					std::begin(names),
+					std::find(names.begin(), names.end(), _a.key)
+				);
+			auto b_it=std::distance(
+					std::begin(names),
+					std::find(names.begin(), names.end(), _b.key)
+				);
+
+			return a_it < b_it;
+			//TODO: We could configure a "name" order...
+			//return _a.key < _b.key;
+		}
+	);
 
 	current_index=0;
 	exit_index=lookup.size();
@@ -242,7 +272,7 @@ void properties::request_draw(
 
 void properties::draw(ldv::screen& _screen, int /*fps*/) {
 
-	properties::printer pr{current_index, cancel_index, current_value, text_mode, std::stringstream{}};
+	properties::printer pr{current_index, cancel_index+1, current_value, text_mode, std::stringstream{}};
 
 	if(current_index==exit_index) {
 		pr.special("exit");

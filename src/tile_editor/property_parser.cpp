@@ -102,6 +102,7 @@ void property_parser::read(
 	if(propmap["type"]=="int") {
 
 		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.int_properties);
+		_table.property_names.push_back(propmap["name"]);
 	}
 	else if(propmap["type"]=="string") {
 
@@ -111,6 +112,7 @@ void property_parser::read(
 		}
 
 		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.string_properties);
+		_table.property_names.push_back(propmap["name"]);
 	}
 	else if(propmap["type"]=="double") {
 
@@ -120,6 +122,7 @@ void property_parser::read(
 		}
 
 		insert(propmap["name"], propmap["default"], propmap["comment"], linked_to, _table.double_properties);
+		_table.property_names.push_back(propmap["name"]);
 	}
 	else {
 

@@ -252,7 +252,7 @@ void file_browser::input_navigation(dfw::input& _input) {
 		check_change=true;
 	}
 	else if(_input.is_input_down(input::pageup)
-		|| _input.is_input_down(input::right)
+		|| _input.is_input_down(input::left)
 	) {
 
 		pager.turn_page(decltype(pager)::dir::previous);

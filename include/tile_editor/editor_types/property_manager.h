@@ -14,7 +14,6 @@ struct property_manager {
 	std::map<std::string, int>          int_properties;
 	std::map<std::string, double>       double_properties;
 	std::map<std::string, std::string>  string_properties;
-
 };
 
 }
