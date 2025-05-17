@@ -120,17 +120,31 @@ void properties::input_traverse(dfw::input& _input) {
 		return;
 	}
 
+	//Next
 	if(_input.is_input_down(input::down)) {
+
+		//Allow wrap...
 		if(current_index < cancel_index) {
 			++current_index;
 		}
+		else {
+
+			current_index=0;
+		}
 		return;
 	}
+	//Prev...
 	else if(_input.is_input_down(input::up)) {
 
-		if(current_index > 0) {
+		if(current_index == 0) {
+
+			current_index=cancel_index;
+		}
+		else {
+
 			--current_index;
 		}
+
 		return;
 	}
 

@@ -20,7 +20,7 @@ thing_editor_properties::thing_editor_properties(
 
 	std::vector<int> intsets{};
 
-	menu.set_wrap(false);
+	menu.set_wrap(true);
 	menu.insert(menu_layer_id, "");
 	menu.insert(menu_layer_alpha, 0, 0, 255, false);
 	menu.insert(menu_layer_set, intsets, true);

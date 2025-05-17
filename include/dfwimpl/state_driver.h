@@ -33,12 +33,12 @@ class state_driver:
 									state_driver(dfw::kernel& kernel, dfwimpl::config& config, const tile_editor::env&);
 
 	virtual void                    init(dfw::kernel&);
-	virtual void					common_pre_loop_input(dfw::input& input, float delta);
-	virtual void					common_pre_loop_step(float delta);
-	virtual void					common_loop_input(dfw::input& input, float delta);
-	virtual void					common_loop_step(float delta);
+	virtual void					common_pre_loop_input(dfw::input& input, ldtools::tdelta delta);
+	virtual void					common_pre_loop_step(ldtools::tdelta delta);
+	virtual void					common_loop_input(dfw::input& input, ldtools::tdelta delta);
+	virtual void					common_loop_step(ldtools::tdelta delta);
 	virtual void					prepare_state(int, int);
-	virtual float					get_max_timestep() const {return 0.03f;}
+	virtual ldtools::tdelta			get_max_timestep() const {return 0.03;}
 
 	private:
 

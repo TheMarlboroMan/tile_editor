@@ -24,7 +24,7 @@ layer_selector::layer_selector(
 	message_manager{_message_manager},
 	exchange_data{_exchange_data}{
 
-	new_layer_menu.set_wrap(false);
+	new_layer_menu.set_wrap(true);
 	std::vector<int> types{tile, thing, poly};
 
 	new_layer_menu.insert(menu_layer_type, types, true);

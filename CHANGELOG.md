@@ -12,6 +12,11 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.9]: 2025-05-17
+### Changed
+- Allow looping on thing properties.
+- Adapt to changes in libraries.
+
 ## [v1.1.8]: 2024-08-27
 ### Fixed
 - Property indexes are now correct when browsing them.
