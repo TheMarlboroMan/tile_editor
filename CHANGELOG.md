@@ -12,6 +12,10 @@ Changes will be documented under Added, Changed, Deprecated, Removed, Fixed or S
 ### Pending
 - Confirm before exiting?
 
+## [v1.1.10]: 2025-06-01
+### Fixed
+- Left alt (to snap to grid) works with different zoom levels now.
+
 ## [v1.1.9]: 2025-05-17
 ### Changed
 - Allow looping on thing properties.

@@ -46,6 +46,8 @@ void properties::awake(dfw::input& /*input*/) {
 	};
 
 	lookup.clear();
+
+	//TODO: Please, make them appear in the same order instead of this!!!
 	add(property_manager->string_properties, option_types::str);
 	add(property_manager->int_properties, option_types::integer);
 	add(property_manager->double_properties, option_types::decimal);

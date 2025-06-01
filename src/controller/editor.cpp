@@ -261,6 +261,7 @@ void editor::loop(dfw::input& _input, const dfw::loop_iteration_data& /*_lid*/) 
 		} dispatcher;
 
 		if(dispatch_layer(dispatcher) && dispatcher.snappable) {
+
 			mouse_pos=snap_to_grid(mouse_pos);
 		}
 	}
@@ -2031,11 +2032,13 @@ bool editor::dispatch_layer(tile_editor::layer_visitor& _dispatcher) {
 
 editor::editor_point editor::snap_to_grid(editor_point _point) const {
 
+	auto zoom=camera.get_zoom();
+	
 	double  x=_point.x,
 	        y=_point.y,
-	        factor=subgrid_factor,
-	        offset_x=fmod(camera.get_x(), factor),
-	        offset_y=fmod(camera.get_y(), factor);
+	        factor=subgrid_factor*zoom,
+	        offset_x=fmod(camera.get_x(), factor)*zoom,
+	        offset_y=fmod(camera.get_y(), factor)*zoom;
 
 	int px=(round(x / factor) * factor)-offset_x;
 	int py=(round(y / factor) * factor)-offset_y;
